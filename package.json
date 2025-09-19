@@ -1,0 +1,44 @@
+{
+  "name": "glintz-monorepo",
+  "version": "1.0.0",
+  "description": "Glintz - Mobile-first travel discovery app with swipe-based hotel browsing",
+  "private": true,
+  "scripts": {
+    "setup-ios": "./setup-ios.sh",
+    "install:all": "cd api && npm install && cd ../app && npm install",
+    "dev": "concurrently \"cd api && npm run dev\" \"cd app && npm start\"",
+    "dev:api": "cd api && npm run dev",
+    "dev:app": "cd app && npm start",
+    "build:api": "cd api && npm run build",
+    "build:ios": "cd app && expo build:ios",
+    "ios": "cd app && npm run ios",
+    "ios:device": "cd app && expo run:ios --device",
+    "clean": "cd api && rm -rf node_modules dist && cd ../app && rm -rf node_modules .expo",
+    "clean:ios": "cd app && expo r -c && rm -rf ios/build",
+    "setup": "./setup-ios.sh"
+  },
+  "keywords": [
+    "travel",
+    "hotels",
+    "mobile",
+    "react-native",
+    "expo",
+    "amadeus",
+    "swipe",
+    "discovery"
+  ],
+  "author": "Glintz Team",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-preset-expo": "^54.0.2",
+    "concurrently": "^8.2.2"
+  },
+  "workspaces": [
+    "api",
+    "app"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "glintz-api",
+  "version": "1.0.0",
+  "description": "Amadeus API proxy for Glintz travel app",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon",
+    "seed-supabase": "tsc --skipLibCheck && node -e \"const{AmadeusClient}=require('./dist/amadeus');const{DatabaseService}=require('./dist/database');require('dotenv').config();(async()=>{try{console.log('🏨 Generating hotels...');const amadeus=new AmadeusClient();const hotels=await amadeus.seedHotelsFromCities();console.log('💾 Saving to Supabase...');const db=new DatabaseService();await db.initializeTables();await db.storeHotels(hotels);console.log('✅ Success! Saved',hotels.length,'hotels with photos');}catch(e){console.error('❌ Error:',e.message);}})();\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "amadeus",
+    "travel",
+    "api",
+    "proxy"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "axios": "^1.12.2",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "node-cache": "^5.1.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/crypto-js": "^4.2.2",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.5.2",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
