@@ -1,0 +1,27 @@
+{
+  "currentStatus": {
+    "totalHotels": 27,
+    "targetProgress": 1.8,
+    "remainingHotels": 1473
+  },
+  "processStatus": {
+    "isRunning": true,
+    "processId": 56381,
+    "logFile": "/Users/ala/tindertravel/api/hotel-fetching.log",
+    "lastActivity": "⚠️  No offers for hotel YXNYCVNY"
+  },
+  "apiStatus": {
+    "amadeus": true,
+    "supabase": true,
+    "googlePlaces": false
+  },
+  "recentActivity": {
+    "newHotelsLast10Min": 0,
+    "averageRate": 0,
+    "eta": "Calculating..."
+  },
+  "recommendations": [
+    "⚠️ Google Places API key not configured - photos may be limited",
+    "🚀 Consider running global fetcher for faster initial population"
+  ]
+}
