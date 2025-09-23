@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon",
     "seed": "npm run build && node -e \"console.log('🏨 Seeding hotels via API endpoint. Use POST /api/seed')\"",
+    "refresh-coordinates": "npm run build && node dist/refresh-coordinates.js",
     "test": "echo \"Tests will be added in future versions\"",
     "clean": "rm -rf dist *.log"
   },

@@ -95,4 +95,15 @@ export class SupabaseService {
       throw new Error(`Failed to clear hotels: ${error.message}`);
     }
   }
+
+  async updateHotelCoordinates(id: string, coords: { lat: number; lng: number }): Promise<void> {
+    const { error } = await supabase
+      .from('hotels')
+      .update({ coords })
+      .eq('id', id);
+
+    if (error) {
+      throw new Error(`Failed to update hotel coordinates: ${error.message}`);
+    }
+  }
 } 
