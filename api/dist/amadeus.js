@@ -1081,15 +1081,39 @@ class AmadeusClient {
             }
             // Create booking URL (placeholder for now)
             const bookingUrl = `https://booking.example.com/hotel/${offer.hotel.hotelId}`;
+            // CRITICAL FIX: Proper coordinate validation and Google Places lookup
+            let hotelCoords;
+            // Check if Amadeus provides valid coordinates
+            if (offer.hotel.latitude && offer.hotel.longitude &&
+                offer.hotel.latitude !== 0 && offer.hotel.longitude !== 0 &&
+                Math.abs(offer.hotel.latitude) <= 90 && Math.abs(offer.hotel.longitude) <= 180) {
+                // Validate coordinates are not just city center
+                const distanceFromCityCenter = this.calculateDistance(offer.hotel.latitude, offer.hotel.longitude, city.coords.lat, city.coords.lng);
+                // If coordinates are more than 100m from city center, they're likely accurate
+                if (distanceFromCityCenter > 0.1) {
+                    hotelCoords = {
+                        lat: offer.hotel.latitude,
+                        lng: offer.hotel.longitude
+                    };
+                    console.log(`✅ Using Amadeus coordinates for ${offer.hotel.name}: ${offer.hotel.latitude}, ${offer.hotel.longitude}`);
+                }
+                else {
+                    // Too close to city center, likely inaccurate - use Google Places lookup
+                    console.warn(`⚠️ Amadeus coordinates too close to city center for ${offer.hotel.name}, using Google Places lookup`);
+                    hotelCoords = await this.getAccurateHotelCoordinates(offer.hotel.name, city);
+                }
+            }
+            else {
+                // No valid coordinates from Amadeus - use Google Places lookup
+                console.warn(`⚠️ No valid Amadeus coordinates for ${offer.hotel.name}, using Google Places lookup`);
+                hotelCoords = await this.getAccurateHotelCoordinates(offer.hotel.name, city);
+            }
             return {
                 id: offer.hotel.hotelId,
                 name: offer.hotel.name || content?.name || 'Beautiful Hotel',
                 city: city.name,
                 country: this.getCountryName(city.countryCode),
-                coords: offer.hotel.latitude && offer.hotel.longitude ? {
-                    lat: offer.hotel.latitude,
-                    lng: offer.hotel.longitude
-                } : city.coords,
+                coords: hotelCoords,
                 price: offer.offers[0] ? {
                     amount: offer.offers[0].price.total,
                     currency: offer.offers[0].price.currency
@@ -1412,6 +1436,50 @@ class AmadeusClient {
             return rotatedPhotos;
         }
         return cityPhotos;
+    }
+    /**
+     * Calculate distance between two coordinates in kilometers
+     */
+    calculateDistance(lat1, lng1, lat2, lng2) {
+        const R = 6371; // Earth's radius in kilometers
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+    /**
+     * Get accurate hotel coordinates using Google Places API
+     */
+    async getAccurateHotelCoordinates(hotelName, city) {
+        try {
+            const googlePlacesApiKey = process.env.GOOGLE_PLACES_API_KEY || 'AIzaSyBh4W1feHK_zB7uiIx0VIkllOpy8ClnSk8';
+            // Search for the hotel using Google Places Text Search
+            const searchQuery = `${hotelName} hotel ${city.name}`;
+            const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${googlePlacesApiKey}`;
+            const response = await this.client.get(searchUrl);
+            if (response.data.results && response.data.results.length > 0) {
+                const place = response.data.results[0];
+                // Validate the result is actually a hotel/lodging
+                const types = place.types || [];
+                const isHotel = types.some((type) => ['lodging', 'establishment', 'point_of_interest'].includes(type));
+                if (isHotel && place.geometry && place.geometry.location) {
+                    console.log(`✅ Found accurate coordinates for ${hotelName}: ${place.geometry.location.lat}, ${place.geometry.location.lng}`);
+                    return {
+                        lat: place.geometry.location.lat,
+                        lng: place.geometry.location.lng
+                    };
+                }
+            }
+            console.warn(`⚠️ Could not find accurate coordinates for ${hotelName}, using city center as fallback`);
+            return city.coords;
+        }
+        catch (error) {
+            console.error(`❌ Error fetching coordinates for ${hotelName}:`, error);
+            return city.coords;
+        }
     }
 }
 exports.AmadeusClient = AmadeusClient;

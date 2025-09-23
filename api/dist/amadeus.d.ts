@@ -76,5 +76,13 @@ export declare class AmadeusClient {
      * Get curated real hotel photos by city and hotel name
      */
     private getCuratedRealHotelPhotos;
+    /**
+     * Calculate distance between two coordinates in kilometers
+     */
+    private calculateDistance;
+    /**
+     * Get accurate hotel coordinates using Google Places API
+     */
+    private getAccurateHotelCoordinates;
 }
 //# sourceMappingURL=amadeus.d.ts.map

@@ -62,6 +62,15 @@ class SupabaseService {
             throw new Error(`Failed to clear hotels: ${error.message}`);
         }
     }
+    async updateHotelCoordinates(id, coords) {
+        const { error } = await exports.supabase
+            .from('hotels')
+            .update({ coords })
+            .eq('id', id);
+        if (error) {
+            throw new Error(`Failed to update hotel coordinates: ${error.message}`);
+        }
+    }
 }
 exports.SupabaseService = SupabaseService;
 //# sourceMappingURL=supabase.js.map

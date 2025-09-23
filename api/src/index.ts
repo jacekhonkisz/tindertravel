@@ -9,6 +9,8 @@ import { SupabaseService } from './supabase';
 import { HotelCard, PersonalizationData } from './types';
 import { glintzCurate, RawHotel } from './curation';
 import { SupabaseHotel } from './supabase';
+import { HotelDiscoveryController } from './hotel-discovery-controller';
+import { PhotoQualityAuditor } from './photo-quality-auditor';
 
 // Load environment variables
 dotenv.config();
@@ -51,6 +53,13 @@ try {
 } catch (error) {
   console.error('Failed to initialize Supabase service:', error);
 }
+
+// Initialize Hotel Discovery Controller
+
+// Initialize Photo Quality Auditor
+const photoAuditor = new PhotoQualityAuditor();
+
+const discoveryController = new HotelDiscoveryController();
 
 // CORS configuration - Allow all origins for development
 app.use(cors({
@@ -1163,6 +1172,184 @@ app.use((error: Error, req: express.Request, res: express.Response, next: expres
   });
 });
 
+// ==================== HOTEL DISCOVERY ENDPOINTS ====================
+
+// Start global hotel discovery
+app.post('/api/discovery/start', async (req, res) => {
+  try {
+    const config = req.body;
+    
+    // Validate configuration
+    const validation = discoveryController.validateConfig(config);
+    if (!validation.valid) {
+      return res.status(400).json({
+        error: 'Invalid configuration',
+        errors: validation.errors
+      });
+    }
+
+    const sessionId = await discoveryController.startDiscovery(config);
+    
+    res.json({
+      success: true,
+      sessionId,
+      message: 'Hotel discovery started successfully',
+      config
+    });
+  } catch (error) {
+    console.error('Failed to start discovery:', error);
+    res.status(500).json({
+      error: 'Failed to start discovery',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Stop current discovery session
+app.post('/api/discovery/stop', async (req, res) => {
+  try {
+    const stopped = await discoveryController.stopDiscovery();
+    
+    if (stopped) {
+      res.json({
+        success: true,
+        message: 'Discovery session stopped successfully'
+      });
+    } else {
+      res.status(400).json({
+        error: 'No active discovery session to stop'
+      });
+    }
+  } catch (error) {
+    console.error('Failed to stop discovery:', error);
+    res.status(500).json({
+      error: 'Failed to stop discovery',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Get current discovery status
+app.get('/api/discovery/status', async (req, res) => {
+  try {
+    const currentSession = discoveryController.getCurrentSession();
+    const liveProgress = discoveryController.getLiveProgress();
+    const stats = await discoveryController.getDiscoveryStats();
+    
+    res.json({
+      currentSession,
+      liveProgress,
+      stats,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to get discovery status:', error);
+    res.status(500).json({
+      error: 'Failed to get discovery status',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Get all discovery sessions
+app.get('/api/discovery/sessions', async (req, res) => {
+  try {
+    const sessions = discoveryController.getAllSessions();
+    
+    res.json({
+      sessions,
+      total: sessions.length,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to get sessions:', error);
+    res.status(500).json({
+      error: 'Failed to get sessions',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Get specific session details
+app.get('/api/discovery/sessions/:sessionId', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const session = discoveryController.getSession(sessionId);
+    
+    if (!session) {
+      return res.status(404).json({
+        error: 'Session not found',
+        sessionId
+      });
+    }
+    
+    res.json({
+      session,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to get session:', error);
+    res.status(500).json({
+      error: 'Failed to get session',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Get recommended configuration
+app.get('/api/discovery/config/recommended', async (req, res) => {
+  try {
+    const config = await discoveryController.getRecommendedConfig();
+    
+    res.json({
+      config,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to get recommended config:', error);
+    res.status(500).json({
+      error: 'Failed to get recommended config',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Validate configuration
+app.post('/api/discovery/config/validate', async (req, res) => {
+  try {
+    const config = req.body;
+    const validation = discoveryController.validateConfig(config);
+    
+    res.json({
+      valid: validation.valid,
+      errors: validation.errors,
+      config
+    });
+  } catch (error) {
+    console.error('Failed to validate config:', error);
+    res.status(500).json({
+      error: 'Failed to validate config',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Export session results
+app.get('/api/discovery/sessions/:sessionId/export', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const results = await discoveryController.exportResults(sessionId);
+    
+    res.json(results);
+  } catch (error) {
+    console.error('Failed to export results:', error);
+    res.status(500).json({
+      error: 'Failed to export results',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
@@ -1189,4 +1376,94 @@ app.listen(port, () => {
   });
 });
 
-export default app; 
+export default app;
+
+// ==================== ENHANCED GLOBAL HOTEL DISCOVERY ====================
+
+import { EnhancedGlobalHotelDiscovery } from './enhanced-global-hotel-discovery';
+
+// Initialize Enhanced Discovery
+const enhancedDiscovery = new EnhancedGlobalHotelDiscovery();
+
+// Start enhanced global hotel discovery
+app.post('/api/discovery/enhanced', async (req, res) => {
+  try {
+    const { targetCount = 1000 } = req.body;
+    
+    console.log(`🌍 Starting Enhanced Global Hotel Discovery for ${targetCount} hotels...`);
+    
+    // Start the discovery process (non-blocking)
+    enhancedDiscovery.discoverGlobalHotels(targetCount).catch(error => {
+      console.error('Enhanced discovery failed:', error);
+    });
+    
+    res.json({
+      success: true,
+      message: `Enhanced global hotel discovery started`,
+      targetCount,
+      strategies: [
+        'Luxury Hotel Brands',
+        'Unique Property Types', 
+        'Destination Types',
+        'Exotic Locations',
+        'Hidden Gems',
+        'UNESCO & Natural Wonders',
+        'Systematic Regional Coverage'
+      ]
+    });
+    
+  } catch (error) {
+    console.error('Failed to start enhanced discovery:', error);
+    res.status(500).json({
+      error: 'Failed to start enhanced discovery',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+
+// ==================== TARGETED LUXURY DISCOVERY ====================
+
+import { TargetedLuxuryDiscovery } from './targeted-luxury-discovery';
+
+// Initialize Targeted Discovery
+const targetedDiscovery = new TargetedLuxuryDiscovery();
+
+// Start targeted luxury hotel discovery for under-represented destinations
+app.post('/api/discovery/targeted-luxury', async (req, res) => {
+  try {
+    console.log('🎯 Starting Targeted Luxury Discovery for under-represented destinations...');
+    
+    // Start the discovery process (non-blocking)
+    targetedDiscovery.discoverTargetedLuxuryHotels().catch(error => {
+      console.error('Targeted luxury discovery failed:', error);
+    });
+    
+    res.json({
+      success: true,
+      message: 'Targeted luxury hotel discovery started',
+      focus: 'Under-represented and missing luxury destinations',
+      criteria: {
+        photoRequirement: 'Minimum 4 high-quality photos (1200x800+)',
+        luxuryFilters: 'Boutique, luxury, premium, exclusive properties only',
+        ratingMinimum: '4.0+ stars',
+        sources: 'Amadeus + Google Places hybrid system'
+      },
+      targets: [
+        'Major Urban Luxury: NYC, London, Paris, Singapore, Hong Kong',
+        'Alpine Luxury: St. Moritz, Courchevel, Zermatt',
+        'Caribbean Paradise: St. Barts, Barbados, Turks & Caicos',
+        'Cultural Heritage: Machu Picchu, Petra',
+        'Under-represented: Rome, Tokyo, Dubai (expansion)'
+      ]
+    });
+    
+  } catch (error) {
+    console.error('Failed to start targeted luxury discovery:', error);
+    res.status(500).json({
+      error: 'Failed to start targeted luxury discovery',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+

@@ -27,5 +27,9 @@ export declare class SupabaseService {
     getHotelById(id: string): Promise<SupabaseHotel | null>;
     getHotelCount(): Promise<number>;
     clearHotels(): Promise<void>;
+    updateHotelCoordinates(id: string, coords: {
+        lat: number;
+        lng: number;
+    }): Promise<void>;
 }
 //# sourceMappingURL=supabase.d.ts.map

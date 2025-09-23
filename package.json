@@ -20,7 +20,8 @@
     "clean:app": "cd app && rm -rf node_modules .expo",
     "clean:ios": "cd app && expo r -c && rm -rf ios/build",
     "test": "echo \"Tests will be added in future versions\"",
-    "lint": "echo \"Linting will be added in future versions\""
+    "lint": "echo \"Linting will be added in future versions\"",
+    "android": "expo run:android"
   },
   "keywords": [
     "travel",
@@ -36,6 +37,7 @@
   "author": "Glintz Team",
   "license": "MIT",
   "devDependencies": {
+    "@react-native-community/cli": "^20.0.2",
     "concurrently": "^8.2.2"
   },
   "workspaces": [
@@ -49,5 +51,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/glintz/travel-app"
+  },
+  "dependencies": {
+    "expo": "~54.0.9",
+    "react": "19.1.0",
+    "react-native": "0.81.4"
   }
-} 
+}

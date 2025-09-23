@@ -69,7 +69,7 @@ export interface HotelCard {
     amenityTags: string[];
     photos: string[];
     heroPhoto: string;
-    bookingUrl: string;
+    bookingUrl?: string;
     rating?: number;
 }
 export interface PersonalizationData {
