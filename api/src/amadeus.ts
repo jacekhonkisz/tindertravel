@@ -3,6 +3,7 @@ import NodeCache from 'node-cache';
 import { AmadeusTokenResponse, AmadeusHotelOffer, AmadeusHotelContent, HotelCard, SeedCity } from './types';
 import { HotellookClient } from './hotellook';
 import { GooglePlacesClient } from './google-places';
+import { enhancedHotelGenerator, HotelCharacteristics } from './enhanced-hotel-generator';
 
 export interface CuratedHotel {
   name: string;
@@ -46,8 +47,8 @@ export class AmadeusClient {
       coords: { lat: -8.4095, lng: 115.1889 },
       category: "luxury",
       priceRange: { min: 600, max: 1500, currency: "USD" },
-      description: "Clifftop resort with infinity pools overlooking the Lombok Strait and sacred Mount Agung",
-      amenityTags: ["infinity-pool", "spa", "ocean-view", "private-beach", "wellness", "cultural-immersion"],
+      description: "",
+      amenityTags: ['infinity-pool', 'spa-sanctuary', 'private-beach', 'fine-dining', 'butler-service', 'ocean-views'],
       website: "https://www.aman.com/resorts/amankila",
       bookingPartners: ["aman.com", "booking.com"]
     },
@@ -60,7 +61,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 800, max: 2000, currency: "USD" },
       description: "Overwater villas and clifftop pavilions with panoramic views of Phang Nga Bay",
-      amenityTags: ["overwater-villa", "infinity-pool", "spa-sanctuary", "private-beach", "yoga-pavilion", "diving-center"],
+      amenityTags: [],
       website: "https://www.sixsenses.com/en/resorts/yao-noi",
       bookingPartners: ["sixsenses.com", "booking.com"]
     },
@@ -73,7 +74,7 @@ export class AmadeusClient {
       category: "luxury", 
       priceRange: { min: 400, max: 800, currency: "USD" },
       description: "Beachfront resort with private white sand beach and tropical gardens",
-      amenityTags: ["private-beach", "infinity-pool", "spa", "sunset-views", "water-sports", "fine-dining"],
+      amenityTags: [],
       website: "https://www.shangri-la.com/boracay",
       bookingPartners: ["shangri-la.com", "booking.com"]
     },
@@ -88,7 +89,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 1000, max: 3000, currency: "USD" },
       description: "Oceanfront resort with volcanic black rock pools and views of neighboring islands",
-      amenityTags: ["infinity-pool", "private-beach", "spa", "ocean-view", "fine-dining", "cultural-immersion"],
+      amenityTags: [],
       website: "https://www.fourseasons.com/maui",
       bookingPartners: ["fourseasons.com", "booking.com"]
     },
@@ -101,7 +102,7 @@ export class AmadeusClient {
       category: "unique",
       priceRange: { min: 800, max: 1500, currency: "USD" },
       description: "All-inclusive lodge with panoramic views of Torres del Paine National Park",
-      amenityTags: ["mountain-view", "national-park", "adventure-sports", "wildlife-sanctuary", "spa", "fine-dining"],
+      amenityTags: [],
       website: "https://www.explora.com/hotels-and-travesias/patagonia",
       bookingPartners: ["explora.com", "booking.com"]
     },
@@ -113,8 +114,8 @@ export class AmadeusClient {
       coords: { lat: -25.6953, lng: -54.4367 },
       category: "heritage",
       priceRange: { min: 500, max: 1000, currency: "USD" },
-      description: "Historic hotel inside Iguazu National Park with exclusive waterfall access",
-      amenityTags: ["waterfall", "national-park", "historic", "spa", "fine-dining", "wildlife-sanctuary"],
+      description: "",
+      amenityTags: [],
       website: "https://www.belmond.com/hotels/south-america/brazil/iguazu-falls/belmond-hotel-das-cataratas",
       bookingPartners: ["belmond.com", "booking.com"]
     },
@@ -129,7 +130,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 2000, max: 5000, currency: "USD" },
       description: "Edwardian manor house overlooking the endless Serengeti plains",
-      amenityTags: ["safari-view", "infinity-pool", "spa", "wildlife-sanctuary", "fine-dining", "butler-service"],
+      amenityTags: [],
       website: "https://www.singita.com/lodge/sasakwa-lodge",
       bookingPartners: ["singita.com", "booking.com"]
     },
@@ -142,7 +143,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 1500, max: 3000, currency: "USD" },
       description: "Ultra-luxury safari lodge with private pools and Big Five game viewing",
-      amenityTags: ["safari-view", "private-pool", "spa", "wildlife-sanctuary", "fine-dining", "butler-service"],
+      amenityTags: [],
       website: "https://www.royalmalewane.com",
       bookingPartners: ["royalmalewane.com", "booking.com"]
     },
@@ -154,8 +155,8 @@ export class AmadeusClient {
       coords: { lat: -4.3833, lng: 55.6667 },
       category: "luxury",
       priceRange: { min: 3000, max: 8000, currency: "USD" },
-      description: "Private island resort with pristine beaches and conservation focus",
-      amenityTags: ["private-island", "private-beach", "spa", "ocean-view", "fine-dining", "marine-reserve"],
+      description: "",
+      amenityTags: ['private-island', 'conservation-focus', 'pristine-beaches', 'luxury-villas', 'spa-sanctuary', 'fine-dining'],
       website: "https://www.north-island.com",
       bookingPartners: ["north-island.com", "booking.com"]
     },
@@ -170,7 +171,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 800, max: 2000, currency: "USD" },
       description: "Desert oasis with private pools and Arabian oryx sanctuary",
-      amenityTags: ["desert-view", "private-pool", "spa", "wildlife-sanctuary", "fine-dining", "butler-service"],
+      amenityTags: [],
       website: "https://www.al-maha.com",
       bookingPartners: ["al-maha.com", "booking.com"]
     },
@@ -183,7 +184,7 @@ export class AmadeusClient {
       category: "unique",
       priceRange: { min: 200, max: 400, currency: "USD" },
       description: "Solar-powered desert lodge with star-gazing and Bedouin culture",
-      amenityTags: ["desert-view", "star-gazing", "eco-lodge", "cultural-immersion", "adventure-sports", "wellness"],
+      amenityTags: [],
       website: "https://www.feynan.com",
       bookingPartners: ["feynan.com", "booking.com"]
     },
@@ -198,7 +199,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 1000, max: 2500, currency: "AUD" },
       description: "Adults-only resort overlooking the Great Barrier Reef",
-      amenityTags: ["reef-access", "infinity-pool", "spa", "ocean-view", "fine-dining", "adults-only"],
+      amenityTags: [],
       website: "https://www.qualia.com.au",
       bookingPartners: ["qualia.com.au", "booking.com"]
     },
@@ -211,7 +212,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 2000, max: 5000, currency: "USD" },
       description: "Eco-luxury resort on Marlon Brando's private island",
-      amenityTags: ["private-island", "overwater-villa", "lagoon-access", "spa", "fine-dining", "marine-reserve"],
+      amenityTags: [],
       website: "https://www.thebrando.com",
       bookingPartners: ["thebrando.com", "booking.com"]
     },
@@ -226,7 +227,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 800, max: 2000, currency: "EUR" },
       description: "Iconic luxury suites carved into volcanic cliffs with infinity pools overlooking the Aegean Sea",
-      amenityTags: ["infinity-pool", "spa", "sunset-views", "butler-service", "fine-dining", "adults-only"],
+      amenityTags: [],
       website: "https://www.canaves.com",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -239,7 +240,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 600, max: 1500, currency: "EUR" },
       description: "Dramatic clifftop retreat with cave-style suites and world-class spa",
-      amenityTags: ["spa", "infinity-pool", "caldera-views", "fine-dining", "wellness", "romantic"],
+      amenityTags: [],
       website: "https://www.mystique.gr",
       bookingPartners: ["booking.com", "marriott.com"]
     },
@@ -252,7 +253,7 @@ export class AmadeusClient {
       category: "boutique",
       priceRange: { min: 500, max: 1200, currency: "EUR" },
       description: "Minimalist luxury with unparalleled sunset views and Michelin-starred dining",
-      amenityTags: ["michelin-dining", "infinity-pool", "spa", "sunset-views", "minimalist-design"],
+      amenityTags: [],
       website: "https://www.gracehotels.com",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -267,7 +268,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 400, max: 1000, currency: "EUR" },
       description: "Historic luxury hotel with secret gardens near Spanish Steps and Vatican",
-      amenityTags: ["historic", "secret-garden", "spa", "fine-dining", "central-location", "luxury-shopping"],
+      amenityTags: [],
       website: "https://www.roccofortehotels.com/hotels-and-resorts/hotel-de-russie",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -280,7 +281,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 350, max: 800, currency: "EUR" },
       description: "Contemporary luxury in the heart of Rome with rooftop terrace and Michelin dining",
-      amenityTags: ["rooftop-terrace", "michelin-dining", "contemporary-design", "central-location", "spa"],
+      amenityTags: [],
       website: "https://www.thefirstroma.com",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -293,7 +294,7 @@ export class AmadeusClient {
       category: "heritage",
       priceRange: { min: 300, max: 700, currency: "EUR" },
       description: "Francis Ford Coppola's restored 19th-century palazzo with authentic Italian luxury",
-      amenityTags: ["historic-palazzo", "authentic-italian", "luxury-suites", "private-gardens", "cultural"],
+      amenityTags: [],
       website: "https://www.palazzomargherita.com",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -308,7 +309,7 @@ export class AmadeusClient {
       category: "luxury", 
       priceRange: { min: 300, max: 800, currency: "EUR" },
       description: "Iconic luxury hotel with panoramic city views and world-class amenities",
-      amenityTags: ["city-views", "spa", "fine-dining", "luxury-shopping", "central-location", "historic"],
+      amenityTags: [],
       website: "https://www.fourseasons.com/lisbon",
       bookingPartners: ["booking.com", "fourseasons.com"]
     },
@@ -321,7 +322,7 @@ export class AmadeusClient {
       category: "heritage",
       priceRange: { min: 250, max: 600, currency: "EUR" },
       description: "18th-century palace hotel in Sintra with romantic gardens and mountain views",
-      amenityTags: ["historic-palace", "romantic-gardens", "mountain-views", "heritage", "luxury-suites"],
+      amenityTags: [],
       website: "https://www.tivolihotels.com",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -336,7 +337,7 @@ export class AmadeusClient {
       category: "boutique",
       priceRange: { min: 200, max: 500, currency: "EUR" },
       description: "Luxury boutique hotel in Diocletian's Palace with rooftop pool and Adriatic views",
-      amenityTags: ["historic-palace", "rooftop-pool", "adriatic-views", "boutique-luxury", "central-location"],
+      amenityTags: [],
       website: "https://www.villadalmacija.hr",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -349,7 +350,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 180, max: 400, currency: "EUR" },
       description: "Modern luxury with traditional Croatian elements and world-class spa",
-      amenityTags: ["modern-luxury", "spa", "croatian-design", "fine-dining", "wellness"],
+      amenityTags: [],
       website: "https://www.hyatt.com",
       bookingPartners: ["booking.com", "hyatt.com"]
     },
@@ -364,7 +365,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 300, max: 800, currency: "EUR" },
       description: "Iconic clifftop hotel with private beach and views of Old Town walls",
-      amenityTags: ["private-beach", "old-town-views", "clifftop-location", "spa", "fine-dining", "historic"],
+      amenityTags: [],
       website: "https://www.adriaticluxuryhotels.com",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -377,7 +378,7 @@ export class AmadeusClient {
       category: "boutique", 
       priceRange: { min: 250, max: 600, currency: "EUR" },
       description: "Intimate luxury villa with private gardens and panoramic Adriatic views",
-      amenityTags: ["private-villa", "adriatic-views", "intimate-luxury", "private-gardens", "romantic"],
+      amenityTags: [],
       website: "https://www.villa-orsula.hr",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -392,7 +393,7 @@ export class AmadeusClient {
       category: "resort",
       priceRange: { min: 400, max: 1200, currency: "EUR" },
       description: "Clifftop resort with championship golf course and volcanic black sand beaches",
-      amenityTags: ["golf-course", "clifftop-location", "spa", "multiple-pools", "fine-dining", "volcanic-beaches"],
+      amenityTags: [],
       website: "https://www.ritzcarlton.com/abama",
       bookingPartners: ["booking.com", "ritzcarlton.com"]
     },
@@ -405,7 +406,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 300, max: 900, currency: "EUR" },
       description: "Victorian-style luxury resort with botanical gardens and multiple beaches",
-      amenityTags: ["botanical-gardens", "multiple-beaches", "victorian-style", "spa", "fine-dining", "family-luxury"],
+      amenityTags: [],
       website: "https://www.bahia-duque.com",
       bookingPartners: ["booking.com", "expedia.com"]
     },
@@ -422,7 +423,7 @@ export class AmadeusClient {
       category: "boutique",
       priceRange: { min: 400, max: 800, currency: "USD" },
       description: "Contemporary clifftop villas with infinity pools overlooking the Indian Ocean",
-      amenityTags: ["clifftop-location", "infinity-pool", "contemporary-design", "spa", "ocean-view", "adults-only"],
+      amenityTags: [],
       website: "https://www.alilahotels.com/uluwatu",
       bookingPartners: ["alilahotels.com", "booking.com"]
     },
@@ -435,7 +436,7 @@ export class AmadeusClient {
       category: "boutique",
       priceRange: { min: 600, max: 1200, currency: "USD" },
       description: "Modern ryokan in the heart of Tokyo blending traditional Japanese hospitality with contemporary luxury",
-      amenityTags: ["modern-ryokan", "traditional-japanese", "spa", "cultural-immersion", "central-location", "wellness"],
+      amenityTags: [],
       website: "https://hoshinoya.com/tokyo",
       bookingPartners: ["hoshinoya.com", "booking.com"]
     },
@@ -448,7 +449,7 @@ export class AmadeusClient {
       category: "boutique",
       priceRange: { min: 300, max: 700, currency: "USD" },
       description: "Art Deco boutique hotel on the Chao Phraya River with private museum and antique collection",
-      amenityTags: ["art-deco", "river-location", "private-museum", "antique-collection", "spa", "fine-dining"],
+      amenityTags: [],
       website: "https://thesiamhotel.com",
       bookingPartners: ["thesiamhotel.com", "booking.com"]
     },
@@ -463,7 +464,7 @@ export class AmadeusClient {
       category: "heritage",
       priceRange: { min: 400, max: 800, currency: "USD" },
       description: "16th-century monastery converted into luxury hotel near Machu Picchu",
-      amenityTags: ["historic-monastery", "16th-century", "cultural-heritage", "spa", "fine-dining", "machu-picchu-access"],
+      amenityTags: [],
       website: "https://www.belmond.com/hotels/south-america/peru/cusco/belmond-hotel-monasterio",
       bookingPartners: ["belmond.com", "booking.com"]
     },
@@ -476,7 +477,7 @@ export class AmadeusClient {
       category: "boutique",
       priceRange: { min: 800, max: 1500, currency: "USD" },
       description: "Hillside retreat with vineyard views and Michelin-starred dining in Napa Valley",
-      amenityTags: ["vineyard-views", "michelin-dining", "hillside-location", "spa", "wine-tasting", "romantic"],
+      amenityTags: [],
       website: "https://aubergedusoleil.com",
       bookingPartners: ["aubergedusoleil.com", "booking.com"]
     },
@@ -489,7 +490,7 @@ export class AmadeusClient {
       category: "resort",
       priceRange: { min: 300, max: 800, currency: "USD" },
       description: "Luxury resort with championship golf courses and private beaches in the Caribbean",
-      amenityTags: ["championship-golf", "private-beaches", "caribbean-luxury", "spa", "marina", "family-friendly"],
+      amenityTags: [],
       website: "https://www.casadecampo.com.do",
       bookingPartners: ["casadecampo.com.do", "booking.com"]
     },
@@ -504,7 +505,7 @@ export class AmadeusClient {
       category: "heritage",
       priceRange: { min: 800, max: 2000, currency: "EUR" },
       description: "11th-century palace perched on cliffs overlooking the Mediterranean",
-      amenityTags: ["11th-century-palace", "clifftop-location", "mediterranean-views", "infinity-pool", "spa", "fine-dining"],
+      amenityTags: [],
       website: "https://www.belmond.com/hotels/europe/italy/amalfi-coast/belmond-hotel-caruso",
       bookingPartners: ["belmond.com", "booking.com"]
     },
@@ -517,7 +518,7 @@ export class AmadeusClient {
       category: "luxury",
       priceRange: { min: 500, max: 1200, currency: "EUR" },
       description: "Legendary palace hotel with 12-hectare gardens in the heart of Marrakech",
-      amenityTags: ["palace-hotel", "12-hectare-gardens", "moroccan-luxury", "spa", "fine-dining", "cultural-immersion"],
+      amenityTags: [],
       website: "https://www.mamounia.com",
       bookingPartners: ["mamounia.com", "booking.com"]
     },
@@ -530,7 +531,7 @@ export class AmadeusClient {
       category: "boutique",
       priceRange: { min: 300, max: 600, currency: "EUR" },
       description: "Intimate château hotel in Burgundy wine country with vineyard views",
-      amenityTags: ["chateau-hotel", "burgundy-wines", "vineyard-views", "intimate-luxury", "wine-tasting", "romantic"],
+      amenityTags: [],
       website: "https://www.chateaudufey.com",
       bookingPartners: ["chateaudufey.com", "booking.com"]
     },
@@ -545,7 +546,7 @@ export class AmadeusClient {
       category: "boutique",
       priceRange: { min: 600, max: 1200, currency: "USD" },
       description: "Edwardian mansion with panoramic ocean views and contemporary art collection",
-      amenityTags: ["edwardian-mansion", "ocean-views", "art-collection", "spa", "fine-dining", "adults-only"],
+      amenityTags: [],
       website: "https://www.ellerman.co.za",
       bookingPartners: ["ellerman.co.za", "booking.com"]
     },
@@ -558,7 +559,7 @@ export class AmadeusClient {
       category: "unique",
       priceRange: { min: 1500, max: 3000, currency: "USD" },
       description: "Luxury safari lodge on the rim of Ngorongoro Crater with dramatic wildlife views",
-      amenityTags: ["crater-rim-location", "safari-lodge", "wildlife-views", "luxury-tents", "cultural-immersion", "fine-dining"],
+      amenityTags: [],
       website: "https://www.andbeyond.com/our-lodges/africa/tanzania/ngorongoro-crater/ngorongoro-crater-lodge",
       bookingPartners: ["andbeyond.com", "booking.com"]
     },
@@ -573,7 +574,7 @@ export class AmadeusClient {
       category: "unique",
       priceRange: { min: 800, max: 1500, currency: "AUD" },
       description: "Eco-luxury lodge on clifftops overlooking the Southern Ocean with native wildlife",
-      amenityTags: ["clifftop-location", "eco-luxury", "native-wildlife", "southern-ocean-views", "spa", "fine-dining"],
+      amenityTags: [],
       website: "https://www.southernoceanlodge.com.au",
       bookingPartners: ["southernoceanlodge.com.au", "booking.com"]
     },
@@ -586,7 +587,7 @@ export class AmadeusClient {
       category: "boutique",
       priceRange: { min: 600, max: 1200, currency: "NZD" },
       description: "Intimate lakefront hotel with mountain views and personalized luxury service",
-      amenityTags: ["lakefront-location", "mountain-views", "intimate-luxury", "personalized-service", "fine-dining", "adventure-access"],
+      amenityTags: [],
       website: "https://www.eichardts.com",
       bookingPartners: ["eichardts.com", "booking.com"]
     }
@@ -1195,12 +1196,28 @@ export class AmadeusClient {
       // Get real hotel photos from Hotellook API
       const finalPhotos = await this.getHotelPhotos(city.name, city.countryCode, offer.hotel.name);
 
-      // Extract amenities and create tags
-      const amenityTags = this.extractAmenityTags(content?.amenities || []);
+      // Create hotel characteristics for enhanced generation
+      const characteristics: HotelCharacteristics = {
+        name: offer.hotel.name,
+        city: city.name,
+        country: this.getCountryName(city.countryCode)
+        // chainCode not available in current Amadeus response
+      };
 
-      // Generate description
-      const description = content?.description?.text || 
-        `Beautiful hotel in ${city.name}, ${city.countryCode}. ${amenityTags.slice(0, 3).join(', ')}.`;
+      // Generate enhanced data (amenities + longer description)
+      const enhancedData = enhancedHotelGenerator.generateEnhancedData(characteristics);
+
+      // Only use REAL descriptions from Amadeus API - no generated content
+      let description = content?.description?.text;
+      if (!description || description.length < 50) {
+        description = ''; // Drop description entirely if not real
+      }
+
+      // Use enhanced amenities if Amadeus amenities are empty
+      let amenityTags = this.extractAmenityTags(content?.amenities || []);
+      if (amenityTags.length === 0) {
+        amenityTags = enhancedData.amenityTags;
+      }
 
       // Create booking URL (placeholder for now)
       const bookingUrl = `https://booking.example.com/hotel/${offer.hotel.hotelId}`;

@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "main": "index.ts",
+    "main": "./index.js",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -28,26 +28,45 @@
           "arm64"
         ],
         "UIStatusBarStyle": "UIStatusBarStyleLightContent",
-        "UIViewControllerBasedStatusBarAppearance": false
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "UIStatusBarHidden": false
       },
       "associatedDomains": ["applinks:glintz.travel"],
       "usesAppleSignIn": false,
       "config": {
-        "usesNonExemptEncryption": false
+        "usesNonExemptEncryption": false,
+        "googleMapsApiKey": "AIzaSyBh4W1feHK_zB7uiIx0VIkllOpy8ClnSk8"
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
+      },
+      "statusBar": {
+        "barStyle": "light-content",
+        "backgroundColor": "#000000",
+        "translucent": true
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBh4W1feHK_zB7uiIx0VIkllOpy8ClnSk8"
+        }
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [],
+    "plugins": [
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "PORTRAIT_UP"
+        }
+      ]
+    ],
     "scheme": "glintz",
-    "platforms": ["ios"],
+    "platforms": ["ios", "android"],
     "primaryColor": "#000000"
   }
-}
+} 

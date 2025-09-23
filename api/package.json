@@ -1,23 +1,25 @@
 {
   "name": "glintz-api",
   "version": "1.0.0",
-  "description": "Amadeus API proxy for Glintz travel app",
+  "description": "Production API server for Glintz travel app with Amadeus integration",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "nodemon",
-    "seed-supabase": "tsc --skipLibCheck && node -e \"const{AmadeusClient}=require('./dist/amadeus');const{DatabaseService}=require('./dist/database');require('dotenv').config();(async()=>{try{console.log('🏨 Generating hotels...');const amadeus=new AmadeusClient();const hotels=await amadeus.seedHotelsFromCities();console.log('💾 Saving to Supabase...');const db=new DatabaseService();await db.initializeTables();await db.storeHotels(hotels);console.log('✅ Success! Saved',hotels.length,'hotels with photos');}catch(e){console.error('❌ Error:',e.message);}})();\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "seed": "npm run build && node -e \"console.log('🏨 Seeding hotels via API endpoint. Use POST /api/seed')\"",
+    "test": "echo \"Tests will be added in future versions\"",
+    "clean": "rm -rf dist *.log"
   },
   "keywords": [
     "amadeus",
     "travel",
     "api",
-    "proxy"
+    "hotels",
+    "production"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Glintz Team",
+  "license": "MIT",
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
     "axios": "^1.12.2",
@@ -37,4 +39,4 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }
-}
+} 

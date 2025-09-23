@@ -1,21 +1,26 @@
 {
-  "name": "glintz-monorepo",
+  "name": "glintz-travel-app",
   "version": "1.0.0",
-  "description": "Glintz - Mobile-first travel discovery app with swipe-based hotel browsing",
+  "description": "Glintz - Production-ready mobile travel discovery app with swipe-based hotel browsing",
   "private": true,
   "scripts": {
-    "setup-ios": "./setup-ios.sh",
-    "install:all": "cd api && npm install && cd ../app && npm install",
-    "dev": "concurrently \"cd api && npm run dev\" \"cd app && npm start\"",
+    "setup": "./setup-ios.sh",
+    "install:all": "npm install && cd api && npm install && cd ../app && npm install",
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:app\"",
     "dev:api": "cd api && npm run dev",
     "dev:app": "cd app && npm start",
+    "build": "npm run build:api && npm run build:app",
     "build:api": "cd api && npm run build",
-    "build:ios": "cd app && expo build:ios",
+    "build:app": "cd app && expo build:ios",
+    "start": "npm run build:api && cd api && npm start",
     "ios": "cd app && npm run ios",
     "ios:device": "cd app && expo run:ios --device",
-    "clean": "cd api && rm -rf node_modules dist && cd ../app && rm -rf node_modules .expo",
+    "clean": "npm run clean:api && npm run clean:app",
+    "clean:api": "cd api && rm -rf node_modules dist *.log",
+    "clean:app": "cd app && rm -rf node_modules .expo",
     "clean:ios": "cd app && expo r -c && rm -rf ios/build",
-    "setup": "./setup-ios.sh"
+    "test": "echo \"Tests will be added in future versions\"",
+    "lint": "echo \"Linting will be added in future versions\""
   },
   "keywords": [
     "travel",
@@ -25,12 +30,12 @@
     "expo",
     "amadeus",
     "swipe",
-    "discovery"
+    "discovery",
+    "production"
   ],
   "author": "Glintz Team",
   "license": "MIT",
   "devDependencies": {
-    "babel-preset-expo": "^54.0.2",
     "concurrently": "^8.2.2"
   },
   "workspaces": [
@@ -40,5 +45,9 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/glintz/travel-app"
   }
-}
+} 

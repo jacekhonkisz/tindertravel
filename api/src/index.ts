@@ -1,13 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import { AmadeusClient } from './amadeus';
 import DatabaseService from './database';
 import { GooglePlacesClient } from './google-places';
 import { SupabaseService } from './supabase';
 import { HotelCard, PersonalizationData } from './types';
 import { glintzCurate, RawHotel } from './curation';
+import { SupabaseHotel } from './supabase';
 
 // Load environment variables
 dotenv.config();
@@ -212,7 +213,7 @@ app.get('/api/hotels/validated-ad-worthy', async (req, res) => {
       'wine-tasting', 'eco-lodge', 'wellness-retreat', 'adults-only'
     ];
 
-    const adWorthyHotels = allHotels.filter(hotel => {
+    const adWorthyHotels = allHotels.filter((hotel: SupabaseHotel) => {
       // Check for boutique amenities
       const hasBoutiqueAmenity = hotel.amenity_tags.some(tag => 
         boutiqueAmenities.some(amenity => tag.toLowerCase().includes(amenity.toLowerCase()))
@@ -258,7 +259,7 @@ app.get('/api/hotels/validated-ad-worthy', async (req, res) => {
             googlePhotosCount: googlePhotos.length,
             googlePhotos: googlePhotos.slice(0, 6), // Include first 6 photos
             validationStatus: 'success'
-          });
+          } as any);
           
           validationResults.withPhotos++;
           validationResults.totalPhotosFound += googlePhotos.length;
@@ -286,7 +287,7 @@ app.get('/api/hotels/validated-ad-worthy', async (req, res) => {
       Math.round((validationResults.withPhotos / validationResults.totalTested) * 100) : 0;
 
     // Sort by photo count and rating
-    const sortedHotels = validatedHotels.sort((a, b) => {
+    const sortedHotels = validatedHotels.sort((a: any, b: any) => {
       // First by photo count (more photos = better)
       if (a.googlePhotosCount !== b.googlePhotosCount) {
         return b.googlePhotosCount - a.googlePhotosCount;
@@ -299,7 +300,7 @@ app.get('/api/hotels/validated-ad-worthy', async (req, res) => {
 
     // Group by continent for analysis
     const continentAnalysis: { [key: string]: number } = {};
-    validatedHotels.forEach(hotel => {
+    validatedHotels.forEach((hotel: any) => {
       const continent = getContinent(hotel.country);
       continentAnalysis[continent] = (continentAnalysis[continent] || 0) + 1;
     });
@@ -902,11 +903,11 @@ app.get('/api/hotels', async (req, res) => {
       country: hotel.country,
       coords: hotel.coords,
       price: hotel.price,
-      description: hotel.description,
-      amenityTags: hotel.amenity_tags,
-      photos: hotel.photos, // REAL Google Places photos!
-      heroPhoto: hotel.hero_photo, // REAL Google Places hero photo!
-      bookingUrl: hotel.booking_url,
+      description: hotel.description || '',
+      amenityTags: hotel.amenity_tags || [],
+      photos: hotel.photos || [], // REAL Google Places photos!
+      heroPhoto: hotel.hero_photo || (hotel.photos && hotel.photos[0]) || '', // REAL Google Places hero photo!
+      bookingUrl: hotel.booking_url || '',
       rating: hotel.rating
     }));
 
@@ -1135,9 +1136,10 @@ function calculatePersonalizationScore(hotel: HotelCard, personalization: Person
   const countryScore = personalization.countryAffinity[hotel.country] || 0;
 
   // Amenity affinity score
-  const amenityScore = hotel.amenityTags.reduce((sum, tag) => {
+  const amenityTags = hotel.amenityTags || [];
+  const amenityScore = amenityTags.reduce((sum, tag) => {
     return sum + (personalization.amenityAffinity[tag] || 0);
-  }, 0) / Math.max(hotel.amenityTags.length, 1);
+  }, 0) / Math.max(amenityTags.length, 1);
 
   // Seen penalty (should be 0 since we filter out seen hotels, but keeping for completeness)
   const seenPenalty = personalization.seenHotels.has(hotel.id) ? 0.2 : 0;
@@ -1168,6 +1170,7 @@ app.use((req, res) => {
     message: 'The requested endpoint does not exist'
   });
 });
+
 
 // Start server
 app.listen(port, () => {

@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,14 +39,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
-const dotenv_1 = __importDefault(require("dotenv"));
+const dotenv = __importStar(require("dotenv"));
 const amadeus_1 = require("./amadeus");
 const database_1 = __importDefault(require("./database"));
 const google_places_1 = require("./google-places");
 const supabase_1 = require("./supabase");
 const curation_1 = require("./curation");
 // Load environment variables
-dotenv_1.default.config();
+dotenv.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3001;
 // Initialize Amadeus client
@@ -52,10 +85,9 @@ try {
 catch (error) {
     console.error('Failed to initialize Supabase service:', error);
 }
-// CORS configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:8081'];
+// CORS configuration - Allow all origins for development
 app.use((0, cors_1.default)({
-    origin: allowedOrigins,
+    origin: true, // Allow all origins for development
     credentials: true
 }));
 // Rate limiting: 100 requests per 15 minutes per IP
@@ -189,7 +221,7 @@ app.get('/api/hotels/validated-ad-worthy', async (req, res) => {
             'cultural-immersion', 'local-experiences', 'cooking-classes',
             'wine-tasting', 'eco-lodge', 'wellness-retreat', 'adults-only'
         ];
-        const adWorthyHotels = allHotels.filter(hotel => {
+        const adWorthyHotels = allHotels.filter((hotel) => {
             // Check for boutique amenities
             const hasBoutiqueAmenity = hotel.amenity_tags.some(tag => boutiqueAmenities.some(amenity => tag.toLowerCase().includes(amenity.toLowerCase())));
             // Check rating (4.2+ for boutique quality, but allow unrated unique properties)
@@ -256,7 +288,7 @@ app.get('/api/hotels/validated-ad-worthy', async (req, res) => {
         const finalHotels = sortedHotels.slice(parseInt(offset), parseInt(offset) + parseInt(limit));
         // Group by continent for analysis
         const continentAnalysis = {};
-        validatedHotels.forEach(hotel => {
+        validatedHotels.forEach((hotel) => {
             const continent = getContinent(hotel.country);
             continentAnalysis[continent] = (continentAnalysis[continent] || 0) + 1;
         });
@@ -748,11 +780,11 @@ app.get('/api/hotels', async (req, res) => {
             country: hotel.country,
             coords: hotel.coords,
             price: hotel.price,
-            description: hotel.description,
-            amenityTags: hotel.amenity_tags,
-            photos: hotel.photos, // REAL Google Places photos!
-            heroPhoto: hotel.hero_photo, // REAL Google Places hero photo!
-            bookingUrl: hotel.booking_url,
+            description: hotel.description || '',
+            amenityTags: hotel.amenity_tags || [],
+            photos: hotel.photos || [], // REAL Google Places photos!
+            heroPhoto: hotel.hero_photo || (hotel.photos && hotel.photos[0]) || '', // REAL Google Places hero photo!
+            bookingUrl: hotel.booking_url || '',
             rating: hotel.rating
         }));
         // Parse personalization data from query params
@@ -950,9 +982,10 @@ function calculatePersonalizationScore(hotel, personalization) {
     // Country affinity score
     const countryScore = personalization.countryAffinity[hotel.country] || 0;
     // Amenity affinity score
-    const amenityScore = hotel.amenityTags.reduce((sum, tag) => {
+    const amenityTags = hotel.amenityTags || [];
+    const amenityScore = amenityTags.reduce((sum, tag) => {
         return sum + (personalization.amenityAffinity[tag] || 0);
-    }, 0) / Math.max(hotel.amenityTags.length, 1);
+    }, 0) / Math.max(amenityTags.length, 1);
     // Seen penalty (should be 0 since we filter out seen hotels, but keeping for completeness)
     const seenPenalty = personalization.seenHotels.has(hotel.id) ? 0.2 : 0;
     // Weighted score calculation (matching the spec)

@@ -5,7 +5,7 @@ import { AmadeusClient } from './amadeus';
 import { SupabaseService } from './supabase';
 import { GooglePlacesClient } from './google-places';
 import { glintzCurate, RawHotel } from './curation';
-import { PhotoValidator, ValidatedPhoto } from './photo-validator';
+// Photo validation now handled by GooglePlacesClient
 
 // Comprehensive global destinations - EVERY country with major cities
 const GLOBAL_DESTINATIONS = {
@@ -459,33 +459,26 @@ export class GlobalHotelFetcher {
           continue;
         }
         
-        // Extract photo URLs and optimize for high quality
-        const photoUrls = googleHotel.photos.map((photo: any) => 
-          PhotoValidator.optimizePhotoUrl(photo.url, 1920, 1080)
-        );
+        // Extract photo URLs (Google Places already provides high-quality photos)
+        const photoUrls = googleHotel.photos.slice(0, 8); // Take up to 8 photos
         
-        // Validate photo quality
-        const validatedPhotos = await PhotoValidator.validatePhotos(photoUrls);
-        
-        // Check if we have enough high-quality photos (minimum 4)
-        if (!PhotoValidator.hasEnoughQualityPhotos(validatedPhotos, 4)) {
-          console.log(`❌ ${hotel.name}: Only ${validatedPhotos.length}/4 high-quality photos found`);
-          this.totalPhotosRejected += photoUrls.length - validatedPhotos.length;
+        // Check if we have enough photos (minimum 4)
+        if (photoUrls.length < 4) {
+          console.log(`❌ ${hotel.name}: Only ${photoUrls.length}/4 photos found`);
           continue;
         }
         
-        // Update hotel with validated photos
+        // Update hotel with photos
         const updatedHotel = {
           ...hotel,
-          photos: validatedPhotos.map((photo: ValidatedPhoto) => photo.url),
-          heroPhoto: validatedPhotos[0].url,
-          photoQuality: PhotoValidator.getPhotoQualitySummary(validatedPhotos)
+          photos: photoUrls,
+          heroPhoto: photoUrls[0]
         };
         
         hotelsWithValidPhotos.push(updatedHotel);
-        this.totalPhotosValidated += validatedPhotos.length;
+        this.totalPhotosValidated += photoUrls.length;
         
-        console.log(`✅ ${hotel.name}: ${validatedPhotos.length} high-quality photos validated`);
+        console.log(`✅ ${hotel.name}: ${photoUrls.length} photos added`);
         
         // Rate limiting for Google Places API
         await this.sleep(1000);

@@ -1,16 +1,70 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AmadeusClient = void 0;
-const axios_1 = __importDefault(require("axios"));
-const node_cache_1 = __importDefault(require("node-cache"));
-const hotellook_1 = require("./hotellook");
-const google_places_1 = require("./google-places");
-const enhanced_hotel_generator_1 = require("./enhanced-hotel-generator");
-class AmadeusClient {
-    constructor() {
+var axios_1 = require("axios");
+var node_cache_1 = require("node-cache");
+var hotellook_1 = require("./hotellook");
+var google_places_1 = require("./google-places");
+var enhanced_hotel_generator_1 = require("./enhanced-hotel-generator");
+var AmadeusClient = /** @class */ (function () {
+    function AmadeusClient() {
+        var _this = this;
         // Curated list of world's most luxurious and unique hotels - GLOBAL COVERAGE
         this.curatedLuxuryHotels = [
             // ASIA - Tropical Paradise
@@ -569,85 +623,131 @@ class AmadeusClient {
             timeout: 10000,
         });
         // Add request interceptor for authentication
-        this.client.interceptors.request.use(async (config) => {
-            const token = await this.getAccessToken();
-            config.headers.Authorization = `Bearer ${token}`;
-            return config;
-        });
-        // Add response interceptor for error handling
-        this.client.interceptors.response.use((response) => response, async (error) => {
-            if (error.response?.status === 401) {
-                // Token expired, clear cache and retry
-                this.tokenCache.del('access_token');
-                const token = await this.getAccessToken();
-                error.config.headers.Authorization = `Bearer ${token}`;
-                return this.client.request(error.config);
-            }
-            throw error;
-        });
-    }
-    async getAccessToken() {
-        const cachedToken = this.tokenCache.get('access_token');
-        if (cachedToken) {
-            return cachedToken;
-        }
-        try {
-            const response = await axios_1.default.post(`${this.baseUrl}/v1/security/oauth2/token`, new URLSearchParams({
-                grant_type: 'client_credentials',
-                client_id: this.clientId,
-                client_secret: this.clientSecret,
-            }), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            });
-            const { access_token } = response.data;
-            this.tokenCache.set('access_token', access_token);
-            return access_token;
-        }
-        catch (error) {
-            console.error('Failed to get Amadeus access token:', error);
-            throw new Error('Authentication failed');
-        }
-    }
-    async getHotelsByCity(cityCode, limit = 50) {
-        const cacheKey = `hotels_${cityCode}_${limit}`;
-        const cached = this.dataCache.get(cacheKey);
-        if (cached) {
-            return cached;
-        }
-        try {
-            // Step 1: Get hotel list by city (this works!)
-            const hotelListResponse = await this.client.get('/v1/reference-data/locations/hotels/by-city', {
-                params: {
-                    cityCode
+        this.client.interceptors.request.use(function (config) { return __awaiter(_this, void 0, void 0, function () {
+            var token;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getAccessToken()];
+                    case 1:
+                        token = _a.sent();
+                        config.headers.Authorization = "Bearer ".concat(token);
+                        return [2 /*return*/, config];
                 }
             });
-            const hotelList = hotelListResponse.data.data || [];
-            console.log(`📍 Found ${hotelList.length} hotels in ${cityCode}`);
-            if (hotelList.length === 0) {
-                return [];
-            }
-            // Step 2: Get offers for a subset of hotels (batch processing)
-            const hotelsWithOffers = [];
-            const batchSize = 10; // Process hotels in batches to avoid rate limits
-            const maxHotels = Math.min(limit * 3, hotelList.length); // Get more than needed for filtering
-            for (let i = 0; i < maxHotels && hotelsWithOffers.length < limit; i += batchSize) {
-                const batch = hotelList.slice(i, i + batchSize);
-                for (const hotel of batch) {
-                    try {
-                        // Get offers for this specific hotel
-                        const offersResponse = await this.client.get('/v3/shopping/hotel-offers', {
-                            params: {
-                                hotelIds: hotel.hotelId,
-                                adults: 2,
-                                checkInDate: this.getDateString(7),
-                                checkOutDate: this.getDateString(9),
-                                roomQuantity: 1,
-                                currency: 'EUR'
-                            }
-                        });
-                        const offers = offersResponse.data.data || [];
+        }); });
+        // Add response interceptor for error handling
+        this.client.interceptors.response.use(function (response) { return response; }, function (error) { return __awaiter(_this, void 0, void 0, function () {
+            var token;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (!(((_a = error.response) === null || _a === void 0 ? void 0 : _a.status) === 401)) return [3 /*break*/, 2];
+                        // Token expired, clear cache and retry
+                        this.tokenCache.del('access_token');
+                        return [4 /*yield*/, this.getAccessToken()];
+                    case 1:
+                        token = _b.sent();
+                        error.config.headers.Authorization = "Bearer ".concat(token);
+                        return [2 /*return*/, this.client.request(error.config)];
+                    case 2: throw error;
+                }
+            });
+        }); });
+    }
+    AmadeusClient.prototype.getAccessToken = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var cachedToken, response, access_token, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        cachedToken = this.tokenCache.get('access_token');
+                        if (cachedToken) {
+                            return [2 /*return*/, cachedToken];
+                        }
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, axios_1.default.post("".concat(this.baseUrl, "/v1/security/oauth2/token"), new URLSearchParams({
+                                grant_type: 'client_credentials',
+                                client_id: this.clientId,
+                                client_secret: this.clientSecret,
+                            }), {
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                            })];
+                    case 2:
+                        response = _a.sent();
+                        access_token = response.data.access_token;
+                        this.tokenCache.set('access_token', access_token);
+                        return [2 /*return*/, access_token];
+                    case 3:
+                        error_1 = _a.sent();
+                        console.error('Failed to get Amadeus access token:', error_1);
+                        throw new Error('Authentication failed');
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AmadeusClient.prototype.getHotelsByCity = function (cityCode_1) {
+        return __awaiter(this, arguments, void 0, function (cityCode, limit) {
+            var cacheKey, cached, hotelListResponse, hotelList, hotelsWithOffers, batchSize, maxHotels, i, batch, _i, batch_1, hotel, offersResponse, offers, offerError_1, finalHotels, adWorthyHotels_1, remaining, otherHotels, error_2;
+            var _a, _b;
+            if (limit === void 0) { limit = 50; }
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        cacheKey = "hotels_".concat(cityCode, "_").concat(limit);
+                        cached = this.dataCache.get(cacheKey);
+                        if (cached) {
+                            return [2 /*return*/, cached];
+                        }
+                        _c.label = 1;
+                    case 1:
+                        _c.trys.push([1, 15, , 16]);
+                        return [4 /*yield*/, this.client.get('/v1/reference-data/locations/hotels/by-city', {
+                                params: {
+                                    cityCode: cityCode
+                                }
+                            })];
+                    case 2:
+                        hotelListResponse = _c.sent();
+                        hotelList = hotelListResponse.data.data || [];
+                        console.log("\uD83D\uDCCD Found ".concat(hotelList.length, " hotels in ").concat(cityCode));
+                        if (hotelList.length === 0) {
+                            return [2 /*return*/, []];
+                        }
+                        hotelsWithOffers = [];
+                        batchSize = 10;
+                        maxHotels = Math.min(limit * 3, hotelList.length);
+                        i = 0;
+                        _c.label = 3;
+                    case 3:
+                        if (!(i < maxHotels && hotelsWithOffers.length < limit)) return [3 /*break*/, 14];
+                        batch = hotelList.slice(i, i + batchSize);
+                        _i = 0, batch_1 = batch;
+                        _c.label = 4;
+                    case 4:
+                        if (!(_i < batch_1.length)) return [3 /*break*/, 11];
+                        hotel = batch_1[_i];
+                        _c.label = 5;
+                    case 5:
+                        _c.trys.push([5, 8, , 9]);
+                        return [4 /*yield*/, this.client.get('/v3/shopping/hotel-offers', {
+                                params: {
+                                    hotelIds: hotel.hotelId,
+                                    adults: 2,
+                                    checkInDate: this.getDateString(7),
+                                    checkOutDate: this.getDateString(9),
+                                    roomQuantity: 1,
+                                    currency: 'EUR'
+                                }
+                            })];
+                    case 6:
+                        offersResponse = _c.sent();
+                        offers = offersResponse.data.data || [];
                         if (offers.length > 0) {
                             // Convert to our expected format
                             hotelsWithOffers.push({
@@ -656,58 +756,70 @@ class AmadeusClient {
                                     hotelId: hotel.hotelId,
                                     name: hotel.name,
                                     cityCode: cityCode,
-                                    latitude: hotel.geoCode?.latitude,
-                                    longitude: hotel.geoCode?.longitude
+                                    latitude: (_a = hotel.geoCode) === null || _a === void 0 ? void 0 : _a.latitude,
+                                    longitude: (_b = hotel.geoCode) === null || _b === void 0 ? void 0 : _b.longitude
                                 },
                                 offers: offers[0].offers || [],
                                 available: true
                             });
                         }
                         // Rate limiting
-                        await this.delay(100); // 100ms between requests
-                    }
-                    catch (offerError) {
+                        return [4 /*yield*/, this.delay(100)];
+                    case 7:
+                        // Rate limiting
+                        _c.sent(); // 100ms between requests
+                        return [3 /*break*/, 9];
+                    case 8:
+                        offerError_1 = _c.sent();
                         // Skip hotels that don't have offers (common in sandbox)
-                        console.log(`⚠️  No offers for hotel ${hotel.hotelId}`);
-                        continue;
-                    }
-                    if (hotelsWithOffers.length >= limit) {
-                        break;
-                    }
+                        console.log("\u26A0\uFE0F  No offers for hotel ".concat(hotel.hotelId));
+                        return [3 /*break*/, 10];
+                    case 9:
+                        if (hotelsWithOffers.length >= limit) {
+                            return [3 /*break*/, 11];
+                        }
+                        _c.label = 10;
+                    case 10:
+                        _i++;
+                        return [3 /*break*/, 4];
+                    case 11:
+                        if (!(i + batchSize < maxHotels)) return [3 /*break*/, 13];
+                        return [4 /*yield*/, this.delay(500)];
+                    case 12:
+                        _c.sent(); // 500ms between batches
+                        _c.label = 13;
+                    case 13:
+                        i += batchSize;
+                        return [3 /*break*/, 3];
+                    case 14:
+                        console.log("\u2705 Found ".concat(hotelsWithOffers.length, " hotels with offers in ").concat(cityCode));
+                        finalHotels = hotelsWithOffers;
+                        if (hotelsWithOffers.length > limit) {
+                            adWorthyHotels_1 = this.filterAdWorthyHotels(hotelsWithOffers, cityCode);
+                            if (adWorthyHotels_1.length >= limit) {
+                                finalHotels = adWorthyHotels_1.slice(0, limit);
+                            }
+                            else {
+                                remaining = limit - adWorthyHotels_1.length;
+                                otherHotels = hotelsWithOffers
+                                    .filter(function (h) { return !adWorthyHotels_1.includes(h); })
+                                    .slice(0, remaining);
+                                finalHotels = __spreadArray(__spreadArray([], adWorthyHotels_1, true), otherHotels, true);
+                            }
+                        }
+                        this.dataCache.set(cacheKey, finalHotels);
+                        return [2 /*return*/, finalHotels];
+                    case 15:
+                        error_2 = _c.sent();
+                        console.error("Failed to fetch hotels for city ".concat(cityCode, ":"), error_2);
+                        return [2 /*return*/, []];
+                    case 16: return [2 /*return*/];
                 }
-                // Batch delay
-                if (i + batchSize < maxHotels) {
-                    await this.delay(500); // 500ms between batches
-                }
-            }
-            console.log(`✅ Found ${hotelsWithOffers.length} hotels with offers in ${cityCode}`);
-            // Apply filtering if we have enough hotels
-            let finalHotels = hotelsWithOffers;
-            if (hotelsWithOffers.length > limit) {
-                // Apply ad-worthy filtering
-                const adWorthyHotels = this.filterAdWorthyHotels(hotelsWithOffers, cityCode);
-                if (adWorthyHotels.length >= limit) {
-                    finalHotels = adWorthyHotels.slice(0, limit);
-                }
-                else {
-                    // Mix ad-worthy with other quality hotels
-                    const remaining = limit - adWorthyHotels.length;
-                    const otherHotels = hotelsWithOffers
-                        .filter(h => !adWorthyHotels.includes(h))
-                        .slice(0, remaining);
-                    finalHotels = [...adWorthyHotels, ...otherHotels];
-                }
-            }
-            this.dataCache.set(cacheKey, finalHotels);
-            return finalHotels;
-        }
-        catch (error) {
-            console.error(`Failed to fetch hotels for city ${cityCode}:`, error);
-            return [];
-        }
-    }
+            });
+        });
+    };
     // Enhanced criteria for boutique, unique, and luxurious hotels with great reviews
-    getBoutiqueUniqueAmenities() {
+    AmadeusClient.prototype.getBoutiqueUniqueAmenities = function () {
         return [
             // BOUTIQUE & UNIQUE ARCHITECTURE
             'boutique-hotel', 'design-hotel', 'historic-building', 'converted-monastery',
@@ -732,8 +844,8 @@ class AmadeusClient {
             'rooftop-bar', 'secret-garden', 'hidden-courtyard', 'panoramic-views',
             'fireplace', 'library', 'observatory', 'wine-bar', 'jazz-lounge'
         ];
-    }
-    getVisuallyStunningLocationKeywords() {
+    };
+    AmadeusClient.prototype.getVisuallyStunningLocationKeywords = function () {
         return [
             // COASTAL PARADISE
             'santorini', 'mykonos', 'amalfi', 'capri', 'positano', 'cinque terre',
@@ -750,110 +862,113 @@ class AmadeusClient {
             // DESERT LUXURY
             'dubai', 'marrakech', 'rajasthan', 'scottsdale', 'sedona'
         ];
-    }
+    };
     /**
      * Calculate visual appeal score for ad-worthy hotels
      */
-    calculateVisualAppealScore(hotel, hotelName, location) {
-        let score = 0;
-        const name = hotelName.toLowerCase();
-        const loc = location.toLowerCase();
+    AmadeusClient.prototype.calculateVisualAppealScore = function (hotel, hotelName, location) {
+        var score = 0;
+        var name = hotelName.toLowerCase();
+        var loc = location.toLowerCase();
         // ARCHITECTURE & DESIGN APPEAL (25 points max)
-        const luxuryArchitecture = [
+        var luxuryArchitecture = [
             'palace', 'castle', 'villa', 'mansion', 'estate', 'manor',
             'boutique', 'design', 'contemporary', 'historic', 'heritage',
             'collection', 'luxury', 'grand', 'royal', 'imperial'
         ];
-        luxuryArchitecture.forEach(keyword => {
+        luxuryArchitecture.forEach(function (keyword) {
             if (name.includes(keyword))
                 score += 3;
         });
         // BOUTIQUE & UNIQUE AMENITIES (30 points max)
-        const boutiqueAmenities = this.getBoutiqueUniqueAmenities();
+        var boutiqueAmenities = this.getBoutiqueUniqueAmenities();
         // Simulate amenity detection from hotel name/description
-        const amenityKeywords = [
+        var amenityKeywords = [
             'spa', 'pool', 'beach', 'view', 'terrace', 'rooftop', 'garden',
             'infinity', 'private', 'panoramic', 'ocean', 'mountain', 'sunset'
         ];
-        amenityKeywords.forEach(amenity => {
+        amenityKeywords.forEach(function (amenity) {
             if (name.includes(amenity))
                 score += 4;
         });
         // LOCATION APPEAL (25 points max)
-        const stunningLocations = this.getVisuallyStunningLocationKeywords();
-        stunningLocations.forEach(location => {
+        var stunningLocations = this.getVisuallyStunningLocationKeywords();
+        stunningLocations.forEach(function (location) {
             if (loc.includes(location))
                 score += 5;
         });
         // BRAND PRESTIGE (20 points max)
-        const prestigeBrands = [
+        var prestigeBrands = [
             'four seasons', 'ritz carlton', 'mandarin oriental', 'aman',
             'rosewood', 'bulgari', 'armani', 'edition', 'w hotel',
             'st regis', 'conrad', 'waldorf astoria', 'luxury collection',
             'autograph', 'curio', 'tribute', 'unbound', 'marriott',
             'hyatt', 'hilton', 'intercontinental', 'sofitel', 'fairmont'
         ];
-        prestigeBrands.forEach(brand => {
+        prestigeBrands.forEach(function (brand) {
             if (name.includes(brand))
                 score += 2;
         });
         return Math.min(score, 100); // Cap at 100
-    }
+    };
     /**
      * Filter for ad-worthy hotels - visually stunning and Instagram-ready
      */
-    filterAdWorthyHotels(hotels, location = '') {
+    AmadeusClient.prototype.filterAdWorthyHotels = function (hotels, location) {
+        var _this = this;
+        if (location === void 0) { location = ''; }
         return hotels
-            .map(hotel => {
-            const hotelName = hotel.hotel.name?.toLowerCase() || '';
-            const price = parseFloat(hotel.offers[0]?.price?.total || '0');
+            .map(function (hotel) {
+            var _a, _b, _c;
+            var hotelName = ((_a = hotel.hotel.name) === null || _a === void 0 ? void 0 : _a.toLowerCase()) || '';
+            var price = parseFloat(((_c = (_b = hotel.offers[0]) === null || _b === void 0 ? void 0 : _b.price) === null || _c === void 0 ? void 0 : _c.total) || '0');
             // Calculate global visual appeal score
-            const visualScore = this.calculateGlobalVisualAppealScore(hotel, hotelName, location);
+            var visualScore = _this.calculateGlobalVisualAppealScore(hotel, hotelName, location);
             // Calculate value score (visual appeal per euro)
-            const valueScore = price > 0 ? (visualScore / price) * 100 : 0;
-            return {
-                ...hotel,
-                visualScore,
-                valueScore,
-                isAdWorthy: visualScore >= 25 // Lowered threshold to include more boutique hotels globally
-            };
+            var valueScore = price > 0 ? (visualScore / price) * 100 : 0;
+            return __assign(__assign({}, hotel), { visualScore: visualScore, valueScore: valueScore, isAdWorthy: visualScore >= 25 // Lowered threshold to include more boutique hotels globally
+             });
         })
-            .filter(hotel => hotel.isAdWorthy)
-            .sort((a, b) => {
+            .filter(function (hotel) { return hotel.isAdWorthy; })
+            .sort(function (a, b) {
             // Sort by value score (best visual appeal for price)
             return (b.valueScore || 0) - (a.valueScore || 0);
         });
-    }
+    };
     /**
      * Get affordable luxury hotels - great visual appeal without breaking the bank
      */
-    filterAffordableLuxuryHotels(hotels, location = '') {
-        const adWorthyHotels = this.filterAdWorthyHotels(hotels, location);
-        return adWorthyHotels.filter(hotel => {
-            const price = parseFloat(hotel.offers[0]?.price?.total || '0');
-            const visualScore = hotel.visualScore || 0;
+    AmadeusClient.prototype.filterAffordableLuxuryHotels = function (hotels, location) {
+        if (location === void 0) { location = ''; }
+        var adWorthyHotels = this.filterAdWorthyHotels(hotels, location);
+        return adWorthyHotels.filter(function (hotel) {
+            var _a, _b;
+            var price = parseFloat(((_b = (_a = hotel.offers[0]) === null || _a === void 0 ? void 0 : _a.price) === null || _b === void 0 ? void 0 : _b.total) || '0');
+            var visualScore = hotel.visualScore || 0;
             // Sweet spot: High visual appeal (50+) with reasonable price (under €400)
             return visualScore >= 50 && price <= 400;
         });
-    }
+    };
     // Enhanced boutique and luxury hotel filtering - excludes basic chains
-    filterBoutiqueLuxuryHotels(hotels, location = '') {
-        return hotels.filter(hotel => {
-            const price = parseFloat(hotel.offers[0]?.price?.total || '0');
-            const hotelName = hotel.hotel.name?.toLowerCase() || '';
+    AmadeusClient.prototype.filterBoutiqueLuxuryHotels = function (hotels, location) {
+        if (location === void 0) { location = ''; }
+        return hotels.filter(function (hotel) {
+            var _a, _b, _c;
+            var price = parseFloat(((_b = (_a = hotel.offers[0]) === null || _a === void 0 ? void 0 : _a.price) === null || _b === void 0 ? void 0 : _b.total) || '0');
+            var hotelName = ((_c = hotel.hotel.name) === null || _c === void 0 ? void 0 : _c.toLowerCase()) || '';
             // EXCLUDE basic chain hotels first
-            const basicChains = [
+            var basicChains = [
                 'ibis', 'travelodge', 'premier inn', 'holiday inn express', 'comfort inn',
                 'best western', 'days inn', 'super 8', 'motel 6', 'red roof inn',
                 'la quinta', 'hampton inn', 'courtyard by marriott', 'fairfield inn',
                 'residence inn', 'extended stay', 'homewood suites', 'candlewood suites',
                 'holiday inn', 'crowne plaza', 'doubletree', 'embassy suites'
             ];
-            const isBasicChain = basicChains.some(chain => hotelName.includes(chain));
+            var isBasicChain = basicChains.some(function (chain) { return hotelName.includes(chain); });
             if (isBasicChain)
                 return false;
             // INCLUDE boutique luxury brands and unique properties
-            const boutiqueLuxuryBrands = [
+            var boutiqueLuxuryBrands = [
                 // Ultra-luxury brands
                 'ritz carlton', 'four seasons', 'mandarin oriental', 'st. regis', 'aman',
                 'rosewood', 'bulgari', 'armani', 'edition', 'park hyatt', 'grand hyatt',
@@ -867,169 +982,204 @@ class AmadeusClient {
                 'grand hotel', 'royal', 'imperial', 'luxury', 'premium', 'collection',
                 'resort', 'retreat', 'sanctuary', 'lodge', 'estate'
             ];
-            const hasBoutiqueLuxuryBrand = boutiqueLuxuryBrands.some(brand => hotelName.includes(brand));
+            var hasBoutiqueLuxuryBrand = boutiqueLuxuryBrands.some(function (brand) { return hotelName.includes(brand); });
             // Price considerations - not too strict to allow global variety
-            const reasonablePrice = price <= 2000; // Max €2000 per night
-            const hasMinimumPrice = price >= 80; // Minimum €80 per night for quality
+            var reasonablePrice = price <= 2000; // Max €2000 per night
+            var hasMinimumPrice = price >= 80; // Minimum €80 per night for quality
             // Unique property indicators
-            const uniqueKeywords = [
+            var uniqueKeywords = [
                 'spa', 'design', 'art', 'wine', 'golf', 'beach', 'mountain', 'lake',
                 'garden', 'terrace', 'rooftop', 'panoramic', 'view', 'private',
                 'exclusive', 'intimate', 'romantic', 'adults only', 'eco'
             ];
-            const hasUniqueFeatures = uniqueKeywords.some(keyword => hotelName.includes(keyword));
+            var hasUniqueFeatures = uniqueKeywords.some(function (keyword) { return hotelName.includes(keyword); });
             return (hasBoutiqueLuxuryBrand || hasUniqueFeatures) && reasonablePrice && hasMinimumPrice;
-        }).sort((a, b) => {
+        }).sort(function (a, b) {
+            var _a, _b, _c, _d, _e, _f;
             // Sort by a combination of price and brand prestige
-            const priceA = parseFloat(a.offers[0]?.price?.total || '0');
-            const priceB = parseFloat(b.offers[0]?.price?.total || '0');
+            var priceA = parseFloat(((_b = (_a = a.offers[0]) === null || _a === void 0 ? void 0 : _a.price) === null || _b === void 0 ? void 0 : _b.total) || '0');
+            var priceB = parseFloat(((_d = (_c = b.offers[0]) === null || _c === void 0 ? void 0 : _c.price) === null || _d === void 0 ? void 0 : _d.total) || '0');
             // Calculate value score (quality indicators per price)
-            const nameA = a.hotel.name?.toLowerCase() || '';
-            const nameB = b.hotel.name?.toLowerCase() || '';
-            const prestigeWordsA = ['ritz', 'four seasons', 'mandarin', 'st. regis', 'aman', 'rosewood', 'bulgari'].filter(word => nameA.includes(word)).length;
-            const prestigeWordsB = ['ritz', 'four seasons', 'mandarin', 'st. regis', 'aman', 'rosewood', 'bulgari'].filter(word => nameB.includes(word)).length;
+            var nameA = ((_e = a.hotel.name) === null || _e === void 0 ? void 0 : _e.toLowerCase()) || '';
+            var nameB = ((_f = b.hotel.name) === null || _f === void 0 ? void 0 : _f.toLowerCase()) || '';
+            var prestigeWordsA = ['ritz', 'four seasons', 'mandarin', 'st. regis', 'aman', 'rosewood', 'bulgari'].filter(function (word) { return nameA.includes(word); }).length;
+            var prestigeWordsB = ['ritz', 'four seasons', 'mandarin', 'st. regis', 'aman', 'rosewood', 'bulgari'].filter(function (word) { return nameB.includes(word); }).length;
             if (prestigeWordsA !== prestigeWordsB) {
                 return prestigeWordsB - prestigeWordsA; // Higher prestige first
             }
             return priceB - priceA; // Then by price
         });
-    }
+    };
     // Filter for premium hotels (3-4 star equivalent)
-    filterPremiumHotels(hotels) {
-        return hotels.filter(hotel => {
-            const price = parseFloat(hotel.offers[0]?.price?.total || '0');
-            const hotelName = hotel.hotel.name?.toLowerCase() || '';
+    AmadeusClient.prototype.filterPremiumHotels = function (hotels) {
+        return hotels.filter(function (hotel) {
+            var _a, _b, _c;
+            var price = parseFloat(((_b = (_a = hotel.offers[0]) === null || _a === void 0 ? void 0 : _a.price) === null || _b === void 0 ? void 0 : _b.total) || '0');
+            var hotelName = ((_c = hotel.hotel.name) === null || _c === void 0 ? void 0 : _c.toLowerCase()) || '';
             // Price threshold for premium (€100-200 per night)
-            const isPremiumPrice = price >= 100 && price < 200;
+            var isPremiumPrice = price >= 100 && price < 200;
             // Avoid budget chains
-            const budgetChains = ['ibis', 'travelodge', 'premier inn', 'holiday inn express', 'comfort inn'];
-            const isBudgetChain = budgetChains.some(chain => hotelName.includes(chain));
+            var budgetChains = ['ibis', 'travelodge', 'premier inn', 'holiday inn express', 'comfort inn'];
+            var isBudgetChain = budgetChains.some(function (chain) { return hotelName.includes(chain); });
             return isPremiumPrice && !isBudgetChain;
-        }).sort((a, b) => {
-            const priceA = parseFloat(a.offers[0]?.price?.total || '0');
-            const priceB = parseFloat(b.offers[0]?.price?.total || '0');
+        }).sort(function (a, b) {
+            var _a, _b, _c, _d;
+            var priceA = parseFloat(((_b = (_a = a.offers[0]) === null || _a === void 0 ? void 0 : _a.price) === null || _b === void 0 ? void 0 : _b.total) || '0');
+            var priceB = parseFloat(((_d = (_c = b.offers[0]) === null || _c === void 0 ? void 0 : _c.price) === null || _d === void 0 ? void 0 : _d.total) || '0');
             return priceB - priceA;
         });
-    }
-    async getHotelContent(hotelId) {
-        const cacheKey = `content_${hotelId}`;
-        const cached = this.dataCache.get(cacheKey);
-        if (cached) {
-            return cached;
-        }
-        try {
-            const response = await this.client.get(`/v1/reference-data/locations/hotels/by-hotels`, {
-                params: {
-                    hotelIds: hotelId
+    };
+    AmadeusClient.prototype.getHotelContent = function (hotelId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var cacheKey, cached, response, content, error_3;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        cacheKey = "content_".concat(hotelId);
+                        cached = this.dataCache.get(cacheKey);
+                        if (cached) {
+                            return [2 /*return*/, cached];
+                        }
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.client.get("/v1/reference-data/locations/hotels/by-hotels", {
+                                params: {
+                                    hotelIds: hotelId
+                                }
+                            })];
+                    case 2:
+                        response = _b.sent();
+                        content = (_a = response.data.data) === null || _a === void 0 ? void 0 : _a[0];
+                        if (content) {
+                            this.dataCache.set(cacheKey, content);
+                        }
+                        return [2 /*return*/, content || null];
+                    case 3:
+                        error_3 = _b.sent();
+                        console.error("Failed to fetch content for hotel ".concat(hotelId, ":"), error_3);
+                        return [2 /*return*/, null];
+                    case 4: return [2 /*return*/];
                 }
             });
-            const content = response.data.data?.[0];
-            if (content) {
-                this.dataCache.set(cacheKey, content);
-            }
-            return content || null;
-        }
-        catch (error) {
-            console.error(`Failed to fetch content for hotel ${hotelId}:`, error);
-            return null;
-        }
-    }
-    async seedHotelsFromCities() {
-        const allHotels = [];
-        console.log(`🏨 Seeding ${this.curatedLuxuryHotels.length} curated luxury hotels...`);
-        for (const curatedHotel of this.curatedLuxuryHotels) {
-            try {
-                console.log(`Fetching real photos for ${curatedHotel.name} in ${curatedHotel.city}...`);
-                // Get real hotel photos from Google Places API
-                const realPhotos = await this.googlePlacesClient.getSpecificHotelPhotos(curatedHotel.name, curatedHotel.city, 8 // Get 8 photos per hotel
-                );
-                // Generate unique hotel ID
-                const hotelId = this.generateHotelId(curatedHotel.name, curatedHotel.city);
-                // Create HotelCard from curated data
-                const hotelCard = {
-                    id: hotelId,
-                    name: curatedHotel.name,
-                    city: curatedHotel.city,
-                    country: curatedHotel.country,
-                    coords: curatedHotel.coords,
-                    price: {
-                        amount: this.generateRealisticPrice(curatedHotel.priceRange),
-                        currency: curatedHotel.priceRange.currency
-                    },
-                    description: curatedHotel.description,
-                    amenityTags: curatedHotel.amenityTags,
-                    photos: realPhotos.length > 0 ? realPhotos : this.getFallbackPhotos(curatedHotel.city),
-                    heroPhoto: realPhotos.length > 0 ? realPhotos[0] : this.getFallbackPhotos(curatedHotel.city)[0],
-                    bookingUrl: this.generateBookingUrl(curatedHotel),
-                    rating: this.generateRealisticRating(curatedHotel.category)
-                };
-                allHotels.push(hotelCard);
-                console.log(`✅ Added ${curatedHotel.name} with ${realPhotos.length} real photos`);
-                // Add delay to respect Google Places API rate limits
-                await this.delay(500);
-            }
-            catch (error) {
-                console.error(`Failed to process ${curatedHotel.name}:`, error);
-                // Add hotel with fallback photos if Google Places fails
-                const hotelId = this.generateHotelId(curatedHotel.name, curatedHotel.city);
-                const fallbackHotel = {
-                    id: hotelId,
-                    name: curatedHotel.name,
-                    city: curatedHotel.city,
-                    country: curatedHotel.country,
-                    coords: curatedHotel.coords,
-                    price: {
-                        amount: this.generateRealisticPrice(curatedHotel.priceRange),
-                        currency: curatedHotel.priceRange.currency
-                    },
-                    description: curatedHotel.description,
-                    amenityTags: curatedHotel.amenityTags,
-                    photos: this.getFallbackPhotos(curatedHotel.city),
-                    heroPhoto: this.getFallbackPhotos(curatedHotel.city)[0],
-                    bookingUrl: this.generateBookingUrl(curatedHotel),
-                    rating: this.generateRealisticRating(curatedHotel.category)
-                };
-                allHotels.push(fallbackHotel);
-            }
-        }
-        console.log(`🎉 Successfully processed ${allHotels.length} luxury hotels`);
-        return allHotels;
-    }
+        });
+    };
+    AmadeusClient.prototype.seedHotelsFromCities = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var allHotels, _i, _a, curatedHotel, realPhotos, hotelId, hotelCard, error_4, hotelId, fallbackHotel;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        allHotels = [];
+                        console.log("\uD83C\uDFE8 Seeding ".concat(this.curatedLuxuryHotels.length, " curated luxury hotels..."));
+                        _i = 0, _a = this.curatedLuxuryHotels;
+                        _b.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3 /*break*/, 7];
+                        curatedHotel = _a[_i];
+                        _b.label = 2;
+                    case 2:
+                        _b.trys.push([2, 5, , 6]);
+                        console.log("Fetching real photos for ".concat(curatedHotel.name, " in ").concat(curatedHotel.city, "..."));
+                        return [4 /*yield*/, this.googlePlacesClient.getSpecificHotelPhotos(curatedHotel.name, curatedHotel.city, 8 // Get 8 photos per hotel
+                            )];
+                    case 3:
+                        realPhotos = _b.sent();
+                        hotelId = this.generateHotelId(curatedHotel.name, curatedHotel.city);
+                        hotelCard = {
+                            id: hotelId,
+                            name: curatedHotel.name,
+                            city: curatedHotel.city,
+                            country: curatedHotel.country,
+                            coords: curatedHotel.coords,
+                            price: {
+                                amount: this.generateRealisticPrice(curatedHotel.priceRange),
+                                currency: curatedHotel.priceRange.currency
+                            },
+                            description: curatedHotel.description,
+                            amenityTags: curatedHotel.amenityTags,
+                            photos: realPhotos.length > 0 ? realPhotos : this.getFallbackPhotos(curatedHotel.city),
+                            heroPhoto: realPhotos.length > 0 ? realPhotos[0] : this.getFallbackPhotos(curatedHotel.city)[0],
+                            bookingUrl: this.generateBookingUrl(curatedHotel),
+                            rating: this.generateRealisticRating(curatedHotel.category)
+                        };
+                        allHotels.push(hotelCard);
+                        console.log("\u2705 Added ".concat(curatedHotel.name, " with ").concat(realPhotos.length, " real photos"));
+                        // Add delay to respect Google Places API rate limits
+                        return [4 /*yield*/, this.delay(500)];
+                    case 4:
+                        // Add delay to respect Google Places API rate limits
+                        _b.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
+                        error_4 = _b.sent();
+                        console.error("Failed to process ".concat(curatedHotel.name, ":"), error_4);
+                        hotelId = this.generateHotelId(curatedHotel.name, curatedHotel.city);
+                        fallbackHotel = {
+                            id: hotelId,
+                            name: curatedHotel.name,
+                            city: curatedHotel.city,
+                            country: curatedHotel.country,
+                            coords: curatedHotel.coords,
+                            price: {
+                                amount: this.generateRealisticPrice(curatedHotel.priceRange),
+                                currency: curatedHotel.priceRange.currency
+                            },
+                            description: curatedHotel.description,
+                            amenityTags: curatedHotel.amenityTags,
+                            photos: this.getFallbackPhotos(curatedHotel.city),
+                            heroPhoto: this.getFallbackPhotos(curatedHotel.city)[0],
+                            bookingUrl: this.generateBookingUrl(curatedHotel),
+                            rating: this.generateRealisticRating(curatedHotel.category)
+                        };
+                        allHotels.push(fallbackHotel);
+                        return [3 /*break*/, 6];
+                    case 6:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 7:
+                        console.log("\uD83C\uDF89 Successfully processed ".concat(allHotels.length, " luxury hotels"));
+                        return [2 /*return*/, allHotels];
+                }
+            });
+        });
+    };
     // Generate unique hotel ID
-    generateHotelId(hotelName, city) {
-        const combined = `${hotelName}-${city}`.toLowerCase().replace(/[^a-z0-9]/g, '-');
-        return `luxury-${combined}`;
-    }
+    AmadeusClient.prototype.generateHotelId = function (hotelName, city) {
+        var combined = "".concat(hotelName, "-").concat(city).toLowerCase().replace(/[^a-z0-9]/g, '-');
+        return "luxury-".concat(combined);
+    };
     // Generate realistic pricing within the hotel's range
-    generateRealisticPrice(priceRange) {
-        const randomPrice = Math.floor(Math.random() * (priceRange.max - priceRange.min + 1)) + priceRange.min;
+    AmadeusClient.prototype.generateRealisticPrice = function (priceRange) {
+        var randomPrice = Math.floor(Math.random() * (priceRange.max - priceRange.min + 1)) + priceRange.min;
         return randomPrice.toString();
-    }
+    };
     // Generate realistic ratings based on hotel category
-    generateRealisticRating(category) {
-        const ratingRanges = {
+    AmadeusClient.prototype.generateRealisticRating = function (category) {
+        var ratingRanges = {
             'luxury': { min: 4.7, max: 5.0 },
             'boutique': { min: 4.5, max: 4.9 },
             'heritage': { min: 4.4, max: 4.8 },
             'resort': { min: 4.6, max: 4.9 },
             'unique': { min: 4.3, max: 4.8 }
         };
-        const range = ratingRanges[category] || { min: 4.0, max: 4.5 };
+        var range = ratingRanges[category] || { min: 4.0, max: 4.5 };
         return Math.round((Math.random() * (range.max - range.min) + range.min) * 10) / 10;
-    }
+    };
     // Generate real booking URLs
-    generateBookingUrl(hotel) {
+    AmadeusClient.prototype.generateBookingUrl = function (hotel) {
         // Prefer hotel's official website if available
         if (hotel.website) {
             return hotel.website;
         }
         // Otherwise, use booking.com search URL
-        const searchQuery = encodeURIComponent(`${hotel.name} ${hotel.city}`);
-        return `https://www.booking.com/searchresults.html?ss=${searchQuery}`;
-    }
+        var searchQuery = encodeURIComponent("".concat(hotel.name, " ").concat(hotel.city));
+        return "https://www.booking.com/searchresults.html?ss=".concat(searchQuery);
+    };
     // Get fallback photos if Google Places fails
-    getFallbackPhotos(cityName) {
-        const fallbackPhotos = {
+    AmadeusClient.prototype.getFallbackPhotos = function (cityName) {
+        var fallbackPhotos = {
             'Santorini': [
                 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&h=600&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&h=600&fit=crop&q=80',
@@ -1053,62 +1203,68 @@ class AmadeusClient {
             'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&h=600&fit=crop&q=80',
             'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&h=600&fit=crop&q=80'
         ];
-    }
-    async transformToHotelCard(offer, city) {
-        try {
-            // Get additional hotel content
-            const content = await this.getHotelContent(offer.hotel.hotelId);
-            // Get real hotel photos from Hotellook API
-            const finalPhotos = await this.getHotelPhotos(city.name, city.countryCode, offer.hotel.name);
-            // Create hotel characteristics for enhanced generation
-            const characteristics = {
-                name: offer.hotel.name,
-                city: city.name,
-                country: this.getCountryName(city.countryCode)
-                // chainCode not available in current Amadeus response
-            };
-            // Generate enhanced data (amenities + longer description)
-            const enhancedData = enhanced_hotel_generator_1.enhancedHotelGenerator.generateEnhancedData(characteristics);
-            // Only use REAL descriptions from Amadeus API - no generated content
-            let description = content?.description?.text;
-            if (!description || description.length < 50) {
-                description = ''; // Drop description entirely if not real
-            }
-            // Use enhanced amenities if Amadeus amenities are empty
-            let amenityTags = this.extractAmenityTags(content?.amenities || []);
-            if (amenityTags.length === 0) {
-                amenityTags = enhancedData.amenityTags;
-            }
-            // Create booking URL (placeholder for now)
-            const bookingUrl = `https://booking.example.com/hotel/${offer.hotel.hotelId}`;
-            return {
-                id: offer.hotel.hotelId,
-                name: offer.hotel.name || content?.name || 'Beautiful Hotel',
-                city: city.name,
-                country: this.getCountryName(city.countryCode),
-                coords: offer.hotel.latitude && offer.hotel.longitude ? {
-                    lat: offer.hotel.latitude,
-                    lng: offer.hotel.longitude
-                } : city.coords,
-                price: offer.offers[0] ? {
-                    amount: offer.offers[0].price.total,
-                    currency: offer.offers[0].price.currency
-                } : undefined,
-                description,
-                amenityTags,
-                photos: finalPhotos,
-                heroPhoto: finalPhotos[0],
-                bookingUrl,
-                rating: undefined // Amadeus doesn't provide ratings in basic tier
-            };
-        }
-        catch (error) {
-            console.error(`Failed to transform hotel ${offer.hotel.hotelId}:`, error);
-            return null;
-        }
-    }
-    extractAmenityTags(amenities) {
-        const tagMap = {
+    };
+    AmadeusClient.prototype.transformToHotelCard = function (offer, city) {
+        return __awaiter(this, void 0, void 0, function () {
+            var content, finalPhotos, characteristics, enhancedData, description, amenityTags, bookingUrl, error_5;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, this.getHotelContent(offer.hotel.hotelId)];
+                    case 1:
+                        content = _b.sent();
+                        return [4 /*yield*/, this.getHotelPhotos(city.name, city.countryCode, offer.hotel.name)];
+                    case 2:
+                        finalPhotos = _b.sent();
+                        characteristics = {
+                            name: offer.hotel.name,
+                            city: city.name,
+                            country: this.getCountryName(city.countryCode)
+                            // chainCode not available in current Amadeus response
+                        };
+                        enhancedData = enhanced_hotel_generator_1.enhancedHotelGenerator.generateEnhancedData(characteristics);
+                        description = (_a = content === null || content === void 0 ? void 0 : content.description) === null || _a === void 0 ? void 0 : _a.text;
+                        if (!description || description.length < 50) {
+                            description = ''; // Drop description entirely if not real
+                        }
+                        amenityTags = this.extractAmenityTags((content === null || content === void 0 ? void 0 : content.amenities) || []);
+                        if (amenityTags.length === 0) {
+                            amenityTags = enhancedData.amenityTags;
+                        }
+                        bookingUrl = "https://booking.example.com/hotel/".concat(offer.hotel.hotelId);
+                        return [2 /*return*/, {
+                                id: offer.hotel.hotelId,
+                                name: offer.hotel.name || (content === null || content === void 0 ? void 0 : content.name) || 'Beautiful Hotel',
+                                city: city.name,
+                                country: this.getCountryName(city.countryCode),
+                                coords: offer.hotel.latitude && offer.hotel.longitude ? {
+                                    lat: offer.hotel.latitude,
+                                    lng: offer.hotel.longitude
+                                } : city.coords,
+                                price: offer.offers[0] ? {
+                                    amount: offer.offers[0].price.total,
+                                    currency: offer.offers[0].price.currency
+                                } : undefined,
+                                description: description,
+                                amenityTags: amenityTags,
+                                photos: finalPhotos,
+                                heroPhoto: finalPhotos[0],
+                                bookingUrl: bookingUrl,
+                                rating: undefined // Amadeus doesn't provide ratings in basic tier
+                            }];
+                    case 3:
+                        error_5 = _b.sent();
+                        console.error("Failed to transform hotel ".concat(offer.hotel.hotelId, ":"), error_5);
+                        return [2 /*return*/, null];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AmadeusClient.prototype.extractAmenityTags = function (amenities) {
+        var tagMap = {
             'SWIMMING_POOL': 'pool',
             'SPA': 'spa',
             'FITNESS_CENTER': 'fitness',
@@ -1123,12 +1279,12 @@ class AmadeusClient {
             'CONCIERGE': 'concierge'
         };
         return amenities
-            .map(a => tagMap[a.code] || a.description.toLowerCase())
-            .filter(tag => tag && tag.length < 15)
+            .map(function (a) { return tagMap[a.code] || a.description.toLowerCase(); })
+            .filter(function (tag) { return tag && tag.length < 15; })
             .slice(0, 6);
-    }
-    getCountryName(countryCode) {
-        const countries = {
+    };
+    AmadeusClient.prototype.getCountryName = function (countryCode) {
+        var countries = {
             'GR': 'Greece',
             'PT': 'Portugal',
             'ES': 'Spain',
@@ -1136,26 +1292,31 @@ class AmadeusClient {
             'HR': 'Croatia'
         };
         return countries[countryCode] || countryCode;
-    }
-    getDateString(daysFromNow) {
-        const date = new Date();
+    };
+    AmadeusClient.prototype.getDateString = function (daysFromNow) {
+        var date = new Date();
         date.setDate(date.getDate() + daysFromNow);
         return date.toISOString().split('T')[0];
-    }
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    async getHotelPhotos(cityName, countryCode, hotelName) {
-        try {
-            // Use curated real hotel photos by city and hotel name
-            return this.getCuratedRealHotelPhotos(cityName, countryCode, hotelName);
-        }
-        catch (error) {
-            console.warn(`Failed to get photos for ${cityName}:`, error);
-            return this.getCuratedRealHotelPhotos(cityName, countryCode, hotelName);
-        }
-    }
-    getGlobalVisuallyStunningLocations() {
+    };
+    AmadeusClient.prototype.delay = function (ms) {
+        return new Promise(function (resolve) { return setTimeout(resolve, ms); });
+    };
+    AmadeusClient.prototype.getHotelPhotos = function (cityName, countryCode, hotelName) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                try {
+                    // Use curated real hotel photos by city and hotel name
+                    return [2 /*return*/, this.getCuratedRealHotelPhotos(cityName, countryCode, hotelName)];
+                }
+                catch (error) {
+                    console.warn("Failed to get photos for ".concat(cityName, ":"), error);
+                    return [2 /*return*/, this.getCuratedRealHotelPhotos(cityName, countryCode, hotelName)];
+                }
+                return [2 /*return*/];
+            });
+        });
+    };
+    AmadeusClient.prototype.getGlobalVisuallyStunningLocations = function () {
         return {
             // EUROPE - Historic & Coastal
             europe: [
@@ -1251,8 +1412,8 @@ class AmadeusClient {
                 'turkey', 'cappadocia', 'pamukkale', 'bodrum', 'antalya'
             ]
         };
-    }
-    getGlobalInstagramAmenities() {
+    };
+    AmadeusClient.prototype.getGlobalInstagramAmenities = function () {
         return {
             // WATER FEATURES (Universal appeal)
             water: [
@@ -1292,42 +1453,42 @@ class AmadeusClient {
                 'aurora-viewing', 'whale-watching', 'turtle-nesting'
             ]
         };
-    }
+    };
     /**
      * Enhanced global visual appeal scoring
      */
-    calculateGlobalVisualAppealScore(hotel, hotelName, location) {
-        let score = 0;
-        const name = hotelName.toLowerCase();
-        const loc = location.toLowerCase();
+    AmadeusClient.prototype.calculateGlobalVisualAppealScore = function (hotel, hotelName, location) {
+        var score = 0;
+        var name = hotelName.toLowerCase();
+        var loc = location.toLowerCase();
         // GLOBAL LOCATION APPEAL (30 points max)
-        const globalLocations = this.getGlobalVisuallyStunningLocations();
-        Object.values(globalLocations).flat().forEach(destination => {
+        var globalLocations = this.getGlobalVisuallyStunningLocations();
+        Object.values(globalLocations).flat().forEach(function (destination) {
             if (loc.includes(destination.toLowerCase())) {
                 score += 3; // Each matching destination adds points
             }
         });
         // GLOBAL INSTAGRAM AMENITIES (35 points max)
-        const globalAmenities = this.getGlobalInstagramAmenities();
-        Object.values(globalAmenities).flat().forEach(amenity => {
-            const amenityWords = amenity.split('-');
-            if (amenityWords.some(word => name.includes(word))) {
+        var globalAmenities = this.getGlobalInstagramAmenities();
+        Object.values(globalAmenities).flat().forEach(function (amenity) {
+            var amenityWords = amenity.split('-');
+            if (amenityWords.some(function (word) { return name.includes(word); })) {
                 score += 2;
             }
         });
         // ARCHITECTURE & DESIGN (25 points max)
-        const architectureKeywords = [
+        var architectureKeywords = [
             'palace', 'castle', 'villa', 'mansion', 'estate', 'manor',
             'boutique', 'design', 'contemporary', 'historic', 'heritage',
             'collection', 'luxury', 'grand', 'royal', 'imperial',
             'resort', 'retreat', 'sanctuary', 'lodge', 'camp'
         ];
-        architectureKeywords.forEach(keyword => {
+        architectureKeywords.forEach(function (keyword) {
             if (name.includes(keyword))
                 score += 2;
         });
         // GLOBAL LUXURY BRANDS (10 points max)
-        const globalLuxuryBrands = [
+        var globalLuxuryBrands = [
             'four seasons', 'ritz carlton', 'mandarin oriental', 'aman',
             'rosewood', 'bulgari', 'armani', 'edition', 'w hotel',
             'st regis', 'conrad', 'waldorf astoria', 'luxury collection',
@@ -1335,18 +1496,18 @@ class AmadeusClient {
             'fairmont', 'kempinski', 'shangri-la', 'peninsula',
             'oberoi', 'taj', 'banyan tree', 'six senses', 'anantara'
         ];
-        globalLuxuryBrands.forEach(brand => {
+        globalLuxuryBrands.forEach(function (brand) {
             if (name.includes(brand))
                 score += 1;
         });
         return Math.min(score, 100); // Cap at 100
-    }
+    };
     /**
      * Get curated real hotel photos by city and hotel name
      */
-    getCuratedRealHotelPhotos(cityName, countryCode, hotelName) {
+    AmadeusClient.prototype.getCuratedRealHotelPhotos = function (cityName, countryCode, hotelName) {
         // Curated high-quality hotel photos by city - using hotel-specific variations
-        const basePhotos = {
+        var basePhotos = {
             'Rome': [
                 'https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=800&h=600&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&h=600&fit=crop&q=80',
@@ -1389,7 +1550,7 @@ class AmadeusClient {
             ]
         };
         // Get base photos for the city
-        const cityPhotos = basePhotos[cityName] || [
+        var cityPhotos = basePhotos[cityName] || [
             'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop&q=80',
             'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&h=600&fit=crop&q=80',
             'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&h=600&fit=crop&q=80',
@@ -1399,20 +1560,17 @@ class AmadeusClient {
         ];
         // Create hotel-specific variation by using hotel name hash to select different photos
         if (hotelName) {
-            const hash = hotelName.split('').reduce((a, b) => {
+            var hash = hotelName.split('').reduce(function (a, b) {
                 a = ((a << 5) - a) + b.charCodeAt(0);
                 return a & a;
             }, 0);
-            const startIndex = Math.abs(hash) % cityPhotos.length;
+            var startIndex = Math.abs(hash) % cityPhotos.length;
             // Rotate the array based on hotel name to get different photos for each hotel
-            const rotatedPhotos = [
-                ...cityPhotos.slice(startIndex),
-                ...cityPhotos.slice(0, startIndex)
-            ];
+            var rotatedPhotos = __spreadArray(__spreadArray([], cityPhotos.slice(startIndex), true), cityPhotos.slice(0, startIndex), true);
             return rotatedPhotos;
         }
         return cityPhotos;
-    }
-}
+    };
+    return AmadeusClient;
+}());
 exports.AmadeusClient = AmadeusClient;
-//# sourceMappingURL=amadeus.js.map

@@ -55,7 +55,14 @@ async function testAmadeusDirectly() {
                                     latitude: hotel.hotel.latitude || 0,
                                     longitude: hotel.hotel.longitude || 0
                                 },
-                                content,
+                                content: {
+                                    hotelId: content.hotelId,
+                                    name: content.name,
+                                    description: content.description ? { text: content.description.text, lang: 'en' } : undefined,
+                                    amenities: (content.amenities || []).map((a) => a.code),
+                                    media: content.media || [],
+                                    ratings: undefined
+                                },
                                 offers: hotel.offers || []
                             });
                             console.log(`   ✅ ${hotel.hotel.name}: ${content.media.length} photos`);
@@ -79,7 +86,7 @@ async function testAmadeusDirectly() {
                     // Show sample hotel
                     if (curationResult.cards.length > 0) {
                         const sample = curationResult.cards[0];
-                        console.log(`   🌟 Sample: ${sample.name} - Score: ${sample.glintzScore?.toFixed(2)} - Photos: ${sample.photos.length}`);
+                        console.log(`   🌟 Sample: ${sample.name} - Score: ${sample.glintzScore?.toFixed(2) || 'N/A'} - Photos: ${sample.photos.length}`);
                     }
                 }
                 console.log('');
