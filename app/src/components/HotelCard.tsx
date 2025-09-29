@@ -375,6 +375,7 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 25, // Increased padding for fullscreen
     paddingBottom: 40, // More bottom padding for fullscreen
+    zIndex: 3, // Ensure text renders above gradient overlay
   },
   mainInfo: {
     marginBottom: 15,
@@ -384,18 +385,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 5,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 1,
   },
   location: {
     fontSize: 20, // Larger font for fullscreen
     color: '#fff',
-    opacity: 0.9,
+    opacity: 1.0,
     marginBottom: 8,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 1,
   },
   price: {
     fontSize: 18, // Larger font for fullscreen
