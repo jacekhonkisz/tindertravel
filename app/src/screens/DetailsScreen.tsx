@@ -9,6 +9,7 @@ import {
   Linking,
   Alert,
   Platform,
+  StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -19,6 +20,8 @@ import { useAppStore } from '../store';
 import IOSBlurView from '../components/IOSBlurView';
 import IOSHaptics from '../utils/IOSHaptics';
 import HotelMapView from '../components/HotelMapView';
+import { useTheme } from '../theme';
+import { Button, Card, Chip } from '../ui';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -29,9 +32,7 @@ const getResponsiveDimensions = () => {
   const isLargeDevice = SCREEN_HEIGHT >= 900; // iPhone 12/13/14 Pro Max, iPad
 
   return {
-    photoHeight: isSmallDevice ? Math.min(SCREEN_HEIGHT * 0.4, 300) : 
-                 isMediumDevice ? Math.min(SCREEN_HEIGHT * 0.45, 350) : 
-                 Math.min(SCREEN_HEIGHT * 0.5, 400),
+    photoHeight: SCREEN_HEIGHT * 0.6, // Increased to 60% of screen height for more immersive photos
     headerHeight: 44 + (Platform.OS === 'ios' ? 44 : 0), // Status bar + header
     bookingButtonHeight: 80, // Button + attribution + padding
     bottomPadding: isSmallDevice ? 180 : 200, // Increased to prevent button overlap
@@ -46,6 +47,7 @@ const DetailsScreen: React.FC = () => {
   const route = useRoute<DetailsScreenRouteProp>();
   const { hotel } = route.params;
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
   
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const photoScrollViewRef = React.useRef<ScrollView>(null);
@@ -66,20 +68,30 @@ const DetailsScreen: React.FC = () => {
   };
 
   const handleBookNow = async () => {
+    // Only check if URL exists, don't validate format
+    if (!hotel.bookingUrl || hotel.bookingUrl.trim() === '') {
+      Alert.alert(
+        'Booking',
+        'This hotel is available for booking. In a real app, this would open the booking page.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    console.log('🔗 Attempting to open booking URL:', hotel.bookingUrl);
+
     try {
-      const supported = await Linking.canOpenURL(hotel.bookingUrl);
-      if (supported) {
-        await Linking.openURL(hotel.bookingUrl);
-      } else {
-        Alert.alert(
-          'Booking',
-          'This hotel is available for booking. In a real app, this would open the booking page.',
-          [{ text: 'OK' }]
-        );
-      }
+      // Try to open the URL directly first, as Linking.canOpenURL can be unreliable for web URLs
+      await Linking.openURL(hotel.bookingUrl);
+      console.log('✅ Successfully opened booking URL');
     } catch (error) {
-      console.error('Failed to open booking URL:', error);
-      Alert.alert('Error', 'Could not open booking page');
+      console.error('❌ Failed to open booking URL:', error);
+      // Only show fallback if opening actually fails
+      Alert.alert(
+        'Booking',
+        'This hotel is available for booking. In a real app, this would open the booking page.',
+        [{ text: 'OK' }]
+      );
     }
   };
 
@@ -127,7 +139,7 @@ const DetailsScreen: React.FC = () => {
             setCurrentPhotoIndex(index);
           }}
           style={{ flex: 1 }}
-          contentContainerStyle={{ alignItems: 'center' }}
+          contentContainerStyle={{ flexGrow: 1 }} // Changed from alignItems: 'center' to flexGrow: 1
         >
           {hotel.photos.map((photo, index) => (
             <Image
@@ -176,8 +188,186 @@ const DetailsScreen: React.FC = () => {
     );
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.bg,
+    },
+    headerBlur: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 100,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.xl,
+      paddingVertical: theme.spacing.l,
+    },
+    backButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    backButtonText: {
+      fontSize: 24,
+      color: '#fff',
+      fontWeight: 'bold',
+    },
+    headerActions: {
+      flexDirection: 'row',
+      gap: theme.spacing.m,
+    },
+    likeButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(76, 175, 80, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.success,
+    },
+    likeButtonText: {
+      fontSize: 20,
+      color: theme.success,
+    },
+    superlikeButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(33, 150, 243, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#2196F3',
+    },
+    superlikeButtonText: {
+      fontSize: 20,
+      color: '#2196F3',
+    },
+    content: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      paddingTop: 0,
+    },
+    photoSection: {
+      position: 'relative',
+      width: SCREEN_WIDTH,
+      flexShrink: 0,
+    },
+    singlePhoto: {
+      width: SCREEN_WIDTH,
+    },
+    photoCarousel: {
+      width: SCREEN_WIDTH,
+      overflow: 'hidden',
+    },
+    carouselPhoto: {
+      width: SCREEN_WIDTH,
+      resizeMode: 'cover',
+    },
+    dotsContainer: {
+      position: 'absolute',
+      bottom: theme.spacing.xl,
+      left: 0,
+      right: 0,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: theme.spacing.s,
+      zIndex: 10,
+    },
+    dot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    },
+    activeDot: {
+      backgroundColor: '#fff',
+    },
+    infoSection: {
+      padding: theme.spacing.xl,
+    },
+    hotelName: {
+      fontSize: 28,
+      fontWeight: '600',
+      color: theme.textPrimary,
+      marginBottom: theme.spacing.s,
+    },
+    location: {
+      fontSize: 17,
+      color: theme.textSecondary,
+      marginBottom: theme.spacing.s,
+    },
+    price: {
+      fontSize: 20,
+      color: theme.accent,
+      fontWeight: '600',
+      marginBottom: theme.spacing.l,
+    },
+    statusContainer: {
+      flexDirection: 'row',
+      gap: theme.spacing.m,
+    },
+    statusBadge: {
+      backgroundColor: 'rgba(76, 175, 80, 0.2)',
+      paddingHorizontal: theme.spacing.m,
+      paddingVertical: theme.spacing.xs,
+      borderRadius: theme.radius.chip,
+      borderWidth: 1,
+      borderColor: theme.success,
+    },
+    superlikedBadge: {
+      backgroundColor: 'rgba(33, 150, 243, 0.2)',
+      borderColor: '#2196F3',
+    },
+    statusText: {
+      color: theme.textPrimary,
+      fontSize: 13,
+      fontWeight: '500',
+    },
+    mapSection: {
+      paddingHorizontal: theme.spacing.xl,
+      paddingBottom: theme.spacing.xl,
+    },
+    bookingSection: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: theme.surface,
+      paddingHorizontal: theme.spacing.xl,
+      paddingTop: theme.spacing.l,
+      borderTopWidth: 1,
+      borderTopColor: theme.chipBorder,
+      zIndex: 50,
+      ...theme.shadow.card,
+    },
+    attributionText: {
+      color: theme.textSecondary,
+      fontSize: 11,
+      textAlign: 'center',
+      marginTop: theme.spacing.s,
+      opacity: 0.6,
+    },
+  });
+
   return (
     <View style={styles.container}>
+      <StatusBar 
+        barStyle="light-content"
+        backgroundColor={theme.bg} 
+      />
+      
       {/* Header with iOS blur */}
       <IOSBlurView 
         blurType="dark" 
@@ -272,20 +462,6 @@ const DetailsScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Amenities */}
-        {hotel.amenityTags.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Amenities</Text>
-            <View style={styles.amenitiesContainer}>
-              {hotel.amenityTags.map((tag, index) => (
-                <View key={index} style={styles.amenityTag}>
-                  <Text style={styles.amenityText}>{tag}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
         {/* Map View (if coordinates available) */}
         {hotel.coords && (
           <View style={styles.mapSection}>
@@ -307,15 +483,12 @@ const DetailsScreen: React.FC = () => {
           bottom: 0,
         }
       ]}>
-        <TouchableOpacity 
-          style={styles.bookButton} 
+        <Button 
+          title="Book Now"
           onPress={handleBookNow}
-          accessible={true}
-          accessibilityLabel="Book this hotel now"
-          accessibilityRole="button"
-        >
-          <Text style={styles.bookButtonText}>Book Now</Text>
-        </TouchableOpacity>
+          variant="primary"
+          fullWidth
+        />
         
         {/* Attribution */}
         <Text style={styles.attributionText}>Data © Amadeus</Text>
@@ -324,232 +497,6 @@ const DetailsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  headerBlur: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 100,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 24,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  likeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#4CAF50',
-  },
-  likeButtonText: {
-    fontSize: 20,
-    color: '#4CAF50',
-  },
-  superlikeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(33, 150, 243, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#2196F3',
-  },
-  superlikeButtonText: {
-    fontSize: 20,
-    color: '#2196F3',
-  },
-  content: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingTop: 0,
-  },
-  photoSection: {
-    position: 'relative',
-    width: SCREEN_WIDTH,
-    flexShrink: 0, // Prevent photo section from shrinking
-  },
-  singlePhoto: {
-    width: SCREEN_WIDTH,
-  },
-  photoCarousel: {
-    width: SCREEN_WIDTH,
-    overflow: 'hidden',
-  },
-  carouselPhoto: {
-    width: SCREEN_WIDTH,
-    resizeMode: 'cover',
-  },
-  dotsContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-    zIndex: 10,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-  },
-  activeDot: {
-    backgroundColor: '#fff',
-  },
-  infoSection: {
-    padding: 20,
-  },
-  hotelName: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
-  },
-  location: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 8,
-  },
-  price: {
-    fontSize: 20,
-    color: '#4CAF50',
-    fontWeight: '600',
-    marginBottom: 15,
-  },
-  statusContainer: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  statusBadge: {
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#4CAF50',
-  },
-  superlikedBadge: {
-    backgroundColor: 'rgba(33, 150, 243, 0.2)',
-    borderColor: '#2196F3',
-  },
-  statusText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  section: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    lineHeight: 24,
-  },
-  amenitiesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  amenityTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  amenityText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
-    textTransform: 'capitalize',
-  },
-  mapSection: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  bookingSection: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.95)',
-    paddingHorizontal: 20,
-    paddingTop: 15,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
-    zIndex: 50, // Ensure it stays on top
-    // Add backdrop blur effect for iOS
-    ...(Platform.OS === 'ios' && {
-      backdropFilter: 'blur(20px)',
-    }),
-  },
-  bookButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 16,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginBottom: 8,
-    shadowColor: '#4CAF50',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  bookButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  attributionText: {
-    color: 'rgba(255, 255, 255, 0.4)',
-    fontSize: 10,
-    textAlign: 'center',
-  },
-});
+
 
 export default DetailsScreen; 

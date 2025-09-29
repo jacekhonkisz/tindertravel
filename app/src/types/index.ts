@@ -16,7 +16,7 @@ export interface HotelCard {
   amenityTags: string[];
   photos: string[];
   heroPhoto: string;
-  bookingUrl: string;
+  bookingUrl?: string; // Made optional to handle empty/missing URLs
   rating?: number;
 }
 
@@ -33,6 +33,37 @@ export interface ApiResponse<T> {
   error?: string;
   message?: string;
   data?: T;
+}
+
+// Authentication types
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface OTPRequest {
+  email: string;
+}
+
+export interface OTPVerification {
+  email: string;
+  code: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  user?: User;
+  token?: string;
+  message?: string;
+  error?: string;
 }
 
 // Personalization types
@@ -56,6 +87,10 @@ export type RootStackParamList = {
   Home: undefined;
   Details: { hotel: HotelCard };
   Saved: undefined;
+  HotelCollection: { 
+    type: 'like' | 'superlike';
+    title: string;
+  };
 };
 
 // Store types

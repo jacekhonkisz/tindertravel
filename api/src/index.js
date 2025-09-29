@@ -693,20 +693,30 @@ app.get('/api/hotels/ad-worthy', function (req, res) { return __awaiter(void 0, 
                 return [4 /*yield*/, supabaseService.getHotels(limitNum * 2, offsetNum)];
             case 1:
                 supabaseHotels = _g.sent();
-                hotels = supabaseHotels.map(function (hotel) { return ({
-                    id: hotel.id,
-                    name: hotel.name,
-                    city: hotel.city,
-                    country: hotel.country,
-                    coords: hotel.coords,
-                    price: hotel.price,
-                    description: hotel.description,
-                    amenityTags: hotel.amenity_tags,
-                    photos: hotel.photos,
-                    heroPhoto: hotel.hero_photo,
-                    bookingUrl: hotel.booking_url,
-                    rating: hotel.rating
-                }); });
+                hotels = supabaseHotels.map(function (hotel) {
+                    // Generate a proper booking URL if none exists
+                    var bookingUrl = hotel.booking_url;
+                    if (!bookingUrl || bookingUrl.trim() === '') {
+                        // Generate a fallback booking.com search URL
+                        var searchQuery = encodeURIComponent(hotel.name + ' ' + hotel.city);
+                        bookingUrl = "https://www.booking.com/searchresults.html?ss=" + searchQuery;
+                    }
+                    
+                    return {
+                        id: hotel.id,
+                        name: hotel.name,
+                        city: hotel.city,
+                        country: hotel.country,
+                        coords: hotel.coords,
+                        price: hotel.price,
+                        description: hotel.description || '',
+                        amenityTags: hotel.amenity_tags || [],
+                        photos: hotel.photos || [], // REAL Google Places photos!
+                        heroPhoto: hotel.hero_photo || (hotel.photos && hotel.photos[0]) || '', // REAL Google Places hero photo!
+                        bookingUrl: bookingUrl,
+                        rating: hotel.rating
+                    };
+                });
                 adWorthyHotels = hotels.filter(function (hotel) {
                     // Check for boutique and unique amenities
                     var boutiqueAmenities = [
@@ -912,20 +922,30 @@ app.get('/api/hotels', function (req, res) { return __awaiter(void 0, void 0, vo
                 return [4 /*yield*/, supabaseService.getHotels(limitNum, offsetNum)];
             case 2:
                 supabaseHotels = _d.sent();
-                hotels = supabaseHotels.map(function (hotel) { return ({
-                    id: hotel.id,
-                    name: hotel.name,
-                    city: hotel.city,
-                    country: hotel.country,
-                    coords: hotel.coords,
-                    price: hotel.price,
-                    description: hotel.description || '',
-                    amenityTags: hotel.amenity_tags || [],
-                    photos: hotel.photos || [], // REAL Google Places photos!
-                    heroPhoto: hotel.hero_photo || (hotel.photos && hotel.photos[0]) || '', // REAL Google Places hero photo!
-                    bookingUrl: hotel.booking_url || '',
-                    rating: hotel.rating
-                }); });
+                hotels = supabaseHotels.map(function (hotel) {
+                    // Generate a proper booking URL if none exists
+                    var bookingUrl = hotel.booking_url;
+                    if (!bookingUrl || bookingUrl.trim() === '') {
+                        // Generate a fallback booking.com search URL
+                        var searchQuery = encodeURIComponent(hotel.name + ' ' + hotel.city);
+                        bookingUrl = "https://www.booking.com/searchresults.html?ss=" + searchQuery;
+                    }
+                    
+                    return {
+                        id: hotel.id,
+                        name: hotel.name,
+                        city: hotel.city,
+                        country: hotel.country,
+                        coords: hotel.coords,
+                        price: hotel.price,
+                        description: hotel.description || '',
+                        amenityTags: hotel.amenity_tags || [],
+                        photos: hotel.photos || [], // REAL Google Places photos!
+                        heroPhoto: hotel.hero_photo || (hotel.photos && hotel.photos[0]) || '', // REAL Google Places hero photo!
+                        bookingUrl: bookingUrl,
+                        rating: hotel.rating
+                    };
+                });
                 personalization_1 = {
                     countryAffinity: countryAffinity ? JSON.parse(countryAffinity) : {},
                     amenityAffinity: amenityAffinity ? JSON.parse(amenityAffinity) : {},

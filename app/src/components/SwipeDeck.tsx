@@ -14,12 +14,17 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { HotelCard, SwipeAction } from '../types';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { HotelCard, SwipeAction, RootStackParamList } from '../types';
 import HotelCardComponent from './HotelCard';
 import IOSHaptics from '../utils/IOSHaptics';
 import IOSBlurView from './IOSBlurView';
 import IOSPerformance from '../utils/IOSPerformance';
 import HotelMapView from './HotelMapView';
+import { useAppStore } from '../store';
+import { useTheme } from '../theme';
+import { Button } from '../ui';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
@@ -31,9 +36,9 @@ const getCardDimensions = (insets: any) => {
   // Use 100% of screen width - truly edge to edge
   const cardWidth = SCREEN_WIDTH;
   
-  // Use 100% of screen height minus only the safe areas
-  // This ensures cards go edge-to-edge while respecting notches/home indicator
-  const cardHeight = SCREEN_HEIGHT - insets.top - insets.bottom;
+  // Use 100% of screen height for true full-screen photos
+  // Photos should extend all the way to screen edges including safe areas
+  const cardHeight = SCREEN_HEIGHT;
   
   return { width: cardWidth, height: cardHeight };
 };
@@ -43,6 +48,7 @@ interface SwipeDeckProps {
   currentIndex: number;
   onSwipe: (hotelId: string, action: SwipeAction) => void;
   loading?: boolean;
+  navigation: StackNavigationProp<RootStackParamList, 'Home'>;
 }
 
 const SwipeDeck: React.FC<SwipeDeckProps> = ({
@@ -50,7 +56,9 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
   currentIndex,
   onSwipe,
   loading = false,
+  navigation,
 }) => {
+  const theme = useTheme();
   const position = useRef(new Animated.ValueXY()).current;
   const rotate = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
@@ -421,7 +429,11 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         ]}
         {...(isCurrentCard ? panResponder.panHandlers : {})}
       >
-        <HotelCardComponent hotel={hotel} />
+        <HotelCardComponent 
+          hotel={hotel} 
+          navigation={navigation} 
+          isDevelopment={__DEV__} 
+        />
         
         {/* Swipe indicators - only show on current card */}
         {isCurrentCard && (
@@ -487,20 +499,30 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
   const handleBookNow = async () => {
     if (!detailsHotel) return;
     
+    // Only check if URL exists, don't validate format
+    if (!detailsHotel.bookingUrl || detailsHotel.bookingUrl.trim() === '') {
+      Alert.alert(
+        'Booking',
+        'This hotel is available for booking. In a real app, this would open the booking page.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+    
+    console.log('🔗 Attempting to open booking URL:', detailsHotel.bookingUrl);
+    
     try {
-      const supported = await Linking.canOpenURL(detailsHotel.bookingUrl);
-      if (supported) {
-        await Linking.openURL(detailsHotel.bookingUrl);
-      } else {
-        Alert.alert(
-          'Booking',
-          'This hotel is available for booking. In a real app, this would open the booking page.',
-          [{ text: 'OK' }]
-        );
-      }
+      // Try to open the URL directly first, as Linking.canOpenURL can be unreliable for web URLs
+      await Linking.openURL(detailsHotel.bookingUrl);
+      console.log('✅ Successfully opened booking URL');
     } catch (error) {
-      console.error('Failed to open booking URL:', error);
-      Alert.alert('Error', 'Could not open booking page');
+      console.error('❌ Failed to open booking URL:', error);
+      // Only show fallback if opening actually fails
+      Alert.alert(
+        'Booking',
+        'This hotel is available for booking. In a real app, this would open the booking page.',
+        [{ text: 'OK' }]
+      );
     }
   };
 
@@ -531,7 +553,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         nestedScrollEnabled={true}
         scrollEnabled={true}
         onMomentumScrollEnd={(event) => {
-          const index = Math.round(event.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 40));
+          const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH); // Changed from SCREEN_WIDTH - 40
           setCurrentPhotoIndex(Math.max(0, Math.min(index, detailsHotel.photos.length - 1)));
         }}
         style={styles.photoCarousel}
@@ -642,24 +664,13 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
 
               {/* Book Now Button - moved after price info */}
               <View style={styles.bookingSection}>
-                <TouchableOpacity style={styles.bookButton} onPress={handleBookNow}>
-                  <Text style={styles.bookButtonText}>Book Now</Text>
-                </TouchableOpacity>
+                <Button 
+                  title="Book Now" 
+                  onPress={handleBookNow}
+                  variant="primary"
+                  fullWidth
+                />
               </View>
-
-              {/* Amenities */}
-              {detailsHotel.amenityTags.length > 0 && (
-                <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Amenities</Text>
-                  <View style={styles.amenitiesContainer}>
-                    {detailsHotel.amenityTags.map((tag, index) => (
-                      <View key={index} style={styles.amenityTag}>
-                        <Text style={styles.amenityText}>{tag}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              )}
 
               {/* Map View (if coordinates available) */}
               {detailsHotel.coords && (
@@ -709,12 +720,13 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    // Removed alignItems: 'center' and justifyContent: 'center' for true edge-to-edge
     // Removed all padding - true edge-to-edge
   },
   card: {
     position: 'absolute',
+    top: 0, // Ensure cards start at the very top
+    left: 0, // Ensure cards start at the very left
     borderRadius: 0, // Remove border radius for true fullscreen
     backgroundColor: '#fff',
     shadowColor: '#000',
@@ -760,7 +772,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     padding: 12,
     borderRadius: 15,
-    borderWidth: 4,
+    borderWidth: 2,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -773,38 +785,38 @@ const styles = StyleSheet.create({
   likeIndicator: {
     top: 100,
     right: 50,
-    borderColor: '#4CAF50',
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    borderColor: 'rgba(76, 175, 80, 0.8)',
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
     transform: [{ rotate: '15deg' }],
   },
   dislikeIndicator: {
     top: 100,
     left: 50,
-    borderColor: '#F44336',
-    backgroundColor: 'rgba(244, 67, 54, 0.2)',
+    borderColor: 'rgba(244, 67, 54, 0.8)',
+    backgroundColor: 'rgba(244, 67, 54, 0.1)',
     transform: [{ rotate: '-15deg' }],
   },
   superlikeIndicator: {
     bottom: 150,
     alignSelf: 'center',
-    borderColor: '#2196F3',
-    backgroundColor: 'rgba(33, 150, 243, 0.2)',
+    borderColor: 'rgba(33, 150, 243, 0.8)',
+    backgroundColor: 'rgba(33, 150, 243, 0.1)',
     paddingHorizontal: 20,
   },
   detailsIndicator: {
     top: 70,
     alignSelf: 'center',
-    borderColor: '#FF9800',
-    backgroundColor: 'rgba(255, 152, 0, 0.2)',
+    borderColor: 'rgba(255, 152, 0, 0.8)',
+    backgroundColor: 'rgba(255, 152, 0, 0.1)',
     paddingHorizontal: 16,
   },
   indicatorText: {
     color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 18,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    fontWeight: '600',
+    fontSize: 17,
+    textShadowColor: 'rgba(0, 0, 0, 0.7)',
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 3,
   },
   detailsContainer: {
     position: 'absolute',
@@ -861,7 +873,7 @@ const styles = StyleSheet.create({
   },
   detailsContent: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 0, // Changed from 20 to 0 for full-screen photos
     paddingTop: 125, // Increased further to ensure complete clearance
   },
   scrollContentContainer: {
@@ -872,31 +884,31 @@ const styles = StyleSheet.create({
     marginBottom: 12, // Consistent with other sections
   },
   photoSection: {
-    height: 200, // Reduced height to save space
+    height: 300, // Increased from 200 to 300 for more immersive photos
     marginBottom: 12, // Consistent with other sections
     position: 'relative',
     zIndex: 1, // Ensure photos are above background but below header
   },
   singlePhoto: {
-    width: SCREEN_WIDTH - 40,
-    height: 200,
+    width: SCREEN_WIDTH, // Changed from SCREEN_WIDTH - 40 to full width
+    height: 300, // Increased from 200 to 300
   },
   photoCarousel: {
-    width: SCREEN_WIDTH - 40,
-    height: 200,
+    width: SCREEN_WIDTH, // Changed from SCREEN_WIDTH - 40 to full width
+    height: 300, // Increased from 200 to 300
   },
   photoCarouselContainer: {
-    width: SCREEN_WIDTH - 40,
-    height: 200,
-    borderRadius: 15,
+    width: SCREEN_WIDTH, // Changed from SCREEN_WIDTH - 40 to full width
+    height: 300, // Increased from 200 to 300
+    borderRadius: 0, // Removed border radius for true full-screen
     overflow: 'hidden',
   },
   photoCarouselContent: {
     alignItems: 'center',
   },
   carouselPhoto: {
-    width: SCREEN_WIDTH - 40,
-    height: 200,
+    width: SCREEN_WIDTH, // Changed from SCREEN_WIDTH - 40 to full width
+    height: 300, // Increased from 200 to 300
   },
   dotsContainer: {
     position: 'absolute',
@@ -923,6 +935,7 @@ const styles = StyleSheet.create({
   },
   infoSection: {
     marginBottom: 12, // Standardized margin
+    paddingHorizontal: 20, // Added back horizontal padding for text content
   },
   hotelName: {
     color: '#fff',
@@ -976,23 +989,11 @@ const styles = StyleSheet.create({
     height: 80,
   },
   bookingSection: {
-    paddingHorizontal: 0,
+    paddingHorizontal: 20, // Added horizontal padding for button
     paddingTop: 12, // Standardized margin
     paddingBottom: 12, // Standardized margin
   },
-  bookButton: {
-    backgroundColor: '#FFD700',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bookButtonText: {
-    color: '#000',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
+
 });
 
 export default SwipeDeck; 

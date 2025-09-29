@@ -3,8 +3,8 @@ import {
   View,
   StyleSheet,
   Alert,
-  TouchableOpacity,
   Text,
+  StatusBar,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -13,12 +13,15 @@ import SwipeDeck from '../components/SwipeDeck';
 import IOSHaptics from '../utils/IOSHaptics';
 import { useAppStore } from '../store';
 import { RootStackParamList, SwipeAction } from '../types';
+import { useTheme } from '../theme';
+import { Button } from '../ui';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
   
   const {
     hotels,
@@ -68,12 +71,49 @@ const HomeScreen: React.FC = () => {
     loadHotels(true);
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.bg,
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.xxl + theme.spacing.s,
+    },
+    errorTitle: {
+      fontSize: 28,
+      fontWeight: '600',
+      color: theme.textPrimary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.l,
+    },
+    errorMessage: {
+      fontSize: 17,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      lineHeight: 24,
+      marginBottom: theme.spacing.xl,
+    },
+    errorActions: {
+      alignItems: 'center',
+      width: '100%',
+    },
+  });
+
   // Show error state
   if (error && !loading) {
     const isNotSeeded = error.includes('seed');
     
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={styles.container}>
+        <StatusBar 
+          barStyle="light-content"
+          backgroundColor={theme.bg}
+          hidden={true} // Hide status bar for consistency
+        />
+        
         <View style={styles.errorContainer}>
           <Text style={styles.errorTitle}>
             {isNotSeeded ? 'Welcome to Glintz!' : 'Oops!'}
@@ -82,13 +122,17 @@ const HomeScreen: React.FC = () => {
           
           <View style={styles.errorActions}>
             {isNotSeeded ? (
-              <TouchableOpacity style={styles.seedButton} onPress={handleSeedHotels}>
-                <Text style={styles.seedButtonText}>Discover Hotels</Text>
-              </TouchableOpacity>
+              <Button 
+                title="Discover Hotels" 
+                onPress={handleSeedHotels}
+                variant="primary"
+              />
             ) : (
-              <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-                <Text style={styles.retryButtonText}>Try Again</Text>
-              </TouchableOpacity>
+              <Button 
+                title="Try Again" 
+                onPress={handleRetry}
+                variant="secondary"
+              />
             )}
           </View>
         </View>
@@ -97,74 +141,25 @@ const HomeScreen: React.FC = () => {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
+      <StatusBar 
+        barStyle="light-content"
+        backgroundColor={theme.bg}
+        hidden={true} // Hide status bar for true full-screen photos
+      />
+      
       {/* Swipe Deck - Fullscreen */}
       <SwipeDeck
         hotels={hotels}
         currentIndex={currentIndex}
         onSwipe={handleSwipe}
         loading={loading}
+        navigation={navigation}
       />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  errorTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  errorMessage: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 30,
-  },
-  errorActions: {
-    alignItems: 'center',
-  },
-  seedButton: {
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
-    minWidth: 200,
-  },
-  seedButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  retryButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    minWidth: 200,
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-});
+
 
 export default HomeScreen; 

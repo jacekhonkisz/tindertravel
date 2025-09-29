@@ -11,7 +11,7 @@ import { glintzCurate, RawHotel } from './curation';
 import { SupabaseHotel } from './supabase';
 import { HotelDiscoveryController } from './hotel-discovery-controller';
 import { PhotoQualityAuditor } from './photo-quality-auditor';
-
+import { photoCurationService, CuratedPhoto } from './photo-curation';
 // Load environment variables
 dotenv.config();
 
@@ -52,6 +52,7 @@ try {
   console.log('✅ Supabase service initialized');
 } catch (error) {
   console.error('Failed to initialize Supabase service:', error);
+  process.exit(1);
 }
 
 // Initialize Hotel Discovery Controller
@@ -173,6 +174,124 @@ app.delete('/api/hotels', async (req, res) => {
     res.status(500).json({
       error: 'Failed to clear hotels',
       message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// SIMPLE DEV AUTHENTICATION ENDPOINTS
+
+// Simple passwordless auth - always accepts test@glintz.io with OTP 123456
+app.post('/api/auth/request-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email is required',
+      });
+    }
+
+    // In dev mode, only accept test@glintz.io
+    if (email.toLowerCase() !== 'test@glintz.io') {
+      return res.status(400).json({
+        success: false,
+        error: 'Only test@glintz.io is allowed in dev mode',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'OTP sent successfully (dev mode: use 123456)',
+    });
+  } catch (error) {
+    console.error('Request OTP error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Verify OTP code - always accepts 123456 for test@glintz.io
+app.post('/api/auth/verify-otp', async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and code are required',
+      });
+    }
+
+    // In dev mode, only accept test@glintz.io with OTP 123456
+    if (email.toLowerCase() !== 'test@glintz.io' || code !== '123456') {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid email or OTP code',
+      });
+    }
+
+    // Create a simple user object and token
+    const user = {
+      id: 'test-user-id',
+      email: 'test@glintz.io',
+      name: 'Test User',
+    };
+
+    const token = 'dev-token-' + Date.now();
+
+    res.json({
+      success: true,
+      user,
+      token,
+      message: 'Authentication successful',
+    });
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Verify token - always valid for dev tokens
+app.get('/api/auth/verify-token', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        valid: false,
+        error: 'No token provided',
+      });
+    }
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    
+    // In dev mode, accept any token that starts with 'dev-token-'
+    if (!token.startsWith('dev-token-')) {
+      return res.status(401).json({
+        valid: false,
+        error: 'Invalid token',
+      });
+    }
+
+    res.json({
+      valid: true,
+      user: {
+        id: 'test-user-id',
+        email: 'test@glintz.io',
+        name: 'Test User',
+      },
+    });
+  } catch (error) {
+    console.error('Verify token error:', error);
+    res.status(500).json({
+      valid: false,
+      error: 'Internal server error',
     });
   }
 });
@@ -905,20 +1024,30 @@ app.get('/api/hotels', async (req, res) => {
     const supabaseHotels = await supabaseService.getHotels(limitNum, offsetNum);
     
     // Convert Supabase format to HotelCard format
-    const hotels: HotelCard[] = supabaseHotels.map(hotel => ({
-      id: hotel.id,
-      name: hotel.name,
-      city: hotel.city,
-      country: hotel.country,
-      coords: hotel.coords,
-      price: hotel.price,
-      description: hotel.description || '',
-      amenityTags: hotel.amenity_tags || [],
-      photos: hotel.photos || [], // REAL Google Places photos!
-      heroPhoto: hotel.hero_photo || (hotel.photos && hotel.photos[0]) || '', // REAL Google Places hero photo!
-      bookingUrl: hotel.booking_url || '',
-      rating: hotel.rating
-    }));
+    const hotels: HotelCard[] = supabaseHotels.map(hotel => {
+      // Generate a proper booking URL if none exists
+      let bookingUrl = hotel.booking_url;
+      if (!bookingUrl || bookingUrl.trim() === '') {
+        // Generate a fallback booking.com search URL
+        const searchQuery = encodeURIComponent(`${hotel.name} ${hotel.city}`);
+        bookingUrl = `https://www.booking.com/searchresults.html?ss=${searchQuery}`;
+      }
+
+      return {
+        id: hotel.id,
+        name: hotel.name,
+        city: hotel.city,
+        country: hotel.country,
+        coords: hotel.coords,
+        price: hotel.price,
+        description: hotel.description || '',
+        amenityTags: hotel.amenity_tags || [],
+        photos: hotel.photos || [], // REAL Google Places photos!
+        heroPhoto: hotel.hero_photo || (hotel.photos && hotel.photos[0]) || '', // REAL Google Places hero photo!
+        bookingUrl,
+        rating: hotel.rating
+      };
+    });
 
     // Parse personalization data from query params
     const personalization: PersonalizationData = {
@@ -1329,6 +1458,149 @@ app.post('/api/discovery/config/validate', async (req, res) => {
     console.error('Failed to validate config:', error);
     res.status(500).json({
       error: 'Failed to validate config',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// ==================== PHOTO CURATION ENDPOINTS ====================
+
+// Save photo curation for a hotel
+app.post('/api/photos/curate/:hotelId', async (req, res) => {
+  try {
+    const { hotelId } = req.params;
+    const { originalPhotos, curatedPhotos }: { 
+      originalPhotos: string[], 
+      curatedPhotos: CuratedPhoto[] 
+    } = req.body;
+
+    if (!originalPhotos || !curatedPhotos) {
+      return res.status(400).json({
+        error: 'Missing required fields',
+        message: 'originalPhotos and curatedPhotos are required'
+      });
+    }
+
+    await photoCurationService.savePhotoCuration(hotelId, originalPhotos, curatedPhotos);
+
+    res.json({
+      success: true,
+      message: 'Photo curation saved successfully',
+      hotelId,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to save photo curation:', error);
+    res.status(500).json({
+      error: 'Failed to save photo curation',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Get photo curation for a hotel
+app.get('/api/photos/curate/:hotelId', async (req, res) => {
+  try {
+    const { hotelId } = req.params;
+    const curation = await photoCurationService.getPhotoCuration(hotelId);
+
+    res.json({
+      curation,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to get photo curation:', error);
+    res.status(500).json({
+      error: 'Failed to get photo curation',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Reset photo curation for a hotel
+app.delete('/api/photos/curate/:hotelId', async (req, res) => {
+  try {
+    const { hotelId } = req.params;
+    await photoCurationService.resetPhotoCuration(hotelId);
+
+    res.json({
+      success: true,
+      message: 'Photo curation reset successfully',
+      hotelId,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to reset photo curation:', error);
+    res.status(500).json({
+      error: 'Failed to reset photo curation',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Get all curated hotels
+app.get('/api/photos/curated-hotels', async (req, res) => {
+  try {
+    const hotels = await photoCurationService.getCuratedHotels();
+
+    res.json({
+      hotels,
+      count: hotels.length,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to get curated hotels:', error);
+    res.status(500).json({
+      error: 'Failed to get curated hotels',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Get photo quality statistics
+app.get('/api/photos/stats', async (req, res) => {
+  try {
+    const stats = await photoCurationService.getPhotoQualityStats();
+
+    res.json({
+      stats,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to get photo stats:', error);
+    res.status(500).json({
+      error: 'Failed to get photo stats',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Direct photo removal endpoint (dev mode only)
+app.delete('/api/photos/remove/:hotelId/:photoIndex', async (req, res) => {
+  try {
+    const { hotelId, photoIndex } = req.params;
+    const index = parseInt(photoIndex);
+
+    if (isNaN(index) || index < 0) {
+      return res.status(400).json({
+        error: 'Invalid photo index',
+        message: 'Photo index must be a non-negative number'
+      });
+    }
+
+    await photoCurationService.removePhotoDirectly(hotelId, index);
+
+    res.json({
+      success: true,
+      message: 'Photo removed successfully',
+      hotelId,
+      photoIndex: index,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Failed to remove photo directly:', error);
+    res.status(500).json({
+      error: 'Failed to remove photo',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
   }

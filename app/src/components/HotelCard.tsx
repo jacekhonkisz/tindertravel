@@ -8,18 +8,28 @@ import {
   Animated,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { HotelCard as HotelCardType } from '../types';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { HotelCard as HotelCardType, RootStackParamList } from '../types';
 import IOSHaptics from '../utils/IOSHaptics';
+import { PhotoManager } from './PhotoManager';
+import { Ionicons } from '@expo/vector-icons';
+import { apiClient } from '../api/client';
+import { useTheme } from '../theme';
+import { GradientOverlay, DebugBadge, Chip } from '../ui';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface HotelCardProps {
   hotel: HotelCardType;
   onPress?: () => void;
+  navigation?: StackNavigationProp<RootStackParamList, 'Home'>;
+  isDevelopment?: boolean;
 }
 
-const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress }) => {
+const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress, navigation, isDevelopment = false }) => {
+  const theme = useTheme();
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [photoManagerVisible, setPhotoManagerVisible] = useState(false);
   const fadeAnim = new Animated.Value(1);
 
   const photos = hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto];
@@ -68,6 +78,77 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress }) => {
   const handleRightTap = () => {
     if (totalPhotos > 1) {
       changePhoto('next');
+    }
+  };
+
+  const handlePhotoSave = async (updatedPhotos: any[]) => {
+    try {
+      console.log('Saving photo changes for hotel:', hotel.id, updatedPhotos);
+      
+      // Convert to API format
+      const curatedPhotos = updatedPhotos.map(photo => ({
+        url: photo.url,
+        order: photo.order,
+        is_removed: false, // Photos in updatedPhotos are not removed
+      }));
+
+      // Get original photos (current photos before curation)
+      const originalPhotos = photos;
+
+      // Save to API
+      await apiClient.savePhotoCuration(hotel.id, {
+        originalPhotos,
+        curatedPhotos,
+      });
+
+      console.log('✅ Photo curation saved successfully');
+      setPhotoManagerVisible(false);
+    } catch (error) {
+      console.error('❌ Failed to save photo curation:', error);
+      // Keep modal open on error so user can retry
+    }
+  };
+
+  const convertPhotosToManagerFormat = () => {
+    return photos.map((url, index) => ({
+      id: `${hotel.id}_photo_${index}`,
+      url,
+      order: index,
+    }));
+  };
+
+  const handleDirectRemovePhoto = async () => {
+    try {
+      console.log('Directly removing photo at index:', currentPhotoIndex, 'for hotel:', hotel.id);
+      
+      // Haptic feedback
+      IOSHaptics.buttonPress();
+      
+      // Get the original hotel ID (remove the timestamp suffix if it exists)
+      const originalHotelId = hotel.id.split('-')[0];
+      
+      // Call API to remove photo directly
+      await apiClient.removePhotoDirectly(originalHotelId, currentPhotoIndex);
+      
+      console.log('✅ Photo removed directly from backend');
+      
+      // Update local hotel data immediately for instant UI feedback
+      const updatedPhotos = photos.filter((_, index) => index !== currentPhotoIndex);
+      
+      // Update the hotel object (this is a local update for immediate UI feedback)
+      hotel.photos = updatedPhotos;
+      
+      // Adjust current photo index if needed
+      if (currentPhotoIndex >= updatedPhotos.length && updatedPhotos.length > 0) {
+        setCurrentPhotoIndex(updatedPhotos.length - 1);
+      } else if (updatedPhotos.length === 0) {
+        setCurrentPhotoIndex(0);
+      }
+      
+      console.log('✅ UI updated immediately with new photo count:', updatedPhotos.length);
+      
+    } catch (error) {
+      console.error('❌ Failed to remove photo directly:', error);
     }
   };
 
@@ -121,7 +202,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress }) => {
       )}
 
       {/* Gradient Overlay */}
-      <View style={styles.gradientOverlay} />
+      <GradientOverlay height="55%" />
 
       {/* Hotel Information Overlay */}
       <View style={styles.infoOverlay}>
@@ -133,27 +214,14 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress }) => {
             {hotel.city}, {hotel.country}
           </Text>
           {hotel.price && (
-            <Text style={styles.price}>
-              {formatPrice(hotel.price)}
-            </Text>
+            <View style={[styles.pricePill, { backgroundColor: theme.accent }]}>
+              <Text style={styles.priceText}>
+                {formatPrice(hotel.price)}
+              </Text>
+            </View>
           )}
         </View>
 
-        {/* Amenity Tags */}
-        {hotel.amenityTags.length > 0 && (
-          <View style={styles.amenityContainer}>
-            {hotel.amenityTags.slice(0, 4).map((tag, index) => (
-              <View key={index} style={styles.amenityTag}>
-                <Text style={styles.amenityText}>{tag}</Text>
-              </View>
-            ))}
-            {hotel.amenityTags.length > 4 && (
-              <View style={styles.amenityTag}>
-                <Text style={styles.amenityText}>+{hotel.amenityTags.length - 4}</Text>
-              </View>
-            )}
-          </View>
-        )}
       </View>
 
       {/* Photo counter */}
@@ -165,17 +233,65 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress }) => {
         </View>
       )}
 
-      {/* Dev mode indicator for looped hotels */}
-      {hotel.id.split('-').length > 3 && (
-        <View style={styles.devIndicator}>
-          <Text style={styles.devIndicatorText}>LOOP</Text>
-        </View>
-      )}
+      {/* Profile button */}
+      <TouchableOpacity
+        style={styles.profileButton}
+        onPress={() => {
+          IOSHaptics.navigationTransition();
+          navigation?.navigate('Saved');
+        }}
+        accessible={true}
+        accessibilityLabel="View profile and saved hotels"
+        accessibilityRole="button"
+      >
+        <Text style={styles.profileButtonText}>👤</Text>
+      </TouchableOpacity>
 
       {/* Amadeus Attribution */}
       <View style={styles.attribution}>
         <Text style={styles.attributionText}>Data © Amadeus</Text>
       </View>
+
+      {/* Development Photo Manager Button */}
+      {isDevelopment && (
+        <TouchableOpacity
+          style={styles.devPhotoButton}
+          onPress={() => {
+            IOSHaptics.buttonPress();
+            setPhotoManagerVisible(true);
+          }}
+          accessible={true}
+          accessibilityLabel="Manage photos (Development only)"
+          accessibilityRole="button"
+        >
+          <Ionicons name="camera" size={16} color="#fff" />
+          <Text style={styles.devPhotoButtonText}>Photos</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* Development Direct Remove Photo Button */}
+      {isDevelopment && totalPhotos > 1 && (
+        <TouchableOpacity
+          style={styles.devRemoveButton}
+          onPress={handleDirectRemovePhoto}
+          accessible={true}
+          accessibilityLabel="Remove current photo (Development only)"
+          accessibilityRole="button"
+        >
+          <Ionicons name="trash" size={16} color="#fff" />
+          <Text style={styles.devRemoveButtonText}>Remove</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* Photo Manager Modal */}
+      <PhotoManager
+        visible={photoManagerVisible}
+        onClose={() => setPhotoManagerVisible(false)}
+        hotelId={hotel.id}
+        hotelName={hotel.name}
+        photos={convertPhotosToManagerFormat()}
+        onSave={handlePhotoSave}
+      />
     </TouchableOpacity>
   );
 };
@@ -215,7 +331,7 @@ const styles = StyleSheet.create({
   },
   photoIndicators: {
     position: 'absolute',
-    top: 30, // Moved down slightly for better visibility
+    top: 50, // Moved higher to avoid collision with content
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -224,17 +340,17 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    marginHorizontal: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    marginHorizontal: 3,
   },
   activeIndicator: {
-    backgroundColor: '#fff',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    backgroundColor: 'rgba(255, 255, 255, 1.0)',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   photoCounter: {
     position: 'absolute',
@@ -251,20 +367,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  gradientOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '60%',
-    backgroundColor: 'transparent',
-    // iOS-style gradient with better shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -120 },
-    shadowOpacity: 0.9,
-    shadowRadius: 120,
-    elevation: 0, // Remove Android elevation
-  },
+
   infoOverlay: {
     position: 'absolute',
     bottom: 0,
@@ -302,24 +405,16 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
   },
-  amenityContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  amenityTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  pricePill: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 22,
+    alignSelf: 'flex-start',
   },
-  amenityText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-    textTransform: 'capitalize',
+  priceText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   attribution: {
     position: 'absolute',
@@ -328,23 +423,62 @@ const styles = StyleSheet.create({
   },
   attributionText: {
     color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '400',
+    opacity: 0.6,
   },
-  devIndicator: {
+  profileButton: {
     position: 'absolute',
-    top: 20, // Moved up slightly
-    left: 15, // Moved closer to edge
-    backgroundColor: 'red',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 10,
+    top: 20,
+    left: 15,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 20,
     zIndex: 3,
   },
-  devIndicatorText: {
+  profileButtonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 16,
     fontWeight: 'bold',
+  },
+  devPhotoButton: {
+    position: 'absolute',
+    bottom: 20, // Moved much lower
+    left: '50%', // Center horizontally
+    transform: [{ translateX: -90 }], // Use transform instead of marginLeft
+    backgroundColor: 'rgba(255, 152, 0, 0.9)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 25,
+    zIndex: 3,
+  },
+  devPhotoButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+  devRemoveButton: {
+    position: 'absolute',
+    bottom: 20, // Same bottom position
+    left: '50%', // Center horizontally
+    transform: [{ translateX: 10 }], // Position to the right with proper spacing
+    backgroundColor: 'rgba(255, 59, 48, 0.9)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 25,
+    zIndex: 3,
+  },
+  devRemoveButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+    marginLeft: 6,
   },
 });
 

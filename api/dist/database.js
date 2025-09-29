@@ -248,4 +248,3 @@ class DatabaseService {
 }
 exports.DatabaseService = DatabaseService;
 exports.default = DatabaseService;
-//# sourceMappingURL=database.js.map

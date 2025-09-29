@@ -16,6 +16,8 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, HotelCard } from '../types';
 import { useAppStore } from '../store';
+import { useTheme } from '../theme';
+import { Button, Card, Chip } from '../ui';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 2 cards per row with margins
@@ -24,7 +26,8 @@ type SavedScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Saved'
 
 const SavedScreen: React.FC = () => {
   const navigation = useNavigation<SavedScreenNavigationProp>();
-  const { savedHotels, removeSavedHotel } = useAppStore();
+  const theme = useTheme();
+  const { savedHotels, removeSavedHotel, logout, user } = useAppStore();
 
   const formatPrice = (price?: { amount: string; currency: string }) => {
     if (!price) return null;
@@ -37,6 +40,32 @@ const SavedScreen: React.FC = () => {
 
   const handleHotelPress = (hotel: HotelCard) => {
     navigation.navigate('Details', { hotel });
+  };
+
+  const handleSeeAll = (type: 'like' | 'superlike') => {
+    const categoryName = type === 'superlike' ? 'Super Liked' : 'Liked';
+    
+    navigation.navigate('HotelCollection', {
+      type,
+      title: `${categoryName} Hotels`
+    });
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Logout', 
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+          }
+        }
+      ]
+    );
   };
 
   const handleRemoveHotel = (hotelId: string, type: 'like' | 'superlike') => {
@@ -61,34 +90,71 @@ const SavedScreen: React.FC = () => {
       onPress={() => handleHotelPress(hotel)}
       onLongPress={() => handleRemoveHotel(hotel.id, type)}
     >
+      <Card variant="surface">
+        <Image
+          source={{ uri: hotel.heroPhoto }}
+          style={styles.hotelImage}
+          contentFit="cover"
+        />
+        
+        <View style={styles.hotelInfo}>
+          <Text style={styles.hotelName} numberOfLines={2}>
+            {hotel.name}
+          </Text>
+          <Text style={styles.hotelLocation} numberOfLines={1}>
+            {hotel.city}, {hotel.country}
+          </Text>
+          {hotel.price && (
+            <Text style={styles.hotelPrice}>
+              from {formatPrice(hotel.price)}/night
+            </Text>
+          )}
+        </View>
+
+        {/* Type indicator */}
+        <View style={[
+          styles.typeIndicator,
+          { backgroundColor: type === 'superlike' ? '#2196F3' : theme.success }
+        ]}>
+          <Text style={styles.typeIndicatorText}>
+            {type === 'superlike' ? '★' : '♡'}
+          </Text>
+        </View>
+      </Card>
+    </TouchableOpacity>
+  );
+
+  const renderCompactHotelCard = (hotel: HotelCard, type: 'like' | 'superlike') => (
+    <TouchableOpacity
+      key={hotel.id}
+      style={styles.compactHotelCard}
+      onPress={() => handleHotelPress(hotel)}
+      onLongPress={() => handleRemoveHotel(hotel.id, type)}
+    >
       <Image
         source={{ uri: hotel.heroPhoto }}
-        style={styles.hotelImage}
+        style={styles.compactHotelImage}
         contentFit="cover"
       />
       
-      <View style={styles.hotelInfo}>
-        <Text style={styles.hotelName} numberOfLines={2}>
+      <View style={styles.compactHotelBadge}>
+        <Text style={styles.compactHotelBadgeText}>
+          {type === 'superlike' ? '★' : '♡'}
+        </Text>
+      </View>
+      
+      <View style={styles.compactHotelInfo}>
+        <Text style={styles.compactHotelName} numberOfLines={1}>
           {hotel.name}
         </Text>
-        <Text style={styles.hotelLocation} numberOfLines={1}>
+        <Text style={styles.compactHotelLocation} numberOfLines={1}>
           {hotel.city}, {hotel.country}
         </Text>
         {hotel.price && (
-          <Text style={styles.hotelPrice}>
+          <Text style={styles.compactHotelPrice}>
             from {formatPrice(hotel.price)}/night
           </Text>
         )}
-      </View>
-
-      {/* Type indicator */}
-      <View style={[
-        styles.typeIndicator,
-        type === 'superlike' ? styles.superlikeIndicator : styles.likeIndicator
-      ]}>
-        <Text style={styles.typeIndicatorText}>
-          {type === 'superlike' ? '★' : '♡'}
-        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -125,9 +191,327 @@ const SavedScreen: React.FC = () => {
 
   const totalSaved = savedHotels.liked.length + savedHotels.superliked.length;
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.bg,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.xl,
+      paddingVertical: theme.spacing.l,
+    },
+    backButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: theme.chipBg,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    backButtonText: {
+      fontSize: 24,
+      color: theme.textPrimary,
+      fontWeight: 'bold',
+    },
+    headerCenter: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 22,
+      fontWeight: '600',
+      color: theme.textPrimary,
+    },
+    userEmail: {
+      fontSize: 13,
+      color: theme.textSecondary,
+      marginTop: 2,
+    },
+    headerRight: {
+      width: 80,
+      alignItems: 'center',
+    },
+    logoutButton: {
+      paddingHorizontal: theme.spacing.m,
+      paddingVertical: theme.spacing.xs,
+      backgroundColor: theme.chipBg,
+      borderRadius: theme.spacing.xs,
+    },
+    logoutText: {
+      fontSize: 13,
+      color: theme.textPrimary,
+      fontWeight: '500',
+    },
+    content: {
+      flex: 1,
+    },
+    hotelCard: {
+      width: CARD_WIDTH,
+      marginBottom: theme.spacing.l,
+    },
+    hotelImage: {
+      width: '100%',
+      height: 120,
+      borderTopLeftRadius: theme.radius.card,
+      borderTopRightRadius: theme.radius.card,
+    },
+    hotelInfo: {
+      padding: theme.spacing.m,
+    },
+    hotelName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.textPrimary,
+      marginBottom: theme.spacing.xs,
+    },
+    hotelLocation: {
+      fontSize: 13,
+      color: theme.textSecondary,
+      marginBottom: theme.spacing.xs,
+    },
+    hotelPrice: {
+      fontSize: 13,
+      color: theme.accent,
+      fontWeight: '500',
+    },
+    typeIndicator: {
+      position: 'absolute',
+      top: theme.spacing.s,
+      right: theme.spacing.s,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    typeIndicatorText: {
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: 'bold',
+    },
+    profileStats: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      backgroundColor: theme.surface,
+      marginHorizontal: theme.spacing.xl,
+      marginVertical: theme.spacing.l,
+      paddingVertical: theme.spacing.xl,
+      borderRadius: theme.radius.card,
+      ...theme.shadow.card,
+    },
+    statItem: {
+      alignItems: 'center',
+      flex: 1,
+    },
+    statNumber: {
+      color: theme.textPrimary,
+      fontSize: 24,
+      fontWeight: '600',
+      marginBottom: theme.spacing.xs,
+    },
+    statLabel: {
+      color: theme.textSecondary,
+      fontSize: 13,
+      textAlign: 'center',
+    },
+    statDivider: {
+      width: 1,
+      height: 30,
+      backgroundColor: theme.chipBorder,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.xxl + theme.spacing.s,
+    },
+    emptyTitle: {
+      fontSize: 28,
+      fontWeight: '600',
+      color: theme.textPrimary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.l,
+    },
+    emptyDescription: {
+      fontSize: 17,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      lineHeight: 24,
+      marginBottom: theme.spacing.xl,
+    },
+    categorySection: {
+      marginBottom: theme.spacing.xl,
+    },
+    categoryHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.xl,
+      marginBottom: theme.spacing.l,
+    },
+    categoryTitle: {
+      color: theme.textPrimary,
+      fontSize: 22,
+      fontWeight: '600',
+    },
+    seeAllButton: {
+      backgroundColor: theme.chipBg,
+      paddingHorizontal: theme.spacing.m,
+      paddingVertical: theme.spacing.xs,
+      borderRadius: theme.radius.chip,
+    },
+    seeAllText: {
+      color: theme.textPrimary,
+      fontSize: 13,
+      fontWeight: '500',
+    },
+    hotelScrollView: {
+      paddingLeft: theme.spacing.xl,
+    },
+    hotelScrollContent: {
+      paddingRight: theme.spacing.xl,
+    },
+    emptyRowMessage: {
+      width: SCREEN_WIDTH - 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: theme.spacing.xxl + theme.spacing.s,
+      backgroundColor: theme.surface,
+      borderRadius: theme.radius.card,
+    },
+    emptyRowText: {
+      color: theme.textPrimary,
+      fontSize: 16,
+      fontWeight: '500',
+      marginBottom: theme.spacing.xs,
+    },
+    emptyRowSubtext: {
+      color: theme.textSecondary,
+      fontSize: 13,
+      textAlign: 'center',
+    },
+    compactHotelCard: {
+      width: 160,
+      backgroundColor: theme.surface,
+      borderRadius: theme.radius.card,
+      overflow: 'hidden',
+      marginRight: theme.spacing.l,
+      ...theme.shadow.card,
+    },
+    compactHotelImage: {
+      width: '100%',
+      height: 120,
+    },
+    compactHotelBadge: {
+      position: 'absolute',
+      top: theme.spacing.s,
+      right: theme.spacing.s,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      borderRadius: 12,
+      width: 24,
+      height: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    compactHotelBadgeText: {
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: 'bold',
+    },
+    compactHotelInfo: {
+      padding: theme.spacing.m,
+    },
+    compactHotelName: {
+      color: theme.textPrimary,
+      fontSize: 13,
+      fontWeight: '600',
+      marginBottom: theme.spacing.xs,
+    },
+    compactHotelLocation: {
+      color: theme.textSecondary,
+      fontSize: 12,
+      marginBottom: theme.spacing.xs,
+    },
+    compactHotelPrice: {
+      color: theme.accent,
+      fontSize: 12,
+      fontWeight: '500',
+    },
+    scrollContainer: {
+      position: 'relative',
+    },
+    scrollIndicator: {
+      position: 'absolute',
+      right: 10,
+      top: '50%',
+      transform: [{ translateY: -12 }],
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      borderRadius: 12,
+      width: 24,
+      height: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1,
+    },
+    scrollIndicatorText: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
+    instructions: {
+      alignItems: 'center',
+      paddingVertical: theme.spacing.xl,
+    },
+    instructionText: {
+      color: theme.textSecondary,
+      fontSize: 13,
+      textAlign: 'center',
+      opacity: 0.8,
+    },
+    section: {
+      paddingHorizontal: theme.spacing.xl,
+      paddingBottom: theme.spacing.xl,
+    },
+    sectionTitle: {
+      fontSize: 24,
+      fontWeight: '600',
+      color: theme.textPrimary,
+      marginBottom: theme.spacing.xl,
+    },
+    hotelsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      gap: theme.spacing.l,
+    },
+    emptySection: {
+      alignItems: 'center',
+      paddingVertical: theme.spacing.xxl + theme.spacing.s,
+    },
+    emptyText: {
+      fontSize: 17,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.s,
+    },
+    emptySubtext: {
+      fontSize: 13,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      opacity: 0.7,
+    },
+  });
+
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <StatusBar 
+        barStyle="light-content" 
+        backgroundColor={theme.bg} 
+      />
       
       {/* Header */}
       <View style={styles.header}>
@@ -138,38 +522,128 @@ const SavedScreen: React.FC = () => {
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         
-        <Text style={styles.headerTitle}>Saved Hotels</Text>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>My Profile</Text>
+          {user && (
+            <Text style={styles.userEmail}>{user.email}</Text>
+          )}
+        </View>
         
         <View style={styles.headerRight}>
-          {totalSaved > 0 && (
-            <Text style={styles.totalCount}>{totalSaved}</Text>
-          )}
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Profile Stats Section */}
+      <View style={styles.profileStats}>
+        <View style={styles.statItem}>
+          <Text style={styles.statNumber}>{savedHotels.superliked.length}</Text>
+          <Text style={styles.statLabel}>Super Liked</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statItem}>
+          <Text style={styles.statNumber}>{savedHotels.liked.length}</Text>
+          <Text style={styles.statLabel}>Liked</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statItem}>
+          <Text style={styles.statNumber}>{totalSaved}</Text>
+          <Text style={styles.statLabel}>Total Saved</Text>
         </View>
       </View>
 
       {totalSaved === 0 ? (
         // Empty state
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>No saved hotels yet</Text>
+          <Text style={styles.emptyTitle}>Your Profile is Empty</Text>
           <Text style={styles.emptyDescription}>
-            Start swiping to discover amazing hotels!{'\n'}
+            Start discovering amazing hotels to build your collection!{'\n'}
             Swipe right to like, swipe down to super like.
           </Text>
-          <TouchableOpacity
-            style={styles.discoverButton}
+          <Button
+            title="Discover Hotels"
             onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.discoverButtonText}>Discover Hotels</Text>
-          </TouchableOpacity>
+            variant="primary"
+          />
         </View>
       ) : (
         // Hotels list
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Super Liked Section */}
-          {renderSection('Super Liked', savedHotels.superliked, 'superlike')}
-          
-          {/* Liked Section */}
-          {renderSection('Liked', savedHotels.liked, 'like')}
+          {/* Super Liked Row */}
+          <View style={styles.categorySection}>
+            <View style={styles.categoryHeader}>
+              <Text style={styles.categoryTitle}>Super Liked ({savedHotels.superliked.length})</Text>
+              {savedHotels.superliked.length > 3 && (
+                <TouchableOpacity 
+                  style={styles.seeAllButton}
+                  onPress={() => handleSeeAll('superlike')}
+                >
+                  <Text style={styles.seeAllText}>View List</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            <View style={styles.scrollContainer}>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                style={styles.hotelScrollView}
+                contentContainerStyle={styles.hotelScrollContent}
+              >
+                {savedHotels.superliked.length === 0 ? (
+                  <View style={styles.emptyRowMessage}>
+                    <Text style={styles.emptyRowText}>No super liked hotels yet</Text>
+                    <Text style={styles.emptyRowSubtext}>Swipe down on hotels you absolutely love!</Text>
+                  </View>
+                ) : (
+                  savedHotels.superliked.map(hotel => renderCompactHotelCard(hotel, 'superlike'))
+                )}
+              </ScrollView>
+              {savedHotels.superliked.length > 2 && (
+                <View style={styles.scrollIndicator}>
+                  <Text style={styles.scrollIndicatorText}>→</Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* Liked Row */}
+          <View style={styles.categorySection}>
+            <View style={styles.categoryHeader}>
+              <Text style={styles.categoryTitle}>Liked ({savedHotels.liked.length})</Text>
+              {savedHotels.liked.length > 3 && (
+                <TouchableOpacity 
+                  style={styles.seeAllButton}
+                  onPress={() => handleSeeAll('like')}
+                >
+                  <Text style={styles.seeAllText}>View List</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            <View style={styles.scrollContainer}>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                style={styles.hotelScrollView}
+                contentContainerStyle={styles.hotelScrollContent}
+              >
+                {savedHotels.liked.length === 0 ? (
+                  <View style={styles.emptyRowMessage}>
+                    <Text style={styles.emptyRowText}>No liked hotels yet</Text>
+                    <Text style={styles.emptyRowSubtext}>Swipe right on hotels you like!</Text>
+                  </View>
+                ) : (
+                  savedHotels.liked.map(hotel => renderCompactHotelCard(hotel, 'like'))
+                )}
+              </ScrollView>
+              {savedHotels.liked.length > 2 && (
+                <View style={styles.scrollIndicator}>
+                  <Text style={styles.scrollIndicatorText}>→</Text>
+                </View>
+              )}
+            </View>
+          </View>
           
           {/* Instructions */}
           <View style={styles.instructions}>
@@ -183,171 +657,6 @@ const SavedScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 24,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  headerRight: {
-    width: 44,
-    alignItems: 'center',
-  },
-  totalCount: {
-    fontSize: 16,
-    color: '#4CAF50',
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-  },
-  section: {
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 20,
-  },
-  hotelsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 15,
-  },
-  hotelCard: {
-    width: CARD_WIDTH,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 15,
-    overflow: 'hidden',
-    marginBottom: 15,
-    position: 'relative',
-  },
-  hotelImage: {
-    width: '100%',
-    height: 120,
-  },
-  hotelInfo: {
-    padding: 12,
-  },
-  hotelName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  hotelLocation: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
-    marginBottom: 6,
-  },
-  hotelPrice: {
-    fontSize: 14,
-    color: '#4CAF50',
-    fontWeight: '500',
-  },
-  typeIndicator: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  likeIndicator: {
-    backgroundColor: 'rgba(76, 175, 80, 0.9)',
-  },
-  superlikeIndicator: {
-    backgroundColor: 'rgba(33, 150, 243, 0.9)',
-  },
-  typeIndicatorText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  emptySection: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  emptyText: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.6)',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.4)',
-    textAlign: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  emptyDescription: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.7)',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 30,
-  },
-  discoverButton: {
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
-  },
-  discoverButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  instructions: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  instructionText: {
-    color: 'rgba(255, 255, 255, 0.5)',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-});
+
 
 export default SavedScreen; 

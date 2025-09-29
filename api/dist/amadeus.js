@@ -1,11 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AmadeusClient = void 0;
-const axios_1 = __importDefault(require("axios"));
-const node_cache_1 = __importDefault(require("node-cache"));
+const axios_1 = require("axios");
+const node_cache_1 = require("node-cache");
 const hotellook_1 = require("./hotellook");
 const google_places_1 = require("./google-places");
 const enhanced_hotel_generator_1 = require("./enhanced-hotel-generator");
@@ -1483,4 +1480,3 @@ class AmadeusClient {
     }
 }
 exports.AmadeusClient = AmadeusClient;
-//# sourceMappingURL=amadeus.js.map

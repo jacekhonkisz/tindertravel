@@ -1,10 +1,14 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { HotelCard, PersonalizationData, SwipeAction, AppState } from '../types';
+import { HotelCard, PersonalizationData, SwipeAction, AppState, User, AuthState, OTPRequest, OTPVerification, AuthResponse } from '../types';
 import apiClient from '../api/client';
 
-interface AppStore extends AppState {
-  // Actions
+interface AppStore extends AppState, AuthState {
+  // Additional auth state
+  isVerifyingOTP: boolean;
+  otpEmail: string | null;
+  
+  // Hotel Actions
   loadHotels: (refresh?: boolean) => Promise<void>;
   swipeHotel: (hotelId: string, action: SwipeAction) => Promise<void>;
   saveHotel: (hotel: HotelCard, type: 'like' | 'superlike') => void;
@@ -14,6 +18,15 @@ interface AppStore extends AppState {
   persistData: () => Promise<void>;
   seedHotels: () => Promise<void>;
   resetError: () => void;
+  
+  // Auth Actions
+  requestOTP: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  verifyOTP: (email: string, code: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  logout: () => Promise<void>;
+  checkAuthStatus: () => Promise<void>;
+  clearAuthError: () => void;
+  setVerifyingOTP: (verifying: boolean) => void;
+  setOTPEmail: (email: string | null) => void;
 }
 
 // Storage keys
@@ -21,10 +34,12 @@ const STORAGE_KEYS = {
   PERSONALIZATION: '@glintz_personalization',
   SAVED_HOTELS: '@glintz_saved_hotels',
   SEEN_HOTELS: '@glintz_seen_hotels',
+  AUTH_TOKEN: '@glintz_auth_token',
+  USER_DATA: '@glintz_user_data',
 };
 
 export const useAppStore = create<AppStore>((set, get) => ({
-  // Initial state
+  // Initial state - Hotels
   hotels: [],
   currentIndex: 0,
   loading: false,
@@ -39,6 +54,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
     liked: [],
     superliked: [],
   },
+
+  // Initial state - Auth
+  user: null,
+  isAuthenticated: false,
+  isLoading: false,
+  isVerifyingOTP: false,
+  otpEmail: null,
 
   // Load hotels from API
   loadHotels: async (refresh = false) => {
@@ -303,4 +325,175 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   // Reset error state
   resetError: () => set({ error: null }),
+
+  // AUTH METHODS
+
+  // Request OTP code via email
+  requestOTP: async (email: string) => {
+    console.log('🏪 Store: Starting OTP request for', email);
+    set({ isLoading: true, error: null });
+    
+    try {
+      console.log('🏪 Store: Calling API client...');
+      const response = await apiClient.requestOTP({ email });
+      console.log('🏪 Store: API client response:', response);
+      
+      set({ isLoading: false });
+      
+      const result = {
+        success: response.success || false,
+        message: response.message,
+        error: response.error,
+      };
+      
+      console.log('🏪 Store: Returning result:', result);
+      return result;
+    } catch (error) {
+      console.log('🏪 Store: API client threw error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send OTP';
+      set({ 
+        isLoading: false,
+        error: errorMessage,
+      });
+      
+      const result = {
+        success: false,
+        error: errorMessage,
+      };
+      
+      console.log('🏪 Store: Returning error result:', result);
+      return result;
+    }
+  },
+
+  // Verify OTP code and authenticate user
+  verifyOTP: async (email: string, code: string) => {
+    set({ isLoading: true, error: null });
+    
+    try {
+      const response = await apiClient.verifyOTP({ email, code });
+      
+      if (response.success && response.user && response.token) {
+        // Store auth data
+        await Promise.all([
+          AsyncStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.token),
+          AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user)),
+        ]);
+        
+        // Set auth token in API client
+        apiClient.setAuthToken(response.token);
+        
+        // Update state
+        set({
+          user: response.user,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        });
+        
+        return {
+          success: true,
+          message: response.message,
+        };
+      } else {
+        set({ 
+          isLoading: false,
+          error: response.error || 'Invalid verification code',
+        });
+        
+        return {
+          success: false,
+          error: response.error || 'Invalid verification code',
+        };
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to verify OTP';
+      set({ 
+        isLoading: false,
+        error: errorMessage,
+      });
+      
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+  },
+
+  // Logout user
+  logout: async () => {
+    try {
+      // Clear stored auth data
+      await Promise.all([
+        AsyncStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN),
+        AsyncStorage.removeItem(STORAGE_KEYS.USER_DATA),
+      ]);
+      
+      // Clear auth token from API client
+      apiClient.setAuthToken(null);
+      
+      // Reset auth state
+      set({
+        user: null,
+        isAuthenticated: false,
+        error: null,
+      });
+    } catch (error) {
+      console.error('Failed to logout:', error);
+    }
+  },
+
+  // Check if user is already authenticated (on app startup)
+  checkAuthStatus: async () => {
+    set({ isLoading: true });
+    
+    try {
+      const [token, userData] = await Promise.all([
+        AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKEN),
+        AsyncStorage.getItem(STORAGE_KEYS.USER_DATA),
+      ]);
+      
+      if (token && userData) {
+        const user = JSON.parse(userData);
+        
+        // Verify token is still valid with API
+        try {
+          const isValid = await apiClient.verifyToken(token);
+          
+          if (isValid) {
+            // Set auth token in API client
+            apiClient.setAuthToken(token);
+            
+            set({
+              user,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+          } else {
+            // Token expired, clear auth data
+            await get().logout();
+            set({ isLoading: false });
+          }
+        } catch (error) {
+          // If verification fails, assume token is invalid
+          await get().logout();
+          set({ isLoading: false });
+        }
+      } else {
+        set({ isLoading: false });
+      }
+    } catch (error) {
+      console.error('Failed to check auth status:', error);
+      set({ isLoading: false });
+    }
+  },
+
+  // Clear authentication error
+  clearAuthError: () => set({ error: null }),
+
+  // Set OTP verification state
+  setVerifyingOTP: (verifying: boolean) => set({ isVerifyingOTP: verifying }),
+
+  // Set OTP email
+  setOTPEmail: (email: string | null) => set({ otpEmail: email }),
 })); 
