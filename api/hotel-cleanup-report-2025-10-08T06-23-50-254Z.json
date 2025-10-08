@@ -1,0 +1,416 @@
+{
+  "timestamp": "2025-10-08T06:23:50.254Z",
+  "summary": {
+    "totalHotelsChecked": 543,
+    "hotelsWithZeroPhotos": 18,
+    "hotelsDeleted": 18,
+    "errorCount": 0
+  },
+  "deletedHotels": [
+    {
+      "id": "ChIJD3KueOta0i0Rl2LFO5YakuE",
+      "name": "Bvlgari Resort Bali",
+      "city": "Bali",
+      "country": "Indonesia",
+      "coords": {
+        "lat": -8.8429187,
+        "lng": 115.1216909
+      },
+      "price": null,
+      "description": "Luxury hotel in Bali, Indonesia",
+      "amenity_tags": [
+        "Curated",
+        "generic_photos",
+        "unsplash"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2ePlfjOwrLqscKdcG_Qu2W0RbawKHzvpH2sUwdtWiA6FrMWzyt5zfHLtN5sryzPo0S59yglPN06B4Q7v3GHxQ4NbHT9q5-daNHCOHQvURf5O64wVQ7NX-_4LuJ82dkTMytOU8XtQy9SBF8GnQCdndx6d5sETzEd5a4jQ1yYS8Gu-5GBoLMic2evuLhOrJSJbcEeq2L_LnfdLxMznNjpIt6kvEdDho7jwPFLqpiXQab5JJs6MJ3Vcm8CGwcdxeXvoYmQIHt7X1P40P3jBMBkokf8MeaUQyBFwe5b4NfZRI-1bg&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.7,
+      "created_at": "2025-09-23T13:34:13.401+00:00",
+      "updated_at": "2025-10-07T16:33:48.68+00:00"
+    },
+    {
+      "id": "google_ChIJWfU5lIOabZERHfkiK8ptvJw",
+      "name": "Casa del Sol Machu Picchu Hotel Boutique",
+      "city": "Machu Picchu",
+      "country": "Peru",
+      "coords": {
+        "lat": -13.1554657,
+        "lng": -72.52521469999999
+      },
+      "price": null,
+      "description": "Luxury cultural hotel in Machu Picchu, Peru",
+      "amenity_tags": [
+        "Cultural Heritage",
+        "Curated",
+        "generic_photos",
+        "unsplash"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2dMM0dPzc1pGx-3Apy1wEO8Ykpwf4xAmvBmjKLEyS1S9ZtgwC00vzLgFdZNw6JcIGXd1nBrrVEMfmVg5O1_DEXGLoQrwr2E3Q93ZXCLoCCL9tW3DpErCbsTvuwo5XIEBliv7y-w4TiV3vaY6WAOt68uBdZqz6mxmVX9G6sls_gk2i3O2rLOxLrz45hXxt7PDTj07ZqCP1u2W_MUh1cc7WVsFAJxL2TdGDsUxqcxpLDuKmCwLoDliiNh0A1hzbKi52u_rs9iFAwwFfgTKBFtNplI4agxsJjUMi_rLmbdv6Q8Jw&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.4,
+      "created_at": "2025-09-23T14:01:47.215+00:00",
+      "updated_at": "2025-10-07T16:38:40.956+00:00"
+    },
+    {
+      "id": "google_ChIJi9dmQpBhLxMRRMMQoSG6Qs4",
+      "name": "Divina Luxury Hotel",
+      "city": "Rome",
+      "country": "Italy",
+      "coords": {
+        "lat": 41.9071468,
+        "lng": 12.4878389
+      },
+      "price": null,
+      "description": "Luxury urban hotel in Rome, Italy",
+      "amenity_tags": [
+        "Urban Luxury",
+        "Curated",
+        "Highly Rated",
+        "generic_photos",
+        "unsplash"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2c33EjL2lzF2JZEfUg0Tu3_qQ6efjSqFpH3_bIz06aTGkDLN2m1tQFowGhESP9GBBLnOJJ_ftQ07V4VCGhj6z_HGDKNcD5mmPlZ9kARZqguUf4axiwklqL9TAJYgN_ffD51_BRkgeNP6bc0-BILqXdDMr_XwC8l39bFOXTsZhLJNFCToJ7yjiMkt7qKMrH2E_ewcDiYFwX2SEF2hcQo75odTqDiGXAKBkbMiIu_JvXONakQaS2AvCu0F6gz4D-rfYrGtOfMgvMzgKD5IATBvJQUugnvxHC8ZEwhoO3reV257w&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.6,
+      "created_at": "2025-09-23T14:02:55.861+00:00",
+      "updated_at": "2025-10-07T16:34:40.775+00:00"
+    },
+    {
+      "id": "ChIJX-ln8UQJAWARCiiFrZs6sbA",
+      "name": "Homm Stay Nagi Shijo Kyoto",
+      "city": "Kyoto",
+      "country": "Japan",
+      "coords": {
+        "lat": 35.0040834,
+        "lng": 135.753788
+      },
+      "price": null,
+      "description": "Luxury hotel in Kyoto, Japan",
+      "amenity_tags": [
+        "Curated",
+        "generic_photos",
+        "unsplash"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2esLDWe98AFk0qCdmu0CDrtk9oygi2mUu0-CssAl0tBhpfQ9CIOAt_84uMT1ndG-xQIrQfhRCtKRYzMJCAmINo643rg4Sls9Gip8W29GzIsXL9MJJAIlHP06JVVTRw1JiyxReClcF9pIdvQoRaSur7KigdSydZb07eTFYn7Ee1zog37orQD9i_w07NeObE9KgMTvwml5YzNJLzQwilCtQor7YZCWUxcb9_2S71BzIUhWgrppamun44KD_akc7wM13HTH8DTserqV7GozuvAsAQ8PpR1yJGzssRvetgGKCKY5g&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.7,
+      "created_at": "2025-09-23T13:34:00.75+00:00",
+      "updated_at": "2025-10-07T16:35:34.121+00:00"
+    },
+    {
+      "id": "ChIJp_9V0bi9zhIRngvarU1KTs4",
+      "name": "Hôtel Cap Riviera",
+      "city": "French Riviera",
+      "country": "France",
+      "coords": {
+        "lat": 43.3720564,
+        "lng": 6.713318399999999
+      },
+      "price": null,
+      "description": "Luxury hotel in French Riviera, France",
+      "amenity_tags": [
+        "Curated",
+        "generic_photos",
+        "unsplash"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2fY9bbAxlr0T7VzdTCChXv5L_IV3Jgfui45mi8Bfvhl8N1gPaPOHwsOZcxLz6fvYpxbPSSn2P8gom8DRCjta6hLEn-wmMxQDOu77ObwgopMkGttuw0_HdVVME3y8uIGa9_7OBDQkFhiY8AnAMmQolrD_x7N-UZ1KFq6FNM66w9LOd42USsccX0QBGO4iwebCo5XDvEYmP7F0LC1oDPznSPLygKXkx-OMU4rNGPm9V8qdW3gfW-bxDJR2Lv5WpXp1VDfVmjRqadPygYLW4TKDclnnaa9SabBtB-bhmhdUZ2Fqw&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.4,
+      "created_at": "2025-09-23T13:33:11.964+00:00",
+      "updated_at": "2025-10-07T16:31:11.456+00:00"
+    },
+    {
+      "id": "ChIJ15pw4t6WOxMRMoTdR1vyGoY",
+      "name": "Hotel Pellegrino",
+      "city": "Amalfi Coast",
+      "country": "Italy",
+      "coords": {
+        "lat": 40.6164155,
+        "lng": 14.5218464
+      },
+      "price": null,
+      "description": "Luxury hotel in Amalfi Coast, Italy",
+      "amenity_tags": [
+        "Curated"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2dx0Qq0Ssq6zHZIhOq9UTgDOm7SJtURhzBd34Y_TsbxcwFnF7AgoA0wVLX-uVm2mwxmz_BeVfDjdYdKRFIfjJJgqnflRwROKQEce2FjRu8B7r8AQGphgxKNg3YPRrZ5OlYDqp7BY8tu5EFjqgFvB9vPiqXcxVpDbnE7otFU6Kw99HhzW16ZUSGQm1zzJzBNw6FVgPCKwRYwoDACKqRCT5BFJTSSpzKK8PXbcPsEofuxReMLcf9BHXthJqD16YWNZGV9MoitmeTjys2_HY09-ZAu64raWj8BAGNs0avr_qutfw&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.9,
+      "created_at": "2025-09-23T12:43:06.11+00:00",
+      "updated_at": "2025-10-07T16:35:18.769+00:00"
+    },
+    {
+      "id": "ChIJ0ZVhhQcrHiMRdX1EMKsGV2I",
+      "name": "laïla, Seychelles, a Tribute Portfolio Resort",
+      "city": "Seychelles",
+      "country": "Seychelles",
+      "coords": {
+        "lat": -4.7388898,
+        "lng": 55.5185401
+      },
+      "price": null,
+      "description": "Luxury hotel in Seychelles, Seychelles",
+      "amenity_tags": [
+        "Curated"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2e52Z9yhWz8yNJ9k-SeaTwiA3CeXP3Ruaso-APbvt2rQSgSEGwUU0vuuW7pqrXN96dyJoufHMkogJBaSg5y7yRl792RmfhKhnthRJzU9orUT0Nf9KJJm8-d-4iUO1JbVVtoi6eA_OOu0vW3xRJKTdOGdaF2sWtbLkNntvJuyS5Bs0AQEKtiEnMg077AfkD8paWypyRp9GY0l0DpMHt4Dw0F8ZG6gCmTgbnrK-sCcVS74fT6mMhvO0HvAUCc0lUXpcMUNEdtpg-RkamyH83fYXNfI5iLQUCg5-ymEZnn-ziV8A&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.4,
+      "created_at": "2025-09-23T13:35:02.371+00:00",
+      "updated_at": "2025-10-07T16:39:20.014+00:00"
+    },
+    {
+      "id": "ChIJi4rHJaU9XRgRymJJp_hX_Zs",
+      "name": "Liquid Life Boutique Hotel Zanzibar",
+      "city": "Zanzibar",
+      "country": "Tanzania",
+      "coords": {
+        "lat": -6.274062499999999,
+        "lng": 39.5353281
+      },
+      "price": null,
+      "description": "Luxury hotel in Zanzibar, Tanzania",
+      "amenity_tags": [
+        "Curated"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2e4WYIvztw8QagsFarE5TrYDby1PxBBnATiyKU9wzT2eaYJSPJluSWTT32x0-Nv0QJslahwttwvvz7PeOyW2-wkAzvMtXN7zJCfvPByUmlh2RSwmBXRBHweoqIDIWzIgxGb5eeinfIRZtmvz9KvBhAKC_KQZOHBlMj8uBduGlaywCVynjbrFtzcvj14rKgpgLfyKCxWrS4dP9gz7ENxX-Tpni8As4pjFZ4wir0GkQbPM_EoGDfI-4Ww8HX_qqUUW2POPaSFNmpQrWAB1qdrNvHvgil1KzrUOTz9brzAzP2OwTlQ_paz_ruKS8q5NWOudOb-19-Qes6CYGnnJUJyjIYlkULDiySt22-VxSBa-0blshNbVoAWFz22U6Ul4OFl0SjOIC0Gz6ZIoFzPkBN-EXrajusLtdejiOsz8XunQhOMIHk&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.4,
+      "created_at": "2025-09-23T13:35:05.486+00:00",
+      "updated_at": "2025-10-07T16:42:09.897+00:00"
+    },
+    {
+      "id": "google_ChIJYyt4v8Nv5kcRqArzsLx7ENk",
+      "name": "Paris Marriott Champs Elysees Hotel",
+      "city": "Paris",
+      "country": "France",
+      "coords": {
+        "lat": 48.8708786,
+        "lng": 2.3050769
+      },
+      "price": null,
+      "description": "Luxury urban hotel in Paris, France",
+      "amenity_tags": [
+        "Urban Luxury",
+        "Curated"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2eGymul31CbPvlWqX-IvpskY0TptHBbzFPrG79DlkNBiMdbdJB2QFkQJ3jh9p2PmLk5MmoSrfu60G0HVtcLSshkf9_vqLbhy_o88nv5f59yorClnFXGBrGkNi-XHtoF_QMYnDtY6l0W1AE1pYgot8yFJIxIHurm3OFX11CGUjwvmXknK8C6c4crtp89xGeXSgmfKA6DhYrmiEqBZyoEfVdumcKYKatMR3w4PXkr41PZMb4dqx-kqeAF2eJA4VSPm2zOYd8V1PKJoo062BKxyhZTJJsLHr238bi6ogP45p9H6g&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.3,
+      "created_at": "2025-09-23T13:57:01.513+00:00",
+      "updated_at": "2025-10-07T16:31:30.8+00:00"
+    },
+    {
+      "id": "ChIJ64esjG9SNgYRCFKa76bR3ko",
+      "name": "Pousada Vila Sal Boutique Noronha",
+      "city": "Fernando de Noronha",
+      "country": "Brazil",
+      "coords": {
+        "lat": -3.8457969,
+        "lng": -32.4131184
+      },
+      "price": null,
+      "description": "Luxury hotel in Fernando de Noronha, Brazil",
+      "amenity_tags": [
+        "Curated"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2d5hsFS_F-ayzv_N97PcAQX4ciIPtTEG3ItQIXwPRhX6x8CXjA5HIoH585Su1DTsYe3zW5sm0FhuD0P5QTXMqdEaqb7vIoKDqp14pmSLoaFoVjGPdlHU7t3SUZ5LMBnbvAwv8leQMxA4R4VTKfROSY0G-2_pAuDecXh4iXChvZREcSkcgIvOyxRk0vFTKmqrN5CC3Y--yYgDC7Z6-YZNkRiUPvpRzKr6TxlPiYk_FNog2oY7xbN9u-0OtOQi-NW6Ag5Qru1UOokdZ6-PL0_EmdWRFfmKGvPPKUm9Mz6qBMYzA&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.6,
+      "created_at": "2025-09-23T13:34:30.632+00:00",
+      "updated_at": "2025-10-07T16:29:27.714+00:00"
+    },
+    {
+      "id": "google_ChIJP1VkCmBgLxMRiCtiU61Ptoc",
+      "name": "Residenza Scipioni Luxury Rooms",
+      "city": "Rome",
+      "country": "Italy",
+      "coords": {
+        "lat": 41.909298,
+        "lng": 12.460749
+      },
+      "price": null,
+      "description": "Luxury urban hotel in Rome, Italy",
+      "amenity_tags": [
+        "Urban Luxury",
+        "Curated",
+        "Highly Rated",
+        "generic_photos",
+        "unsplash"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2cCUItviP0JfrOfwff1GeLOflztrBlvzcrkG3r3EPyoiw0hBED9IKXDkE2dUmZ6o-NNI5jBCGiOSURdM0kyVNYGYSfwv1Eu00Gy_vf5woHbsQOU9LhqlIEBODyqxHcae_cODIcCtZCk7njFanqabJcCxV2Lc3fOpE6B47_Cn_ktdoHMjXpRGFkVF7Sq1c8f5Vqb_8D-kUu2VbGfpFBOtFDWa4GXIjfVtm-_wg8r4CmQcdoZrqEGoyONPDrEhPbb8M36Pgpa8n0twi60ctMV7K2oye8gCpC8csNfhc69SUQy_w&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.5,
+      "created_at": "2025-09-23T14:02:55.861+00:00",
+      "updated_at": "2025-10-07T16:34:11.904+00:00"
+    },
+    {
+      "id": "ChIJU5XOs1vurw0RDO5_DNjJRVE",
+      "name": "Riad Viva",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "coords": {
+        "lat": 31.6205215,
+        "lng": -7.995635699999999
+      },
+      "price": null,
+      "description": "Luxury hotel in Marrakech, Morocco",
+      "amenity_tags": [
+        "Curated"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2fYo-LTm3QsydOViVNYGKCuNsJhLnWEbRjNiKwWPzme1UjfCdgrmqV7Laae3CAF0qgPeWR4jxMRaAtaCKXUNj_5JtvHdcIWLzUpcoyLl8fgcVSQe9j9IKd7ddrbINfma5LGAjLBBEk-RnZBh3k0Zr2fHpJU47twRRxdBuhiC7tyXxUK8DtbO9_wmdP3jU3HfzMtuD6OHxxBLo4Q66nnTeMVEH5O3x5gjUaepa_s16O0tA4WVSdAA3vO-E-kFwa2csydewJQv6VIcImPWrm8y4hhbSZG77iSNbKb-X3rrcPN4w&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.7,
+      "created_at": "2025-09-23T13:35:09.806+00:00",
+      "updated_at": "2025-10-07T16:38:18.236+00:00"
+    },
+    {
+      "id": "ChIJx9AWKWG-ohQRc_7gfyskSU4",
+      "name": "Santa Marina, a Luxury Collection Resort, Mykonos",
+      "city": "Mykonos",
+      "country": "Greece",
+      "coords": {
+        "lat": 37.418269,
+        "lng": 25.3261947
+      },
+      "price": null,
+      "description": "Luxury hotel in Mykonos, Greece",
+      "amenity_tags": [
+        "Curated"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2eiYiHKOa46uBhNjaG1_y_1YDM6wsJ4YjQEn3ykPKg3CDRLTu3m8Au_fFd2faVBt9U3-SjNzGic1mC0zBN8G1Y9M89CAgocZ9S8bbDqsrnUiqXa6zkc6psUHwGKXUJ4iYVnq6arw5jNGz57XO7xUDdAs8LxYPi64f6rJoaw86KYiav_2dXJtIH0uyHYcCnvqvdaNuOzalTfbIGXF1JIvjcmTrkgloVZ4VQ0ImG4oI99BXfvZkKxBAWbDM3d43on1uSePhx7seoB3b6Ska9dH_-weCqjG5cnoF9Et8rQ3QUbjA&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.5,
+      "created_at": "2025-09-23T13:33:02.527+00:00",
+      "updated_at": "2025-10-07T16:32:41.4+00:00"
+    },
+    {
+      "id": "ChIJrWV4LIjvrw0R8KD05Qp6yYc",
+      "name": "Sillage palace",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "coords": {
+        "lat": 31.6215975,
+        "lng": -7.995766
+      },
+      "price": null,
+      "description": "Luxury hotel in Marrakech, Morocco",
+      "amenity_tags": [
+        "Curated"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2cfJyjszzu4MtmHwjSbOld0dO095Rw9q1ICOr0B2JaJ1ClTeflD7KF_BN37OOz5MUhMjQ9OC60rl_MVbsgXwnnLETd9j8L5wHob5JElVe_PvSsvt24kJFmhfpUq6jCa2QkZoxMhs_pFhNZrVaBrqCUbevd2SLDJyBGpIcTcN4DNv8tr5LXsYcc6LdNfF7P5ck46F-tqnr235YjauFHZqxaMGQNSf4U_muqHeTw-QX1j3Tb-TqMFscXQXt0uxTb5Y5xZvWDNrRu4JMl3bTH3kFzrTfdxg1nhncYYlfB7soFpWA&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.7,
+      "created_at": "2025-09-23T13:35:09.806+00:00",
+      "updated_at": "2025-10-07T16:38:15.122+00:00"
+    },
+    {
+      "id": "ChIJjyjkVgA5QIcRD4P2THr2jRI",
+      "name": "St. Regis Residence Club, Aspen",
+      "city": "Aspen",
+      "country": "United States",
+      "coords": {
+        "lat": 39.1869935,
+        "lng": -106.8212945
+      },
+      "price": null,
+      "description": "Luxury hotel in Aspen, United States",
+      "amenity_tags": [
+        "Curated",
+        "generic_photos",
+        "unsplash"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2diqXUep5h1v_KPn-nXQY9DJ6gsngwnqhPDCVIfmuMcN0N8OSneuv_-hD0rPPW3eGn-a-8Dxgy-8YSTIQuN72UXnzxvehAmy7QQcAASYg-79ndsH0hBXuK3gx4WwOhZQ1KY5KdCnTm2yA5fbJSmzlHDgtU46aSg2AnZsOdyPH-wGJtHikCIcoBzsh7Cru7BSELHtSkdIG46Fa-0j-GSv176Prdh30KujioZQJaXtPHxHx6YcGOJELtS5V8gKHCUcT2q7vn128vulfixH2F7x5vhWXgRKTxZlO97AWxnpU8dLA&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.3,
+      "created_at": "2025-09-23T13:34:35.117+00:00",
+      "updated_at": "2025-10-07T16:45:17.603+00:00"
+    },
+    {
+      "id": "ChIJSwzMYK9NvjsRDxpxGdB8NM0",
+      "name": "The St. Regis Goa Resort",
+      "city": "Goa",
+      "country": "India",
+      "coords": {
+        "lat": 15.1570331,
+        "lng": 73.950941
+      },
+      "price": null,
+      "description": "Luxury hotel in Goa, India",
+      "amenity_tags": [
+        "Curated",
+        "generic_photos",
+        "unsplash"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2cZ0YKMrXtuSpqCgWblbEZBdJzd5tBmNtpmtgPcakPQHsCiIA9PZJWCtXPNYClEyU62juLwld5RTfgcRnlk1TIozEhJ8XBTKAnn8f6ArZy2IGv9Zg_fFti1aUjIjD_RZBzsQFGh9KNRP6rloLO-_b00ZBNZravV8TXIcThd08mm2fLm7cD1Qs9L6oZxEq2MecMFWwnEpQomYPbKE-LNP0nOPAjqLRJYijg0LLLuQMW1h8Q-_9-GKiH5jeafLLBSo2GpJjMM1JcpV2J6QpQtizCRmNi__nRBov8imC1DeGL7rQ&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.6,
+      "created_at": "2025-09-23T13:34:39.987+00:00",
+      "updated_at": "2025-10-07T16:33:12.451+00:00"
+    },
+    {
+      "id": "ChIJJTtgi1VTNgYRANL6A1ghYE4",
+      "name": "Triângulo Noronha",
+      "city": "Fernando de Noronha",
+      "country": "Brazil",
+      "coords": {
+        "lat": -3.8437279,
+        "lng": -32.4064149
+      },
+      "price": null,
+      "description": "Luxury hotel in Fernando de Noronha, Brazil",
+      "amenity_tags": [
+        "Curated",
+        "generic_photos",
+        "unsplash"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2eay2pqN3F9NKWi1PwE3g_Fb1C2dv2rdmMcqJrWTbEelJCZBXKyaIVRpsHmj357HP9f3YggpGgHDN-S6-ksoVLad-aouAoQjOHdjpsoD9GkffbH4TenuQlbhHCw_Epuam6cy-Cj33GcbriNhfZtqGAtfGhKB7yHlbwGy8ShbwXzyzr15mlPb5ViHm8ASSWUa2Qky4fy4fckx2x8X5c2GqBbIENPFNWyuyflSG-dK2GZI8OR9SLAMB02RyxNbOD_b_4d7yGU9Svyg7LRTENhVrOCk3ge-zFBqVGA1_XZYVRSCA&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.6,
+      "created_at": "2025-09-23T13:34:30.632+00:00",
+      "updated_at": "2025-10-07T16:29:16.551+00:00"
+    },
+    {
+      "id": "google_ChIJsx8tf0JgLxMRjg04QVXIOug",
+      "name": "Villa Agrippina Gran Meliá - The Leading Hotels of the World",
+      "city": "Rome",
+      "country": "Italy",
+      "coords": {
+        "lat": 41.89906999999999,
+        "lng": 12.46057
+      },
+      "price": null,
+      "description": "Luxury urban hotel in Rome, Italy",
+      "amenity_tags": [
+        "Urban Luxury",
+        "Curated",
+        "Highly Rated"
+      ],
+      "photos": [],
+      "hero_photo": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2048&photo_reference=AciIO2fDR4Cc-MZyRSssTL6KjyBhZDpTLVLTSqawEjcFq5BZvTRK078MBxcZE3cmEM2x7dH4CTcwKh35qBGLnQA9PIdLOIH_HoU1Da3cmjkzCnmGfChyA-3cWWqkDf_8x3I02Mkbu5ZNZM6roJ9q-QUVP0KGL-pbSEocdENPiFgTtLPbpcG0r8_sHK4LBdMRuue0Cna39nibM90rUlS0tbmKb3jrcihQZavXRjlVWrTyVstus54FOMFOc2bl6ND0Y1cSNlmoY5F3DO2XV79QjEvWQo8_g_1o8bJpRFa6ED_O3eF-BQ&key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU",
+      "booking_url": null,
+      "rating": 4.5,
+      "created_at": "2025-09-23T14:02:55.861+00:00",
+      "updated_at": "2025-10-07T16:35:07.08+00:00"
+    }
+  ],
+  "errors": []
+}

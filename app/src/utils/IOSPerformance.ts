@@ -1,4 +1,4 @@
-import { Platform, InteractionManager, LayoutAnimation } from 'react-native';
+import { Platform, InteractionManager, LayoutAnimation, Image } from 'react-native';
 
 export class IOSPerformance {
   // iOS-specific layout animations
@@ -49,24 +49,29 @@ export class IOSPerformance {
     });
   }
 
-  // iOS-optimized image preloading
+  // iOS-optimized image preloading using React Native's Image.prefetch
   static async preloadImages(imageUrls: string[]): Promise<void> {
-    if (Platform.OS !== 'ios') return;
+    // Filter out undefined, null, or empty URLs
+    const validUrls = imageUrls.filter(url => url && typeof url === 'string' && url.trim() !== '');
+    
+    if (validUrls.length === 0) {
+      return;
+    }
 
-    const preloadPromises = imageUrls.map((url) => {
-      return new Promise<void>((resolve, reject) => {
-        const image = new Image();
-        image.onload = () => resolve();
-        image.onerror = () => resolve(); // Don't fail the batch
-        image.src = url;
-      });
+    const preloadPromises = validUrls.map(async (url) => {
+      try {
+        await Image.prefetch(url);
+      } catch (error) {
+        console.warn(`Failed to preload image ${url}:`, error);
+        // Don't fail the batch
+      }
     });
 
-    // Batch preload with concurrency limit for iOS
+    // Batch preload with concurrency limit
     const batchSize = 3;
     for (let i = 0; i < preloadPromises.length; i += batchSize) {
       const batch = preloadPromises.slice(i, i + batchSize);
-      await Promise.all(batch);
+      await Promise.allSettled(batch);
     }
   }
 
@@ -140,4 +145,4 @@ export class IOSPerformance {
   }
 }
 
-export default IOSPerformance; 
+export default IOSPerformance;

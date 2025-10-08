@@ -62,6 +62,7 @@ export interface HotelCard {
   name: string;
   city: string;
   country: string;
+  address?: string; // Full street address from Google Places or Amadeus
   coords?: {
     lat: number;
     lng: number;

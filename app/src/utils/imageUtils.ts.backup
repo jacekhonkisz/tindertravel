@@ -1,0 +1,77 @@
+export const getImageUrl = (photo: any): string => {
+  // If it's a JSON string, try to parse it and extract URL
+  if (typeof photo === 'string' && photo.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(photo);
+      if (parsed.url) {
+        return parsed.url;
+      }
+    } catch (e) {
+      // If parsing fails, fall through to direct usage
+    }
+  }
+  
+  // If it's an object with url property
+  if (typeof photo === 'object' && photo && photo.url) {
+    return photo.url;
+  }
+  
+  // If it's already a string URL, use it directly
+  if (typeof photo === 'string') {
+    return photo;
+  }
+  
+  // Fallback
+  return '';
+};
+
+export const getImageSource = (photo: any) => {
+  const url = getImageUrl(photo);
+  
+  if (!url) {
+    return { uri: '' };
+  }
+  
+  // For Unsplash URLs, add proper headers
+  if (url.includes('unsplash.com')) {
+    return {
+      uri: url,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; ReactNative/1.0)',
+        'Accept': 'image/*',
+      },
+    };
+  }
+  
+  // For other URLs, use standard format
+  return { uri: url };
+};
+
+export const getPhotoSource = (photo: any): string => {
+  if (typeof photo === 'string' && photo.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(photo);
+      if (parsed.source) {
+        return parsed.source;
+      }
+    } catch (e) {
+      // fall through
+    }
+  }
+  
+  if (typeof photo === 'object' && photo && photo.source) {
+    return photo.source;
+  }
+  
+  if (typeof photo === 'string') {
+    if (photo.includes('maps.googleapis.com')) {
+      return 'Google Places';
+    } else if (photo.includes('unsplash.com')) {
+      return 'Unsplash';
+    } else if (photo.includes('serpapi')) {
+      return 'SerpAPI';
+    }
+  }
+  
+  return 'Unknown';
+};

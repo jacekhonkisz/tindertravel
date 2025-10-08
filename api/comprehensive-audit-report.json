@@ -1,0 +1,27 @@
+{
+  "timestamp": "2025-09-29T13:04:02.709Z",
+  "summary": {
+    "totalHotels": 1000,
+    "withPhotos": 1000,
+    "withoutPhotos": 0,
+    "googlePlaces": 997,
+    "serpApi": 3,
+    "other": 0
+  },
+  "photoCounts": {
+    "6": 1,
+    "7": 1,
+    "8": 43,
+    "9": 1,
+    "10": 954
+  },
+  "sources": {
+    "Google Places": 997,
+    "SerpApi": 3
+  },
+  "recommendations": [
+    "Continue updating remaining hotels",
+    "Monitor photo quality",
+    "Consider upgrading SerpApi plan"
+  ]
+}

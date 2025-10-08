@@ -205,12 +205,10 @@ app.get('/api/hotels', async (req, res) => {
 
     console.log(`🏨 Fetching ${limitNum} hotels from Supabase (offset: ${offsetNum})`);
 
-    // Get hotels from Supabase
+    // Get all hotels from Supabase first, then randomize and paginate
     const { data: supabaseHotels, error, count } = await supabase
       .from('hotels')
-      .select('*', { count: 'exact' })
-      .range(offsetNum, offsetNum + limitNum - 1)
-      .order('created_at', { ascending: false });
+      .select('*', { count: 'exact' });
 
     if (error) {
       console.error('Supabase query error:', error);
@@ -229,8 +227,14 @@ app.get('/api/hotels', async (req, res) => {
       });
     }
 
+    // Randomize the hotels array
+    const shuffledHotels = supabaseHotels.sort(() => Math.random() - 0.5);
+    
+    // Apply pagination after randomization
+    const paginatedHotels = shuffledHotels.slice(offsetNum, offsetNum + limitNum);
+
     // Convert Supabase format to HotelCard format
-    const hotels = supabaseHotels.map(hotel => {
+    const hotels = paginatedHotels.map(hotel => {
       // Generate a proper booking URL if none exists
       let bookingUrl = hotel.booking_url;
       if (!bookingUrl || bookingUrl.trim() === '') {
@@ -403,7 +407,7 @@ app.delete('/api/photos/remove/:hotelId/:photoIndex', async (req, res) => {
 // Start server on all interfaces
 app.listen(port, '0.0.0.0', async () => {
   console.log(`🚀 Unified server running on http://0.0.0.0:${port}`);
-  console.log(`📱 For simulator: http://192.168.1.105:${port}`);
+  console.log(`📱 For simulator: http://192.168.1.103:${port}`);
   console.log('📧 Test email: test@glintz.io');
   console.log('🔑 Test OTP: 123456');
   console.log('🗄️  Connected to Supabase database');

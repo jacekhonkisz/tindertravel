@@ -1,0 +1,4322 @@
+[dotenv@17.2.2] injecting env (21) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+🚀 Google Places Photo Fetcher
+================================================================================
+Starting photo fetch process...
+Requirements:
+✅ Only photos from exact hotel
+✅ Minimum 2048px resolution
+✅ 4-8 photos per hotel
+================================================================================
+
+📥 Fetching hotels from database...
+✅ Found 543 hotels
+
+
+================================================================================
+📦 BATCH 1: Processing 10 hotels
+================================================================================
+
+📸 Processing: Hotel das Cataratas, A Belmond Hotel, Iguassu Falls (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 1/543 (0.2%)
+   💰 Cost so far: $0.11
+
+📸 Processing: Gran Meliá Iguazú (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 2/543 (0.4%)
+   💰 Cost so far: $0.20
+
+📸 Processing: Awasi Iguazú (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 3/543 (0.6%)
+   💰 Cost so far: $0.28
+
+📸 Processing: Miraselva Lodge (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 4/543 (0.7%)
+   💰 Cost so far: $0.39
+
+📸 Processing: OVERO Lodge & Selva (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 5/543 (0.9%)
+   💰 Cost so far: $0.49
+
+📸 Processing: Iguazu Jungle Lodge (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 6/543 (1.1%)
+   💰 Cost so far: $0.60
+
+📸 Processing: Selvaje Lodge Iguazú (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 7/543 (1.3%)
+   💰 Cost so far: $0.69
+
+📸 Processing: Glamping Selva Iguazú (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 8/543 (1.5%)
+   💰 Cost so far: $0.77
+
+📸 Processing: La Aldea de la Selva Lodge (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 9/543 (1.7%)
+   💰 Cost so far: $0.85
+
+📸 Processing: Botanica The House Experience (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 10/543 (1.8%)
+   💰 Cost so far: $0.95
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 2: Processing 10 hotels
+================================================================================
+
+📸 Processing: Eco Hostel Iguazu (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 11/543 (2.0%)
+   💰 Cost so far: $1.06
+
+📸 Processing: SecretGardenIguazu B&B (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 12/543 (2.2%)
+   💰 Cost so far: $1.16
+
+📸 Processing: Loi Suites Iguazú Hotel (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 13/543 (2.4%)
+   💰 Cost so far: $1.24
+
+📸 Processing: Posada Portal del Iguazu (Iguazu Falls, Argentina)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 14/543 (2.6%)
+   💰 Cost so far: $1.32
+
+📸 Processing: Orpheus Island Lodge (Great Barrier Reef, Australia)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 15/543 (2.8%)
+   💰 Cost so far: $1.41
+
+📸 Processing: Blue Lagoon Lodge (Lord Howe Island, Australia)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 16/543 (2.9%)
+   💰 Cost so far: $1.49
+
+📸 Processing: Admiralty Apartments (Lord Howe Island, Australia)
+   ✅ Found 7 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 7 photos (some may be below 2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 17/543 (3.1%)
+   💰 Cost so far: $1.59
+
+📸 Processing: Somerset Apartments (Lord Howe Island, Australia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 18/543 (3.3%)
+   💰 Cost so far: $1.69
+
+📸 Processing: Cairns Rainforest Retreats (Great Barrier Reef, Australia)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 19/543 (3.5%)
+   💰 Cost so far: $1.78
+
+📸 Processing: Mission Reef Resort (Great Barrier Reef, Australia)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 20/543 (3.7%)
+   💰 Cost so far: $1.89
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 3: Processing 10 hotels
+================================================================================
+
+📸 Processing: Palm Bay Resort (Great Barrier Reef, Australia)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 21/543 (3.9%)
+   💰 Cost so far: $1.99
+
+📸 Processing: Thala Beach Nature Reserve (Great Barrier Reef, Australia)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 22/543 (4.1%)
+   💰 Cost so far: $2.07
+
+📸 Processing: Noah Creek Eco-Retreat - Eco-Huts & Hiking Trail Reserve (Great Barrier Reef, Australia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 23/543 (4.2%)
+   💰 Cost so far: $2.18
+
+📸 Processing: Green Island Resort (Great Barrier Reef, Australia)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 24/543 (4.4%)
+   💰 Cost so far: $2.27
+
+📸 Processing: Coral Sea Resort (Great Barrier Reef, Australia)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 25/543 (4.6%)
+   💰 Cost so far: $2.35
+
+📸 Processing: Pinetrees Lodge (Lord Howe Island, Australia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 26/543 (4.8%)
+   💰 Cost so far: $2.46
+
+📸 Processing: OceanBlue Resort (Barbados, Barbados)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 27/543 (5.0%)
+   💰 Cost so far: $2.56
+
+📸 Processing: Southern Palms Beach Club & Resort Hotel (Barbados, Barbados)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 28/543 (5.2%)
+   💰 Cost so far: $2.65
+
+📸 Processing: All Seasons Resort Europa (Barbados, Barbados)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 29/543 (5.3%)
+   💰 Cost so far: $2.76
+
+📸 Processing: Colony Club, a Luxury Collection Resort, Barbados (Barbados, Barbados)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 30/543 (5.5%)
+   💰 Cost so far: $2.86
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 4: Processing 10 hotels
+================================================================================
+
+📸 Processing: Hilton Barbados Resort (Barbados, Barbados)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 31/543 (5.7%)
+   💰 Cost so far: $2.97
+
+📸 Processing: The Crane Resort, Barbados (Barbados, Barbados)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 32/543 (5.9%)
+   💰 Cost so far: $3.07
+
+📸 Processing: Little Arches Boutique Hotel - Adults Only (Barbados, Barbados)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 33/543 (6.1%)
+   💰 Cost so far: $3.18
+
+📸 Processing: Savannah Beach Club (Barbados, Barbados)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 34/543 (6.3%)
+   💰 Cost so far: $3.28
+
+📸 Processing: Sweetfield Manor Boutique Hotel (Barbados, Barbados)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 35/543 (6.4%)
+   💰 Cost so far: $3.39
+
+📸 Processing: O2 Beach Club & Spa (Barbados, Barbados)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 36/543 (6.6%)
+   💰 Cost so far: $3.47
+
+📸 Processing: Bhutan Spirit Sanctuary (Bhutan, Bhutan)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 37/543 (6.8%)
+   💰 Cost so far: $3.55
+
+📸 Processing: Amankora Paro (Bhutan, Bhutan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 38/543 (7.0%)
+   💰 Cost so far: $3.65
+
+📸 Processing: Hotel Druk Thimphu Bhutan (Bhutan, Bhutan)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 39/543 (7.2%)
+   💰 Cost so far: $3.75
+
+📸 Processing: Hotel Silverpine - A Boutique Hotel in Thimpu (Bhutan, Bhutan)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 40/543 (7.4%)
+   💰 Cost so far: $3.84
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 5: Processing 10 hotels
+================================================================================
+
+📸 Processing: Hotel Bhutan Home (Bhutan, Bhutan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 41/543 (7.6%)
+   💰 Cost so far: $3.94
+
+📸 Processing: Mountain Resort (Bhutan, Bhutan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 42/543 (7.7%)
+   💰 Cost so far: $4.05
+
+📸 Processing: Pousada Maria Bonita (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 43/543 (7.9%)
+   💰 Cost so far: $4.15
+
+📸 Processing: Pousada Maria Flor Noronha (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 44/543 (8.1%)
+   💰 Cost so far: $4.26
+
+📸 Processing: Pousada Maravilha (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 45/543 (8.3%)
+   💰 Cost so far: $4.36
+
+📸 Processing: Triboju Inn (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 46/543 (8.5%)
+   💰 Cost so far: $4.46
+
+📸 Processing: Triângulo Noronha (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 47/543 (8.7%)
+   💰 Cost so far: $4.56
+
+📸 Processing: Pousada Zé Maria (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 48/543 (8.8%)
+   💰 Cost so far: $4.67
+
+📸 Processing: Hamares Boutique Hotel (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 49/543 (9.0%)
+   💰 Cost so far: $4.75
+
+📸 Processing: Pousada Alto da Vila (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 50/543 (9.2%)
+   💰 Cost so far: $4.85
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 6: Processing 10 hotels
+================================================================================
+
+📸 Processing: Pousada do Mirante - Fernando de Noronha (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 51/543 (9.4%)
+   💰 Cost so far: $4.96
+
+📸 Processing: Pousada Vila Sal Boutique Noronha (Fernando de Noronha, Brazil)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 52/543 (9.6%)
+   💰 Cost so far: $5.06
+
+📸 Processing: Navutu Dreams Resort & Wellness Retreat (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 53/543 (9.8%)
+   💰 Cost so far: $5.17
+
+📸 Processing: Sarai and Wander Resort (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 54/543 (9.9%)
+   💰 Cost so far: $5.26
+
+📸 Processing: Sala Lodges (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 55/543 (10.1%)
+   💰 Cost so far: $5.36
+
+📸 Processing: Zannier Phum Baitang (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 56/543 (10.3%)
+   💰 Cost so far: $5.47
+
+📸 Processing: Angkor Privilege Resort & Spa (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 57/543 (10.5%)
+   💰 Cost so far: $5.57
+
+📸 Processing: Reservoir Hotels | Yoga & Wellness Retreat (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 58/543 (10.7%)
+   💰 Cost so far: $5.68
+
+📸 Processing: Central Indochine D'Angkor Hotel (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 59/543 (10.9%)
+   💰 Cost so far: $5.78
+
+📸 Processing: Siem Reap Center Hotel (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 60/543 (11.0%)
+   💰 Cost so far: $5.89
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 7: Processing 10 hotels
+================================================================================
+
+📸 Processing: Pandora Suite D'Angkor (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 61/543 (11.2%)
+   💰 Cost so far: $5.99
+
+📸 Processing: Hotel Somadevi Angkor Resort & Spa (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 62/543 (11.4%)
+   💰 Cost so far: $6.10
+
+📸 Processing: WAKA VILLA Private Resort & Spa Siem Reap - 16+ Adults Only (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 63/543 (11.6%)
+   💰 Cost so far: $6.20
+
+📸 Processing: Authentic Khmer Village Resort (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 64/543 (11.8%)
+   💰 Cost so far: $6.31
+
+📸 Processing: Anantara Angkor Resort (Siem Reap, Cambodia)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 65/543 (12.0%)
+   💰 Cost so far: $6.38
+
+📸 Processing: Fairmont Banff Springs (Banff, Canada)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 66/543 (12.2%)
+   💰 Cost so far: $6.46
+
+📸 Processing: Moose Hotel & Suites (Banff, Canada)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 67/543 (12.3%)
+   💰 Cost so far: $6.57
+
+📸 Processing: Tunnel Mountain Resort (Banff, Canada)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 68/543 (12.5%)
+   💰 Cost so far: $6.67
+
+📸 Processing: Banff Caribou Lodge & Spa (Banff, Canada)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 69/543 (12.7%)
+   💰 Cost so far: $6.76
+
+📸 Processing: Silver Creek Lodge (Banff, Canada)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 70/543 (12.9%)
+   💰 Cost so far: $6.84
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 8: Processing 10 hotels
+================================================================================
+
+📸 Processing: andBeyond Vira Vira (Patagonia, Chile)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 71/543 (13.1%)
+   💰 Cost so far: $6.94
+
+📸 Processing: Llao Llao Hotel (Patagonia, Chile)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 72/543 (13.3%)
+   💰 Cost so far: $7.05
+
+📸 Processing: Tierra Patagonia (Patagonia, Chile)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 73/543 (13.4%)
+   💰 Cost so far: $7.13
+
+📸 Processing: Kila Tai Tai Lodge (Patagonia, Chile)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 74/543 (13.6%)
+   💰 Cost so far: $7.21
+
+📸 Processing: Montaña Mágica Lodge (Patagonia, Chile)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 75/543 (13.8%)
+   💰 Cost so far: $7.31
+
+📸 Processing: Estancia Peuma Hue (Patagonia, Chile)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 76/543 (14.0%)
+   💰 Cost so far: $7.41
+
+📸 Processing: Awasi Atacama (Atacama Desert, Chile)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 77/543 (14.2%)
+   💰 Cost so far: $7.52
+
+📸 Processing: Explora Atacama (Atacama Desert, Chile)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 78/543 (14.4%)
+   💰 Cost so far: $7.62
+
+📸 Processing: Hotel Jardin Atacama (Atacama Desert, Chile)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 79/543 (14.5%)
+   💰 Cost so far: $7.73
+
+📸 Processing: Hotel Dunas | San Pedro de Atacama (Atacama Desert, Chile)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 80/543 (14.7%)
+   💰 Cost so far: $7.83
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 9: Processing 10 hotels
+================================================================================
+
+📸 Processing: Atacama Loft & Glamp (Atacama Desert, Chile)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 81/543 (14.9%)
+   💰 Cost so far: $7.91
+
+📸 Processing: Nayara Alto Atacama (Atacama Desert, Chile)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 82/543 (15.1%)
+   💰 Cost so far: $8.01
+
+📸 Processing: Luma Casa De Montaña (Patagonia, Chile)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 83/543 (15.3%)
+   💰 Cost so far: $8.11
+
+📸 Processing: Finch Bay Galapagos Hotel (Galápagos Islands, Ecuador)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 84/543 (15.5%)
+   💰 Cost so far: $8.22
+
+📸 Processing: Hotel Indigo Galapagos, an IHG Hotel (Galápagos Islands, Ecuador)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 85/543 (15.7%)
+   💰 Cost so far: $8.32
+
+📸 Processing: Scalesia Lodge (Galápagos Islands, Ecuador)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 86/543 (15.8%)
+   💰 Cost so far: $8.41
+
+📸 Processing: Isamar Hotel Galapagos (Galápagos Islands, Ecuador)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 87/543 (16.0%)
+   💰 Cost so far: $8.50
+
+📸 Processing: Cormorant Beach House (Galápagos Islands, Ecuador)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 88/543 (16.2%)
+   💰 Cost so far: $8.59
+
+📸 Processing: La Isla Galapagos Hotel (Galápagos Islands, Ecuador)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 89/543 (16.4%)
+   💰 Cost so far: $8.67
+
+📸 Processing: Enchanted Galapagos Lodge (Galápagos Islands, Ecuador)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 90/543 (16.6%)
+   💰 Cost so far: $8.78
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 10: Processing 10 hotels
+================================================================================
+
+📸 Processing: Villa Escalesia Galapagos (Galápagos Islands, Ecuador)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 91/543 (16.8%)
+   💰 Cost so far: $8.88
+
+📸 Processing: Sheraton Fiji Golf & Beach Resort (Fiji, Fiji)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 92/543 (16.9%)
+   💰 Cost so far: $8.99
+
+📸 Processing: Nanuku Resort, Fiji (Fiji, Fiji)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 93/543 (17.1%)
+   💰 Cost so far: $9.09
+
+📸 Processing: Kokomo Private Island Resort (Fiji, Fiji)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 94/543 (17.3%)
+   💰 Cost so far: $9.19
+
+📸 Processing: InterContinental Fiji Golf Resort & Spa by IHG (Fiji, Fiji)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 95/543 (17.5%)
+   💰 Cost so far: $9.30
+
+📸 Processing: Taveuni Island Resort & Spa (Fiji, Fiji)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 96/543 (17.7%)
+   💰 Cost so far: $9.40
+
+📸 Processing: Turtle Island Fiji (Fiji, Fiji)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 97/543 (17.9%)
+   💰 Cost so far: $9.48
+
+📸 Processing: Yatule Resort and Spa (Fiji, Fiji)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 98/543 (18.0%)
+   💰 Cost so far: $9.57
+
+📸 Processing: Castaway Island, Fiji (Fiji, Fiji)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 99/543 (18.2%)
+   💰 Cost so far: $9.67
+
+📸 Processing: Matangi Private Island Resort (Fiji, Fiji)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 100/543 (18.4%)
+   💰 Cost so far: $9.77
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 11: Processing 10 hotels
+================================================================================
+
+📸 Processing: Domaine du Mas de Pierre Hôtel Resort & Spa, Relais & Châteaux (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 101/543 (18.6%)
+   💰 Cost so far: $9.88
+
+📸 Processing: Hôtel Byblos (French Riviera, France)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 102/543 (18.8%)
+   💰 Cost so far: $9.98
+
+📸 Processing: Mougins Luxury Retreats (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 103/543 (19.0%)
+   💰 Cost so far: $10.09
+
+📸 Processing: Cap d'Antibes Beach Hotel (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 104/543 (19.2%)
+   💰 Cost so far: $10.19
+
+📸 Processing: Grand-Hotel du Cap-Ferrat, A Four Seasons Hotel (French Riviera, France)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 105/543 (19.3%)
+   💰 Cost so far: $10.30
+
+📸 Processing: Hôtel Cap Riviera (French Riviera, France)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 106/543 (19.5%)
+   💰 Cost so far: $10.40
+
+📸 Processing: Hôtel Cap-Estel (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 107/543 (19.7%)
+   💰 Cost so far: $10.51
+
+📸 Processing: La Toison d'Or - Riviera Villages (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 108/543 (19.9%)
+   💰 Cost so far: $10.60
+
+📸 Processing: Tiara Miramar Beach Resort (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 109/543 (20.1%)
+   💰 Cost so far: $10.71
+
+📸 Processing: Hotel Royal-Riviera (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 110/543 (20.3%)
+   💰 Cost so far: $10.81
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 12: Processing 10 hotels
+================================================================================
+
+📸 Processing: Hotel-Restaurant La Villa Mauresque (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 111/543 (20.4%)
+   💰 Cost so far: $10.92
+
+📸 Processing: Le Negresco (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 112/543 (20.6%)
+   💰 Cost so far: $11.02
+
+📸 Processing: Chateau Le Cagnard (French Riviera, France)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 113/543 (20.8%)
+   💰 Cost so far: $11.13
+
+📸 Processing: G Danube Boutique Hotel (Paris, France)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 114/543 (21.0%)
+   💰 Cost so far: $11.23
+
+📸 Processing: Paris Marriott Champs Elysees Hotel (Paris, France)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 115/543 (21.2%)
+   💰 Cost so far: $11.34
+
+📸 Processing: Hôtel Saint-Louis Marais (Paris, France)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 116/543 (21.4%)
+   💰 Cost so far: $11.44
+
+📸 Processing: Résidence premium Les Chalets du Forum Pierre & Vacances (Courchevel, France)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 117/543 (21.5%)
+   💰 Cost so far: $11.52
+
+📸 Processing: Ecrin Blanc Resort Courchevel (Courchevel, France)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 118/543 (21.7%)
+   💰 Cost so far: $11.63
+
+📸 Processing: Alpine Escape (Courchevel, France)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 119/543 (21.9%)
+   💰 Cost so far: $11.72
+
+📸 Processing: MERCURE NICE PROM D ANGLAIS 3* (French Riviera, France)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 120/543 (22.1%)
+   💰 Cost so far: $11.82
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 13: Processing 10 hotels
+================================================================================
+
+📸 Processing: Amadryades Boutique Hotel (Paris, France)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 121/543 (22.3%)
+   💰 Cost so far: $11.91
+
+📸 Processing: Hôtel Caron de Beaumarchais Paris Marais (Paris, France)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 122/543 (22.5%)
+   💰 Cost so far: $12.00
+
+📸 Processing: Le Bora Bora by Pearl Resorts (Bora Bora, French Polynesia)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 123/543 (22.7%)
+   💰 Cost so far: $12.11
+
+📸 Processing: Le Taha'a by Pearl Resorts (Bora Bora, French Polynesia)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 124/543 (22.8%)
+   💰 Cost so far: $12.21
+
+📸 Processing: InterContinental Bora Bora Resort Thalasso Spa (Bora Bora, French Polynesia)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 125/543 (23.0%)
+   💰 Cost so far: $12.30
+
+📸 Processing: Villa Yrondi / Bora Bora (Bora Bora, French Polynesia)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 126/543 (23.2%)
+   💰 Cost so far: $12.40
+
+📸 Processing: The Westin Bora Bora Resort & Spa (Bora Bora, French Polynesia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 127/543 (23.4%)
+   💰 Cost so far: $12.51
+
+📸 Processing: Hotel Maitai Polynesia (Bora Bora, French Polynesia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 128/543 (23.6%)
+   💰 Cost so far: $12.61
+
+📸 Processing: Anax Resort & Spa (Mykonos, Greece)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 129/543 (23.8%)
+   💰 Cost so far: $12.72
+
+📸 Processing: Mykonos Grand Hotel & Resort (Mykonos, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 130/543 (23.9%)
+   💰 Cost so far: $12.81
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 14: Processing 10 hotels
+================================================================================
+
+📸 Processing: Andronis Concept Wellness Resort (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 131/543 (24.1%)
+   💰 Cost so far: $12.90
+
+📸 Processing: Canaves Oia Suites (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 132/543 (24.3%)
+   💰 Cost so far: $13.01
+
+📸 Processing: Arotron Suites Santorini (Santorini, Greece)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 133/543 (24.5%)
+   💰 Cost so far: $13.11
+
+📸 Processing: Cavo Tagoo (Santorini, Greece)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 134/543 (24.7%)
+   💰 Cost so far: $13.22
+
+📸 Processing: Acroterra Rosa Luxury Suites & Spa (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 135/543 (24.9%)
+   💰 Cost so far: $13.31
+
+📸 Processing: Istoria, a Member of Design Hotels, Santorini (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 136/543 (25.0%)
+   💰 Cost so far: $13.42
+
+📸 Processing: Grand View Hotel (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 137/543 (25.2%)
+   💰 Cost so far: $13.50
+
+📸 Processing: Deluxe Suites Santorini (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 138/543 (25.4%)
+   💰 Cost so far: $13.61
+
+📸 Processing: Valsamo Suites Santorini (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 139/543 (25.6%)
+   💰 Cost so far: $13.71
+
+📸 Processing: Agave Santorini Design Βoutique Hotel (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 140/543 (25.8%)
+   💰 Cost so far: $13.80
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 15: Processing 10 hotels
+================================================================================
+
+📸 Processing: Santa Mar ECO suites (Santorini, Greece)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 141/543 (26.0%)
+   💰 Cost so far: $13.90
+
+📸 Processing: Katikies Chromata Hotel (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 142/543 (26.2%)
+   💰 Cost so far: $14.01
+
+📸 Processing: Cal Day Rooms Santorini (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 143/543 (26.3%)
+   💰 Cost so far: $14.11
+
+📸 Processing: Ersi villas (Santorini, Greece)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 144/543 (26.5%)
+   💰 Cost so far: $14.22
+
+📸 Processing: Boutique 88 (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 145/543 (26.7%)
+   💰 Cost so far: $14.31
+
+📸 Processing: Grace Hotel, Auberge Resorts Collection (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 146/543 (26.9%)
+   💰 Cost so far: $14.42
+
+📸 Processing: Aria Suites (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 147/543 (27.1%)
+   💰 Cost so far: $14.52
+
+📸 Processing: Senses Boutique Hotel (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 148/543 (27.3%)
+   💰 Cost so far: $14.63
+
+📸 Processing: Myst Boutique Hotel Santorini (Santorini, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 149/543 (27.4%)
+   💰 Cost so far: $14.73
+
+📸 Processing: Santa Marina, a Luxury Collection Resort, Mykonos (Mykonos, Greece)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 150/543 (27.6%)
+   💰 Cost so far: $14.84
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 16: Processing 10 hotels
+================================================================================
+
+📸 Processing: Myconian Korali Relais & Châteaux (Mykonos, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 151/543 (27.8%)
+   💰 Cost so far: $14.94
+
+📸 Processing: Mykonos Soul Luxury Suites (Mykonos, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 152/543 (28.0%)
+   💰 Cost so far: $15.04
+
+📸 Processing: ALKISTIS HOTEL (Mykonos, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 153/543 (28.2%)
+   💰 Cost so far: $15.15
+
+📸 Processing: Thallos the Boutique Hotel (Crete, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 154/543 (28.4%)
+   💰 Cost so far: $15.25
+
+📸 Processing: Elounda Infinity Exclusive Resort & Spa (Crete, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 155/543 (28.5%)
+   💰 Cost so far: $15.36
+
+📸 Processing: NEMA Design Hotel & Spa - Adults Only (Crete, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 156/543 (28.7%)
+   💰 Cost so far: $15.46
+
+📸 Processing: Paralos Lifestyle Beach (Crete, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 157/543 (28.9%)
+   💰 Cost so far: $15.57
+
+📸 Processing: Mykonos Princess Hotel (Mykonos, Greece)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 158/543 (29.1%)
+   💰 Cost so far: $15.66
+
+📸 Processing: Admiralty Homes Estate (Hong Kong, Hong Kong)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 159/543 (29.3%)
+   💰 Cost so far: $15.76
+
+📸 Processing: Boutique Hotel Central (Hong Kong, Hong Kong)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 160/543 (29.5%)
+   💰 Cost so far: $15.87
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 17: Processing 10 hotels
+================================================================================
+
+📸 Processing: Hyatt Regency Hong Kong, Tsim Sha Tsui (Hong Kong, Hong Kong)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 161/543 (29.7%)
+   💰 Cost so far: $15.97
+
+📸 Processing: Admiralty Hotel Lekki (Hong Kong, Hong Kong)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 162/543 (29.8%)
+   💰 Cost so far: $16.07
+
+📸 Processing: Aylesburyhomes Luxury Apartments (Hong Kong, Hong Kong)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 163/543 (30.0%)
+   💰 Cost so far: $16.18
+
+📸 Processing: The LaLiT Golf & Spa Resort Goa (Goa, India)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 164/543 (30.2%)
+   💰 Cost so far: $16.28
+
+📸 Processing: The St. Regis Goa Resort (Goa, India)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 165/543 (30.4%)
+   💰 Cost so far: $16.39
+
+📸 Processing: Bogmallo Beach Resort - 5 Star Hotel in Goa (Goa, India)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 166/543 (30.6%)
+   💰 Cost so far: $16.48
+
+📸 Processing: Rajasthan Palace - A Heritage Boutique Hotel in Jaipur (Rajasthan, India)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 167/543 (30.8%)
+   💰 Cost so far: $16.58
+
+📸 Processing: Samode Palace (Rajasthan, India)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 168/543 (30.9%)
+   💰 Cost so far: $16.68
+
+📸 Processing: Laxmi Vilas Palace (Rajasthan, India)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 169/543 (31.1%)
+   💰 Cost so far: $16.77
+
+📸 Processing: Pearl Palace Heritage (Rajasthan, India)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 170/543 (31.3%)
+   💰 Cost so far: $16.88
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 18: Processing 10 hotels
+================================================================================
+
+📸 Processing: HOTEL RATAN VILAS (Rajasthan, India)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 171/543 (31.5%)
+   💰 Cost so far: $16.96
+
+📸 Processing: Shangri-La The Heritage Haveli (Rajasthan, India)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 172/543 (31.7%)
+   💰 Cost so far: $17.04
+
+📸 Processing: Tree of Life Vantara Resort And Spa, Udaipur (Rajasthan, India)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 173/543 (31.9%)
+   💰 Cost so far: $17.15
+
+📸 Processing: Brij Bageecha, Jaipur | Private Villas with Plunge Pools (Rajasthan, India)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 174/543 (32.0%)
+   💰 Cost so far: $17.25
+
+📸 Processing: Dhora Desert Resort & Spa (Rajasthan, India)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 175/543 (32.2%)
+   💰 Cost so far: $17.36
+
+📸 Processing: ITC Grand Goa, a Luxury Collection Resort & Spa, Goa (Goa, India)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 176/543 (32.4%)
+   💰 Cost so far: $17.46
+
+📸 Processing: Whispering Palms Beach Resort (Goa, India)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 177/543 (32.6%)
+   💰 Cost so far: $17.57
+
+📸 Processing: Kaiā Goa (Goa, India)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 178/543 (32.8%)
+   💰 Cost so far: $17.67
+
+📸 Processing: Caravela Beach Resort (Goa, India)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 179/543 (33.0%)
+   💰 Cost so far: $17.74
+
+📸 Processing: Sardargarh Heritage Fort (Rajasthan, India)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 180/543 (33.1%)
+   💰 Cost so far: $17.85
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 19: Processing 10 hotels
+================================================================================
+
+📸 Processing: Jai Mahal Palace, Jaipur (Rajasthan, India)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 181/543 (33.3%)
+   💰 Cost so far: $17.95
+
+📸 Processing: Taj Lake Palace, Udaipur (Rajasthan, India)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 182/543 (33.5%)
+   💰 Cost so far: $18.06
+
+📸 Processing: Bvlgari Resort Bali (Bali, Indonesia)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 183/543 (33.7%)
+   💰 Cost so far: $18.16
+
+📸 Processing: Alila Villas Uluwatu (Bali, Indonesia)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 184/543 (33.9%)
+   💰 Cost so far: $18.24
+
+📸 Processing: Hilton Bali Resort (Bali, Indonesia)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 185/543 (34.1%)
+   💰 Cost so far: $18.34
+
+📸 Processing: The Bali Dream Villa & Resort Echo Beach Canggu (Bali, Indonesia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 186/543 (34.3%)
+   💰 Cost so far: $18.44
+
+📸 Processing: Danu villas Bali (Bali, Indonesia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 187/543 (34.4%)
+   💰 Cost so far: $18.55
+
+📸 Processing: Sau Bali Beach House (Bali, Indonesia)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 188/543 (34.6%)
+   💰 Cost so far: $18.65
+
+📸 Processing: Bali Tropic Resort & Spa (Bali, Indonesia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 189/543 (34.8%)
+   💰 Cost so far: $18.76
+
+📸 Processing: The Sakala Resort Bali (Bali, Indonesia)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 190/543 (35.0%)
+   💰 Cost so far: $18.86
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 20: Processing 10 hotels
+================================================================================
+
+📸 Processing: Club Bali Family Suites at Legian Beach (Bali, Indonesia)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 191/543 (35.2%)
+   💰 Cost so far: $18.95
+
+📸 Processing: Borgo Pignano (Tuscany, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 192/543 (35.4%)
+   💰 Cost so far: $19.05
+
+📸 Processing: Villa Spalletti Trivelli Dimora d'Epoca (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 193/543 (35.5%)
+   💰 Cost so far: $19.16
+
+📸 Processing: Residenza Scipioni Luxury Rooms (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 194/543 (35.7%)
+   💰 Cost so far: $19.26
+
+📸 Processing: Parlamento Boutique Hotel (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 195/543 (35.9%)
+   💰 Cost so far: $19.37
+
+📸 Processing: Villa Rome (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 196/543 (36.1%)
+   💰 Cost so far: $19.47
+
+📸 Processing: Villa di Piazzano (Tuscany, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 197/543 (36.3%)
+   💰 Cost so far: $19.58
+
+📸 Processing: Stelle di Monte (Tuscany, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 198/543 (36.5%)
+   💰 Cost so far: $19.68
+
+📸 Processing: Castello di Casole, A Belmond Hotel, Tuscany (Tuscany, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 199/543 (36.6%)
+   💰 Cost so far: $19.78
+
+📸 Processing: Hotel Relais Palazzo del Capitano (Tuscany, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 200/543 (36.8%)
+   💰 Cost so far: $19.89
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 21: Processing 10 hotels
+================================================================================
+
+📸 Processing: Dharma Luxury Hotel (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 201/543 (37.0%)
+   💰 Cost so far: $19.98
+
+📸 Processing: Villa Bordoni (Tuscany, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 202/543 (37.2%)
+   💰 Cost so far: $20.06
+
+📸 Processing: Guadalupe Tuscany Resort (Tuscany, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 203/543 (37.4%)
+   💰 Cost so far: $20.16
+
+📸 Processing: Palazzo Manfredi (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 204/543 (37.6%)
+   💰 Cost so far: $20.26
+
+📸 Processing: Residence Borgo Verde (Tuscany, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 205/543 (37.8%)
+   💰 Cost so far: $20.36
+
+📸 Processing: Palazzo Caruso - 'A Luxury Home' - Boutique Hotel in the center of Rome (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 206/543 (37.9%)
+   💰 Cost so far: $20.47
+
+📸 Processing: Palazzo Cardinal Cesi (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 207/543 (38.1%)
+   💰 Cost so far: $20.57
+
+📸 Processing: Hotel Villa Pamphili Roma (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 208/543 (38.3%)
+   💰 Cost so far: $20.65
+
+📸 Processing: Divina Luxury Hotel (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 209/543 (38.5%)
+   💰 Cost so far: $20.76
+
+📸 Processing: Terrace Marco Antonio Luxury Suite Rome (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 210/543 (38.7%)
+   💰 Cost so far: $20.86
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 22: Processing 10 hotels
+================================================================================
+
+📸 Processing: Palazzo Roma (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 211/543 (38.9%)
+   💰 Cost so far: $20.97
+
+📸 Processing: H10 Palazzo Galla (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 212/543 (39.0%)
+   💰 Cost so far: $21.07
+
+📸 Processing: Trevi Palace Luxury Inn (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 213/543 (39.2%)
+   💰 Cost so far: $21.18
+
+📸 Processing: Palazzo delle Pietre (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 214/543 (39.4%)
+   💰 Cost so far: $21.28
+
+📸 Processing: Palazzo Ripetta (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 215/543 (39.6%)
+   💰 Cost so far: $21.37
+
+📸 Processing: Esposizione Boutique (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 216/543 (39.8%)
+   💰 Cost so far: $21.48
+
+📸 Processing: Relais Palazzo Taverna (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 217/543 (40.0%)
+   💰 Cost so far: $21.56
+
+📸 Processing: Palazzo Goldoni Condotti Collection (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 218/543 (40.1%)
+   💰 Cost so far: $21.67
+
+📸 Processing: Palazzo Shedir (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 219/543 (40.3%)
+   💰 Cost so far: $21.77
+
+📸 Processing: Hotel NH Roma Villa Carpegna (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 220/543 (40.5%)
+   💰 Cost so far: $21.88
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 23: Processing 10 hotels
+================================================================================
+
+📸 Processing: Villa Agrippina Gran Meliá - The Leading Hotels of the World (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 221/543 (40.7%)
+   💰 Cost so far: $21.98
+
+📸 Processing: Palazzo Dama (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 222/543 (40.9%)
+   💰 Cost so far: $22.09
+
+📸 Processing: Margutta 19 Luxury Hotel (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 223/543 (41.1%)
+   💰 Cost so far: $22.19
+
+📸 Processing: Piazza Farnese Luxury Suites (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 224/543 (41.3%)
+   💰 Cost so far: $22.28
+
+📸 Processing: Florio Luxury Rooms Spagna (Rome, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 225/543 (41.4%)
+   💰 Cost so far: $22.36
+
+📸 Processing: MDM Luxury Rooms (Rome, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 226/543 (41.6%)
+   💰 Cost so far: $22.46
+
+📸 Processing: D'Amalfi Hospitality (Amalfi Coast, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 227/543 (41.8%)
+   💰 Cost so far: $22.57
+
+📸 Processing: Hotel Pellegrino (Amalfi Coast, Italy)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 228/543 (42.0%)
+   💰 Cost so far: $22.66
+
+📸 Processing: Cava Resort Costa d'Amalfi (Amalfi Coast, Italy)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 229/543 (42.2%)
+   💰 Cost so far: $22.76
+
+📸 Processing: Onsen Ryokan Yuen Bettei Tokyo Daita (Tokyo, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 230/543 (42.4%)
+   💰 Cost so far: $22.87
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 24: Processing 10 hotels
+================================================================================
+
+📸 Processing: Ryokan Katsutaro Tokyo (Tokyo, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 231/543 (42.5%)
+   💰 Cost so far: $22.95
+
+📸 Processing: Kaminarimon Ryokan (Tokyo, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 232/543 (42.7%)
+   💰 Cost so far: $23.04
+
+📸 Processing: Nazuna Kyōto Tsubaki St. (Kyoto, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 233/543 (42.9%)
+   💰 Cost so far: $23.15
+
+📸 Processing: Kanamean Nishitomiya (Kyoto, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 234/543 (43.1%)
+   💰 Cost so far: $23.25
+
+📸 Processing: Homm Stay Nagi Shijo Kyoto (Kyoto, Japan)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 235/543 (43.3%)
+   💰 Cost so far: $23.36
+
+📸 Processing: Genji Kyoto 源氏京都 (Kyoto, Japan)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 236/543 (43.5%)
+   💰 Cost so far: $23.46
+
+📸 Processing: Toshiharu Ryokan (Kyoto, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 237/543 (43.6%)
+   💰 Cost so far: $23.56
+
+📸 Processing: GLANSIT KYOTO KAWARAMACHI (Kyoto, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 238/543 (43.8%)
+   💰 Cost so far: $23.66
+
+📸 Processing: Hana Nishijin (Kyoto, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 239/543 (44.0%)
+   💰 Cost so far: $23.77
+
+📸 Processing: HATSUNE GUESTHOUSE (Kyoto, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 240/543 (44.2%)
+   💰 Cost so far: $23.87
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 25: Processing 10 hotels
+================================================================================
+
+📸 Processing: RYOKAN KAMOGAWA (Tokyo, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 241/543 (44.4%)
+   💰 Cost so far: $23.98
+
+📸 Processing: Prostyle Ryokan Asakusa (Tokyo, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 242/543 (44.6%)
+   💰 Cost so far: $24.08
+
+📸 Processing: Kimi Ryokan (Tokyo, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 243/543 (44.8%)
+   💰 Cost so far: $24.19
+
+📸 Processing: Tokyo Ryokan (東京旅館) in Asakusa (Tokyo, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 244/543 (44.9%)
+   💰 Cost so far: $24.26
+
+📸 Processing: Ryokan Asakusa Shigetsu (Tokyo, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 245/543 (45.1%)
+   💰 Cost so far: $24.36
+
+📸 Processing: Andon Ryokan (Tokyo, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 246/543 (45.3%)
+   💰 Cost so far: $24.47
+
+📸 Processing: Gion Ryokan Karaku (Kyoto, Japan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 247/543 (45.5%)
+   💰 Cost so far: $24.57
+
+📸 Processing: Higashiyama Shikikaboku (Kyoto, Japan)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 248/543 (45.7%)
+   💰 Cost so far: $24.68
+
+📸 Processing: Petra Seasons Luxury Resort (Petra, Jordan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 249/543 (45.9%)
+   💰 Cost so far: $24.78
+
+📸 Processing: Petra La Vie Boutique Hotel (Petra, Jordan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 250/543 (46.0%)
+   💰 Cost so far: $24.89
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 26: Processing 10 hotels
+================================================================================
+
+📸 Processing: Petra Moon Luxury Hotel (Petra, Jordan)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 251/543 (46.2%)
+   💰 Cost so far: $24.98
+
+📸 Processing: H Luxury Hotel (Petra, Jordan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 252/543 (46.4%)
+   💰 Cost so far: $25.08
+
+📸 Processing: Petra Desert Dream Hotel (Petra, Jordan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 253/543 (46.6%)
+   💰 Cost so far: $25.19
+
+📸 Processing: Petra Jewel Luxury Hotel (Petra, Jordan)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 254/543 (46.8%)
+   💰 Cost so far: $25.28
+
+📸 Processing: Seven Wonders Luxury Camp (Petra, Jordan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 255/543 (47.0%)
+   💰 Cost so far: $25.39
+
+📸 Processing: Petra Premium Hotel (Petra, Jordan)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 256/543 (47.1%)
+   💰 Cost so far: $25.49
+
+📸 Processing: JW Marriott Masai Mara Lodge (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 257/543 (47.3%)
+   💰 Cost so far: $25.58
+
+📸 Processing: Mara Explorer Tented Camp (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 258/543 (47.5%)
+   💰 Cost so far: $25.68
+
+📸 Processing: Mara Kimana Luxury Camp (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 259/543 (47.7%)
+   💰 Cost so far: $25.77
+
+📸 Processing: Mara River Camp (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 260/543 (47.9%)
+   💰 Cost so far: $25.87
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 27: Processing 10 hotels
+================================================================================
+
+📸 Processing: Kitumo Mara Lodges (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 261/543 (48.1%)
+   💰 Cost so far: $25.98
+
+📸 Processing: Fig Tree Camp (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 262/543 (48.3%)
+   💰 Cost so far: $26.08
+
+📸 Processing: Sand River Masai Mara by Elewana (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 263/543 (48.4%)
+   💰 Cost so far: $26.19
+
+📸 Processing: Basecamp Maasai Mara (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 264/543 (48.6%)
+   💰 Cost so far: $26.29
+
+📸 Processing: Greenwood Safari Camp (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 265/543 (48.8%)
+   💰 Cost so far: $26.40
+
+📸 Processing: Lorian safari camp (Masai Mara, Kenya)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 266/543 (49.0%)
+   💰 Cost so far: $26.50
+
+📸 Processing: The St. Regis Langkawi (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 267/543 (49.2%)
+   💰 Cost so far: $26.61
+
+📸 Processing: The Datai Langkawi (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 268/543 (49.4%)
+   💰 Cost so far: $26.70
+
+📸 Processing: The Danna Langkawi (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 269/543 (49.5%)
+   💰 Cost so far: $26.80
+
+📸 Processing: Tanjung Rhu Resort, Langkawi (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 270/543 (49.7%)
+   💰 Cost so far: $26.91
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 28: Processing 10 hotels
+================================================================================
+
+📸 Processing: Casa del Mar Langkawi (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 271/543 (49.9%)
+   💰 Cost so far: $27.01
+
+📸 Processing: Ambong Rainforest Retreat (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 272/543 (50.1%)
+   💰 Cost so far: $27.09
+
+📸 Processing: Ocean Lodge Langkawi (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 273/543 (50.3%)
+   💰 Cost so far: $27.20
+
+📸 Processing: The Villa Langkawi (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 274/543 (50.5%)
+   💰 Cost so far: $27.29
+
+📸 Processing: The Ocean Residence Langkawi (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 275/543 (50.6%)
+   💰 Cost so far: $27.40
+
+📸 Processing: Langkawi Country Lodge (Langkawi, Malaysia)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 276/543 (50.8%)
+   💰 Cost so far: $27.50
+
+📸 Processing: W Maldives (Maldives, Maldives)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 277/543 (51.0%)
+   💰 Cost so far: $27.61
+
+📸 Processing: Baglioni Maldives Luxury All Inclusive Resort (Maldives, Maldives)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 278/543 (51.2%)
+   💰 Cost so far: $27.70
+
+📸 Processing: Grand Park Kodhipparu, Maldives (Maldives, Maldives)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 279/543 (51.4%)
+   💰 Cost so far: $27.78
+
+📸 Processing: The Residence Maldives at Falhumaafushi (Maldives, Maldives)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 280/543 (51.6%)
+   💰 Cost so far: $27.88
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 29: Processing 10 hotels
+================================================================================
+
+📸 Processing: Sheraton Maldives Full Moon Resort & Spa (Maldives, Maldives)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 281/543 (51.7%)
+   💰 Cost so far: $27.99
+
+📸 Processing: Madifushi Private Island (Maldives, Maldives)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 282/543 (51.9%)
+   💰 Cost so far: $28.08
+
+📸 Processing: Waldorf Astoria Maldives Ithaafushi (Maldives, Maldives)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 283/543 (52.1%)
+   💰 Cost so far: $28.19
+
+📸 Processing: Pullman Maldives Maamutaa, All-Inclusive Resort (Maldives, Maldives)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 284/543 (52.3%)
+   💰 Cost so far: $28.29
+
+📸 Processing: Four Seasons Resort Maldives at Kuda Huraa (Maldives, Maldives)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 285/543 (52.5%)
+   💰 Cost so far: $28.37
+
+📸 Processing: La Valise Tulum, Member of Small Luxury Hotels of the World (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 286/543 (52.7%)
+   💰 Cost so far: $28.48
+
+📸 Processing: Anat Tantric Boutique Hotel (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 287/543 (52.9%)
+   💰 Cost so far: $28.58
+
+📸 Processing: Secrets Tulum Resort & Beach Club (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 288/543 (53.0%)
+   💰 Cost so far: $28.69
+
+📸 Processing: The Beach Tulum Hotel (Tulum, Mexico)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 289/543 (53.2%)
+   💰 Cost so far: $28.79
+
+📸 Processing: Mi Amor, an SLH Hotel (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 290/543 (53.4%)
+   💰 Cost so far: $28.87
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 30: Processing 10 hotels
+================================================================================
+
+📸 Processing: Casa Malca (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 291/543 (53.6%)
+   💰 Cost so far: $28.96
+
+📸 Processing: Hotel Shibari Tulum (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 292/543 (53.8%)
+   💰 Cost so far: $29.05
+
+📸 Processing: Chiibal uh glamping Tulúm (Tulum, Mexico)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 293/543 (54.0%)
+   💰 Cost so far: $29.16
+
+📸 Processing: Eco Suites Tulum (Tulum, Mexico)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 294/543 (54.1%)
+   💰 Cost so far: $29.26
+
+📸 Processing: ECo.Bañitas Hotel (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 295/543 (54.3%)
+   💰 Cost so far: $29.35
+
+📸 Processing: Boutique Hotel Posada 06 Tulum (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 296/543 (54.5%)
+   💰 Cost so far: $29.44
+
+📸 Processing: Azura Boutique Hotel, Tulum (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 297/543 (54.7%)
+   💰 Cost so far: $29.53
+
+📸 Processing: Casa Ambar Hotel & Boutique Tulum (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 298/543 (54.9%)
+   💰 Cost so far: $29.63
+
+📸 Processing: KAHATSA' boutique hotel (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 299/543 (55.1%)
+   💰 Cost so far: $29.74
+
+📸 Processing: Montage Los Cabos (Los Cabos, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 300/543 (55.2%)
+   💰 Cost so far: $29.83
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 31: Processing 10 hotels
+================================================================================
+
+📸 Processing: Grand Velas (Los Cabos, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 301/543 (55.4%)
+   💰 Cost so far: $29.90
+
+📸 Processing: Nobu Hotel Los Cabos (Los Cabos, Mexico)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 302/543 (55.6%)
+   💰 Cost so far: $30.01
+
+📸 Processing: Playa Grande Resort & Grand Spa (Los Cabos, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 303/543 (55.8%)
+   💰 Cost so far: $30.11
+
+📸 Processing: GR Solaris Lighthouse (Los Cabos, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 304/543 (56.0%)
+   💰 Cost so far: $30.22
+
+📸 Processing: Secrets Puerto Los Cabos Golf & Spa Resort (Los Cabos, Mexico)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 305/543 (56.2%)
+   💰 Cost so far: $30.32
+
+📸 Processing: Corazón Cabo Resort & Spa (Los Cabos, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 306/543 (56.4%)
+   💰 Cost so far: $30.40
+
+📸 Processing: Hacienda del Mar Los Cabos (Los Cabos, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 307/543 (56.5%)
+   💰 Cost so far: $30.51
+
+📸 Processing: Roc Jungle Tulum (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 308/543 (56.7%)
+   💰 Cost so far: $30.61
+
+📸 Processing: Camping Chavez (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 309/543 (56.9%)
+   💰 Cost so far: $30.72
+
+📸 Processing: Maria del Mar Boutique Hotel & Spa (Tulum, Mexico)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 310/543 (57.1%)
+   💰 Cost so far: $30.79
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 32: Processing 10 hotels
+================================================================================
+
+📸 Processing: Riad Noir D'Ivoire (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 311/543 (57.3%)
+   💰 Cost so far: $30.90
+
+📸 Processing: La Sultana (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 312/543 (57.5%)
+   💰 Cost so far: $31.00
+
+📸 Processing: Riad Trois Cours (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 313/543 (57.6%)
+   💰 Cost so far: $31.09
+
+📸 Processing: Dar Les Cigognes (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 314/543 (57.8%)
+   💰 Cost so far: $31.16
+
+📸 Processing: Riad Dar Saad - Hammam & Spa (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 315/543 (58.0%)
+   💰 Cost so far: $31.27
+
+📸 Processing: Sillage palace (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 316/543 (58.2%)
+   💰 Cost so far: $31.37
+
+📸 Processing: El Morocco Hotel (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 317/543 (58.4%)
+   💰 Cost so far: $31.48
+
+📸 Processing: Riad Viva (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 318/543 (58.6%)
+   💰 Cost so far: $31.58
+
+📸 Processing: Riad Vendome & Spa (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 319/543 (58.7%)
+   💰 Cost so far: $31.69
+
+📸 Processing: Riad Charai (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 320/543 (58.9%)
+   💰 Cost so far: $31.79
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 33: Processing 10 hotels
+================================================================================
+
+📸 Processing: Riad Espagne (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 321/543 (59.1%)
+   💰 Cost so far: $31.90
+
+📸 Processing: Hôtel Ali (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 322/543 (59.3%)
+   💰 Cost so far: $32.00
+
+📸 Processing: Villa Makassar (Marrakech, Morocco)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 323/543 (59.5%)
+   💰 Cost so far: $32.11
+
+📸 Processing: Kamana Lakehouse (Queenstown, New Zealand)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 324/543 (59.7%)
+   💰 Cost so far: $32.19
+
+📸 Processing: The Rees Hotel, Luxury Apartments & Lakeside Residences (Queenstown, New Zealand)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 325/543 (59.9%)
+   💰 Cost so far: $32.29
+
+📸 Processing: Queenstown Top 10 Holiday Park (Queenstown, New Zealand)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 326/543 (60.0%)
+   💰 Cost so far: $32.37
+
+📸 Processing: Copthorne Hotel and Resort Queenstown Lakefront (Queenstown, New Zealand)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 327/543 (60.2%)
+   💰 Cost so far: $32.46
+
+📸 Processing: Hulbert House: Award Winning Queenstown Luxury Boutique Lodge (Queenstown, New Zealand)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 328/543 (60.4%)
+   💰 Cost so far: $32.56
+
+📸 Processing: Sanctuary Lodge, A Belmond Hotel, Machu Picchu (Machu Picchu, Peru)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 329/543 (60.6%)
+   💰 Cost so far: $32.67
+
+📸 Processing: Casa del Sol Machu Picchu Hotel Boutique (Machu Picchu, Peru)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 330/543 (60.8%)
+   💰 Cost so far: $32.77
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 34: Processing 10 hotels
+================================================================================
+
+📸 Processing: Taypikala Boutique Machupicchu (Machu Picchu, Peru)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 331/543 (61.0%)
+   💰 Cost so far: $32.88
+
+📸 Processing: MAPILAND- Hotel Boutique (Machu Picchu, Peru)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 332/543 (61.1%)
+   💰 Cost so far: $32.98
+
+📸 Processing: Sacred Stone Boutique Hotel (Machu Picchu, Peru)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 333/543 (61.3%)
+   💰 Cost so far: $33.06
+
+📸 Processing: Andenia Boutique Hotel (Machu Picchu, Peru)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 334/543 (61.5%)
+   💰 Cost so far: $33.17
+
+📸 Processing: NaturaLodge (Machu Picchu, Peru)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 335/543 (61.7%)
+   💰 Cost so far: $33.27
+
+📸 Processing: Jaya Machupicchu Boutique Hotel (Machu Picchu, Peru)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 336/543 (61.9%)
+   💰 Cost so far: $33.38
+
+📸 Processing: Hotel Boutique Machupicchu Cusco (Machu Picchu, Peru)
+   ✅ Found 8 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 337/543 (62.1%)
+   💰 Cost so far: $33.45
+
+📸 Processing: WIMCO St Barth Properties - Vacation villas with concierge services (St. Barts, Saint Barthélemy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 338/543 (62.2%)
+   💰 Cost so far: $33.56
+
+📸 Processing: St barts Villa Coco Rock (St. Barts, Saint Barthélemy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 339/543 (62.4%)
+   💰 Cost so far: $33.66
+
+📸 Processing: Pearl Beach Hotel (St. Barts, Saint Barthélemy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 340/543 (62.6%)
+   💰 Cost so far: $33.77
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 35: Processing 10 hotels
+================================================================================
+
+📸 Processing: Hôtel Villa Lodge 4 Epices (St. Barts, Saint Barthélemy)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 341/543 (62.8%)
+   💰 Cost so far: $33.87
+
+📸 Processing: Four Seasons Resort Seychelles (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 342/543 (63.0%)
+   💰 Cost so far: $33.98
+
+📸 Processing: Anantara Maia Seychelles Villas (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 343/543 (63.2%)
+   💰 Cost so far: $34.08
+
+📸 Processing: Constance Ephelia Mahe Seychelles (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 344/543 (63.4%)
+   💰 Cost so far: $34.19
+
+📸 Processing: L'Escale Resort Marina & Spa (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 345/543 (63.5%)
+   💰 Cost so far: $34.29
+
+📸 Processing: JA Enchanted Island Resort (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 346/543 (63.7%)
+   💰 Cost so far: $34.40
+
+📸 Processing: Hilton Seychelles Northolme Resort & Spa (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 347/543 (63.9%)
+   💰 Cost so far: $34.50
+
+📸 Processing: Waldorf Astoria Seychelles Platte Island (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 348/543 (64.1%)
+   💰 Cost so far: $34.61
+
+📸 Processing: ValMer Resort (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 349/543 (64.3%)
+   💰 Cost so far: $34.71
+
+📸 Processing: laïla, Seychelles, a Tribute Portfolio Resort (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 350/543 (64.5%)
+   💰 Cost so far: $34.82
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 36: Processing 10 hotels
+================================================================================
+
+📸 Processing: Savoy Seychelles Resort & Spa (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 351/543 (64.6%)
+   💰 Cost so far: $34.91
+
+📸 Processing: Denis Private Island (Seychelles, Seychelles)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 352/543 (64.8%)
+   💰 Cost so far: $35.01
+
+📸 Processing: Sofitel Hotel Sentosa Singapore (Singapore, Singapore)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 353/543 (65.0%)
+   💰 Cost so far: $35.11
+
+📸 Processing: Holiday Inn Express Singapore Orchard Road by IHG (Singapore, Singapore)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 354/543 (65.2%)
+   💰 Cost so far: $35.21
+
+📸 Processing: Village Hotel Sentosa (Singapore, Singapore)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 355/543 (65.4%)
+   💰 Cost so far: $35.32
+
+📸 Processing: ONE°15 Marina Sentosa Cove Singapore (Singapore, Singapore)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 356/543 (65.6%)
+   💰 Cost so far: $35.41
+
+📸 Processing: Amara Sanctuary Sentosa (Singapore, Singapore)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 357/543 (65.7%)
+   💰 Cost so far: $35.51
+
+📸 Processing: Mount Nelson, A Belmond Hotel, Cape Town (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 358/543 (65.9%)
+   💰 Cost so far: $35.62
+
+📸 Processing: Ellerman House (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 359/543 (66.1%)
+   💰 Cost so far: $35.72
+
+📸 Processing: Pepperclub Hotel (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 360/543 (66.3%)
+   💰 Cost so far: $35.81
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 37: Processing 10 hotels
+================================================================================
+
+📸 Processing: VILLA COLONIALE Schumacher Luxury Retreat, Adults Only (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 361/543 (66.5%)
+   💰 Cost so far: $35.92
+
+📸 Processing: Gorgeous George Hotel (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 362/543 (66.7%)
+   💰 Cost so far: $36.02
+
+📸 Processing: The Trade Boutique Hotel (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 363/543 (66.9%)
+   💰 Cost so far: $36.13
+
+📸 Processing: O on Kloof Boutique Hotel & Spa (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 364/543 (67.0%)
+   💰 Cost so far: $36.22
+
+📸 Processing: The Table Bay Hotel - Temporarily Closed (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 365/543 (67.2%)
+   💰 Cost so far: $36.32
+
+📸 Processing: Camps Bay Retreat (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 366/543 (67.4%)
+   💰 Cost so far: $36.40
+
+📸 Processing: Mount Sierra (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 367/543 (67.6%)
+   💰 Cost so far: $36.51
+
+📸 Processing: Hawksmoor House (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 368/543 (67.8%)
+   💰 Cost so far: $36.61
+
+📸 Processing: The Andros Boutique Hotel (Cape Town, South Africa)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 369/543 (68.0%)
+   💰 Cost so far: $36.72
+
+📸 Processing: Sono Calm Jeju (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 370/543 (68.1%)
+   💰 Cost so far: $36.82
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 38: Processing 10 hotels
+================================================================================
+
+📸 Processing: The Siena Resort (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 371/543 (68.3%)
+   💰 Cost so far: $36.93
+
+📸 Processing: Lotte Resort Jeju Art Villas (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 372/543 (68.5%)
+   💰 Cost so far: $37.03
+
+📸 Processing: Bayhill Pool & Villa (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 373/543 (68.7%)
+   💰 Cost so far: $37.14
+
+📸 Processing: The Shilla Jeju (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 374/543 (68.9%)
+   💰 Cost so far: $37.24
+
+📸 Processing: Gloucester Hotel Jeju (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 375/543 (69.1%)
+   💰 Cost so far: $37.35
+
+📸 Processing: Boutique Hotel Villa de aewol (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 376/543 (69.2%)
+   💰 Cost so far: $37.45
+
+📸 Processing: Phoenix jeju (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 377/543 (69.4%)
+   💰 Cost so far: $37.56
+
+📸 Processing: Dyneoceano Hotel (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 378/543 (69.6%)
+   💰 Cost so far: $37.66
+
+📸 Processing: Sun and Moon Resort (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 379/543 (69.8%)
+   💰 Cost so far: $37.77
+
+📸 Processing: Uni Hotel Jeju | 유니호텔 제주 (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 380/543 (70.0%)
+   💰 Cost so far: $37.85
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 39: Processing 10 hotels
+================================================================================
+
+📸 Processing: Hanwha Resort Jeju (Jeju Island, South Korea)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 381/543 (70.2%)
+   💰 Cost so far: $37.95
+
+📸 Processing: Core Ibiza Town Hotel (Ibiza, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 382/543 (70.3%)
+   💰 Cost so far: $38.06
+
+📸 Processing: Bless Hotel Ibiza (Ibiza, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 383/543 (70.5%)
+   💰 Cost so far: $38.14
+
+📸 Processing: 7Pines Resort Ibiza - Destination by Hyatt (Ibiza, Spain)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 384/543 (70.7%)
+   💰 Cost so far: $38.24
+
+📸 Processing: ME Ibiza - The Leading Hotels of the World (Ibiza, Spain)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 385/543 (70.9%)
+   💰 Cost so far: $38.35
+
+📸 Processing: AMA Ibiza Beachfront Suites (Ibiza, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 386/543 (71.1%)
+   💰 Cost so far: $38.44
+
+📸 Processing: Grand Palladium White Island Resort & Spa (Ibiza, Spain)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 387/543 (71.3%)
+   💰 Cost so far: $38.55
+
+📸 Processing: Jumeirah Mallorca (Mallorca, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 388/543 (71.5%)
+   💰 Cost so far: $38.64
+
+📸 Processing: Castell Son Claret (Mallorca, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 389/543 (71.6%)
+   💰 Cost so far: $38.75
+
+📸 Processing: Kimpton Aysla Mallorca (Mallorca, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 390/543 (71.8%)
+   💰 Cost so far: $38.82
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 40: Processing 10 hotels
+================================================================================
+
+📸 Processing: Zhero Hotel Mallorca (Mallorca, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 391/543 (72.0%)
+   💰 Cost so far: $38.93
+
+📸 Processing: Hotel Miramar Mallorca (Mallorca, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 392/543 (72.2%)
+   💰 Cost so far: $39.00
+
+📸 Processing: Finca Hotel Rural Es Turó (Mallorca, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 393/543 (72.4%)
+   💰 Cost so far: $39.09
+
+📸 Processing: Finca Hotel Son Pont (Mallorca, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 394/543 (72.6%)
+   💰 Cost so far: $39.19
+
+📸 Processing: Hipotels Mediterráneo (Mallorca, Spain)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 395/543 (72.7%)
+   💰 Cost so far: $39.30
+
+📸 Processing: Hotel Atolon & Kaafu Beach Club (Mallorca, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 396/543 (72.9%)
+   💰 Cost so far: $39.39
+
+📸 Processing: Finca Can Coll - Boutique Country House Sóller (Mallorca, Spain)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 397/543 (73.1%)
+   💰 Cost so far: $39.49
+
+📸 Processing: La Residencia, A Belmond Hotel, Mallorca (Mallorca, Spain)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 398/543 (73.3%)
+   💰 Cost so far: $39.60
+
+📸 Processing: Iberostar Selection Playa de Muro Village (Mallorca, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 399/543 (73.5%)
+   💰 Cost so far: $39.68
+
+📸 Processing: Iberostar Selection Santa Eulalia Ibiza (Ibiza, Spain)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 400/543 (73.7%)
+   💰 Cost so far: $39.78
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 41: Processing 10 hotels
+================================================================================
+
+📸 Processing: Hôtel Sa Clau By MAMBO (Ibiza, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 401/543 (73.8%)
+   💰 Cost so far: $39.88
+
+📸 Processing: Grupotel Ibiza Beach Resort (Ibiza, Spain)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 402/543 (74.0%)
+   💰 Cost so far: $39.98
+
+📸 Processing: Firefly Boutique Hotel (Zermatt, Switzerland)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 403/543 (74.2%)
+   💰 Cost so far: $40.06
+
+📸 Processing: Art Boutique Hotel Monopol (St. Moritz, Switzerland)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 404/543 (74.4%)
+   💰 Cost so far: $40.17
+
+📸 Processing: Randolins Familienresort St. Moritz (St. Moritz, Switzerland)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 405/543 (74.6%)
+   💰 Cost so far: $40.27
+
+📸 Processing: Boutique Hotel Matthiol (Zermatt, Switzerland)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 406/543 (74.8%)
+   💰 Cost so far: $40.36
+
+📸 Processing: Hotel Matterhorn Lodge (Zermatt, Switzerland)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 407/543 (75.0%)
+   💰 Cost so far: $40.44
+
+📸 Processing: Hotel Alpen Resort & SPA (Zermatt, Switzerland)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 408/543 (75.1%)
+   💰 Cost so far: $40.52
+
+📸 Processing: Resort La Ginabelle (Zermatt, Switzerland)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 409/543 (75.3%)
+   💰 Cost so far: $40.62
+
+📸 Processing: Matterhorn Inn (Zermatt, Switzerland)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 410/543 (75.5%)
+   💰 Cost so far: $40.73
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 42: Processing 10 hotels
+================================================================================
+
+📸 Processing: Swiss Alpine Hotel Allalin (Swiss Alps, Switzerland)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 411/543 (75.7%)
+   💰 Cost so far: $40.82
+
+📸 Processing: La Val Hotel & Spa (Swiss Alps, Switzerland)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 412/543 (75.9%)
+   💰 Cost so far: $40.91
+
+📸 Processing: Elewana Serengeti Migration Camp (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 413/543 (76.1%)
+   💰 Cost so far: $41.02
+
+📸 Processing: Kuoom Lodge (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 414/543 (76.2%)
+   💰 Cost so far: $41.12
+
+📸 Processing: Serengeti Serena Safari Lodge (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 415/543 (76.4%)
+   💰 Cost so far: $41.23
+
+📸 Processing: Serengeti Luxury Retreat (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 416/543 (76.6%)
+   💰 Cost so far: $41.33
+
+📸 Processing: One Nature Nyaruswiga (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 417/543 (76.8%)
+   💰 Cost so far: $41.44
+
+📸 Processing: Siringit Serengeti Camp (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 418/543 (77.0%)
+   💰 Cost so far: $41.54
+
+📸 Processing: Awali Serengeti Camp (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 419/543 (77.2%)
+   💰 Cost so far: $41.64
+
+📸 Processing: Serengeti Pioneer Camp (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 420/543 (77.3%)
+   💰 Cost so far: $41.74
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 43: Processing 10 hotels
+================================================================================
+
+📸 Processing: Osero Serengeti Tented Camp (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 421/543 (77.5%)
+   💰 Cost so far: $41.83
+
+📸 Processing: Mbalageti Serengeti (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 422/543 (77.7%)
+   💰 Cost so far: $41.92
+
+📸 Processing: Four Seasons Safari Lodge Serengeti (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 423/543 (77.9%)
+   💰 Cost so far: $42.03
+
+📸 Processing: Xanadu Luxury Villas & Retreat Zanzibar (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 424/543 (78.1%)
+   💰 Cost so far: $42.13
+
+📸 Processing: LUX Marijani, Zanzibar (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 425/543 (78.3%)
+   💰 Cost so far: $42.24
+
+📸 Processing: The Residence Zanzibar (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 426/543 (78.5%)
+   💰 Cost so far: $42.32
+
+📸 Processing: Zanzibar Beach Resort (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 427/543 (78.6%)
+   💰 Cost so far: $42.43
+
+📸 Processing: Chuini Zanzibar Beach Lodge (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 428/543 (78.8%)
+   💰 Cost so far: $42.53
+
+📸 Processing: Zanzibar Bay Resort & Spa (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 429/543 (79.0%)
+   💰 Cost so far: $42.64
+
+📸 Processing: Bamboo Zanzibar - Design Hotel (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 430/543 (79.2%)
+   💰 Cost so far: $42.73
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 44: Processing 10 hotels
+================================================================================
+
+📸 Processing: Binta Boutique Hotel (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 431/543 (79.4%)
+   💰 Cost so far: $42.84
+
+📸 Processing: Oleza Boutique Hotel (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 432/543 (79.6%)
+   💰 Cost so far: $42.94
+
+📸 Processing: Meliá Zanzibar (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 433/543 (79.7%)
+   💰 Cost so far: $43.02
+
+📸 Processing: Liquid Life Boutique Hotel Zanzibar (Zanzibar, Tanzania)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 434/543 (79.9%)
+   💰 Cost so far: $43.13
+
+📸 Processing: Africa Safari Serengeti Bologonja (Serengeti, Tanzania)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 435/543 (80.1%)
+   💰 Cost so far: $43.23
+
+📸 Processing: Aladdin Luxury Camp (Phuket, Thailand)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 436/543 (80.3%)
+   💰 Cost so far: $43.34
+
+📸 Processing: Sinae Phuket (Phuket, Thailand)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 437/543 (80.5%)
+   💰 Cost so far: $43.44
+
+📸 Processing: Supalai Scenic Bay Resort (Phuket, Thailand)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 438/543 (80.7%)
+   💰 Cost so far: $43.53
+
+📸 Processing: Phuket Kata Resotel (Phuket, Thailand)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 439/543 (80.8%)
+   💰 Cost so far: $43.64
+
+📸 Processing: Wyndham Grand Phuket Kalim Bay (Phuket, Thailand)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 440/543 (81.0%)
+   💰 Cost so far: $43.74
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 45: Processing 10 hotels
+================================================================================
+
+📸 Processing: Mandarava Resort & Spa (Phuket, Thailand)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 441/543 (81.2%)
+   💰 Cost so far: $43.82
+
+📸 Processing: Bandara Beach Resort Phuket (Phuket, Thailand)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 442/543 (81.4%)
+   💰 Cost so far: $43.92
+
+📸 Processing: Oceanfront Beach Resort (Phuket, Thailand)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 443/543 (81.6%)
+   💰 Cost so far: $44.03
+
+📸 Processing: Anona Beachfront Phuket Resort (Phuket, Thailand)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 444/543 (81.8%)
+   💰 Cost so far: $44.13
+
+📸 Processing: Naiharn on the rock resort (Phuket, Thailand)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 445/543 (82.0%)
+   💰 Cost so far: $44.23
+
+📸 Processing: The Naka Island, a Luxury Collection Resort & Spa, Phuket (Phuket, Thailand)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 446/543 (82.1%)
+   💰 Cost so far: $44.34
+
+📸 Processing: Santhiya Koh Yao Yai Resort & Spa (Phuket, Thailand)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 447/543 (82.3%)
+   💰 Cost so far: $44.44
+
+📸 Processing: COMO Point Yamu (Phuket, Thailand)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 448/543 (82.5%)
+   💰 Cost so far: $44.54
+
+📸 Processing: Seven Stars Resort and Spa (Turks and Caicos, Turks and Caicos Islands)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 449/543 (82.7%)
+   💰 Cost so far: $44.62
+
+📸 Processing: Long Bay Beach Club (Turks and Caicos, Turks and Caicos Islands)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 450/543 (82.9%)
+   💰 Cost so far: $44.72
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 46: Processing 10 hotels
+================================================================================
+
+📸 Processing: South Bank Resort (Turks and Caicos, Turks and Caicos Islands)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 451/543 (83.1%)
+   💰 Cost so far: $44.83
+
+📸 Processing: Wymara Resort Turks & Caicos (Turks and Caicos, Turks and Caicos Islands)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 452/543 (83.2%)
+   💰 Cost so far: $44.93
+
+📸 Processing: Salterra, a Luxury Collection Resort & Spa, South Caicos (Turks and Caicos, Turks and Caicos Islands)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 453/543 (83.4%)
+   💰 Cost so far: $45.02
+
+📸 Processing: Ambergris Cay Private Island Resort, Turks & Caicos - All Inclusive (Turks and Caicos, Turks and Caicos Islands)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 454/543 (83.6%)
+   💰 Cost so far: $45.09
+
+📸 Processing: Sibonné Beach Hotel (Turks and Caicos, Turks and Caicos Islands)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 455/543 (83.8%)
+   💰 Cost so far: $45.20
+
+📸 Processing: Beach House Turks and Caicos (Turks and Caicos, Turks and Caicos Islands)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 456/543 (84.0%)
+   💰 Cost so far: $45.30
+
+📸 Processing: Beaches Turks & Caicos (Turks and Caicos, Turks and Caicos Islands)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 457/543 (84.2%)
+   💰 Cost so far: $45.39
+
+📸 Processing: Anantara The Palm Dubai Resort (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 458/543 (84.3%)
+   💰 Cost so far: $45.47
+
+📸 Processing: Millennium Place Marina (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 459/543 (84.5%)
+   💰 Cost so far: $45.58
+
+📸 Processing: Waldorf Astoria Dubai Palm Jumeirah (Dubai, UAE)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 460/543 (84.7%)
+   💰 Cost so far: $45.68
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 47: Processing 10 hotels
+================================================================================
+
+📸 Processing: Bab Al Shams, A Rare Finds Desert Resort, Dubai (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 461/543 (84.9%)
+   💰 Cost so far: $45.76
+
+📸 Processing: FIVE Palm Jumeirah Hotel (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 462/543 (85.1%)
+   💰 Cost so far: $45.86
+
+📸 Processing: Travelers Dubai Marina Hostel (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 463/543 (85.3%)
+   💰 Cost so far: $45.95
+
+📸 Processing: Taj Exotica Resort & Spa, The Palm, Dubai (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 464/543 (85.5%)
+   💰 Cost so far: $46.05
+
+📸 Processing: Marriott Resort Palm Jumeirah, Dubai (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 465/543 (85.6%)
+   💰 Cost so far: $46.14
+
+📸 Processing: Fairmont The Palm (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 466/543 (85.8%)
+   💰 Cost so far: $46.24
+
+📸 Processing: Beach Walk Boutique Hotel - Jumeriah (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 467/543 (86.0%)
+   💰 Cost so far: $46.33
+
+📸 Processing: Raffles The Palm Dubai (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 468/543 (86.2%)
+   💰 Cost so far: $46.43
+
+📸 Processing: The St. Regis Dubai, The Palm (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 469/543 (86.4%)
+   💰 Cost so far: $46.54
+
+📸 Processing: La Verda Suites and Villas Dubai Marina (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 470/543 (86.6%)
+   💰 Cost so far: $46.64
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 48: Processing 10 hotels
+================================================================================
+
+📸 Processing: Signature Hotel Apartments & Spa Marina (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 471/543 (86.7%)
+   💰 Cost so far: $46.75
+
+📸 Processing: Regency Luxury Suites - Dubai Marina (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 472/543 (86.9%)
+   💰 Cost so far: $46.85
+
+📸 Processing: Rove Dubai Marina (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 473/543 (87.1%)
+   💰 Cost so far: $46.95
+
+📸 Processing: Jannah Marina Hotel Apartments (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 474/543 (87.3%)
+   💰 Cost so far: $47.05
+
+📸 Processing: The First Collection Dubai Marina (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 475/543 (87.5%)
+   💰 Cost so far: $47.14
+
+📸 Processing: Vida Dubai Marina & Yacht Club (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 476/543 (87.7%)
+   💰 Cost so far: $47.24
+
+📸 Processing: Barcelo Residences Dubai Marina (Dubai, UAE)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 477/543 (87.8%)
+   💰 Cost so far: $47.35
+
+📸 Processing: Marina Byblos Hotel (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 478/543 (88.0%)
+   💰 Cost so far: $47.44
+
+📸 Processing: Grosvenor House, a Luxury Collection Hotel, Dubai (Dubai, UAE)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 479/543 (88.2%)
+   💰 Cost so far: $47.54
+
+📸 Processing: Stella Di Mare Dubai Marina Hotel (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 480/543 (88.4%)
+   💰 Cost so far: $47.65
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 49: Processing 10 hotels
+================================================================================
+
+📸 Processing: Jumeirah Burj Al Arab (Dubai, UAE)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 481/543 (88.6%)
+   💰 Cost so far: $47.75
+
+📸 Processing: Aloft Palm Jumeirah (Dubai, UAE)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 482/543 (88.8%)
+   💰 Cost so far: $47.86
+
+📸 Processing: Radisson Beach Resort Palm Jumeirah (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 483/543 (89.0%)
+   💰 Cost so far: $47.94
+
+📸 Processing: The Retreat Palm Dubai MGallery by Sofitel (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 484/543 (89.1%)
+   💰 Cost so far: $48.03
+
+📸 Processing: Adagio Premium The Palm (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 485/543 (89.3%)
+   💰 Cost so far: $48.14
+
+📸 Processing: Kempinski Hotel & Residences Palm Jumeirah (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 486/543 (89.5%)
+   💰 Cost so far: $48.24
+
+📸 Processing: Hilton Dubai Palm Jumeirah (Dubai, UAE)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 487/543 (89.7%)
+   💰 Cost so far: $48.35
+
+📸 Processing: Al Maha, a Luxury Collection Desert Resort & Spa, Dubai (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 488/543 (89.9%)
+   💰 Cost so far: $48.45
+
+📸 Processing: Terra Solis Dubai Desert Destination (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 4 high-quality photos (≥2048px)
+   ✅ Updated with 4 photos
+   📊 Progress: 489/543 (90.1%)
+   💰 Cost so far: $48.53
+
+📸 Processing: Meliá Desert Palm member of Meliá Collection (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 490/543 (90.2%)
+   💰 Cost so far: $48.63
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 50: Processing 10 hotels
+================================================================================
+
+📸 Processing: Desert Dune Farmhouse by Seven Elements (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 491/543 (90.4%)
+   💰 Cost so far: $48.73
+
+📸 Processing: Atlantis - The Palm (Dubai, UAE)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 492/543 (90.6%)
+   💰 Cost so far: $48.84
+
+📸 Processing: The Park Tower Knightsbridge, a Luxury Collection Hotel, London (London, United Kingdom)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 493/543 (90.8%)
+   💰 Cost so far: $48.94
+
+📸 Processing: The Mayfair Townhouse (London, United Kingdom)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 494/543 (91.0%)
+   💰 Cost so far: $49.05
+
+📸 Processing: Flemings Mayfair Hotel (London, United Kingdom)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 495/543 (91.2%)
+   💰 Cost so far: $49.15
+
+📸 Processing: Althoff St. James's Hotel & Club - Mayfair London (London, United Kingdom)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 496/543 (91.3%)
+   💰 Cost so far: $49.24
+
+📸 Processing: Knightsbridge Hotel (London, United Kingdom)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 497/543 (91.5%)
+   💰 Cost so far: $49.35
+
+📸 Processing: Beaufort House Knightsbridge, Serviced Apartments (London, United Kingdom)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 498/543 (91.7%)
+   💰 Cost so far: $49.45
+
+📸 Processing: Covent Garden Hotel (London, United Kingdom)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 499/543 (91.9%)
+   💰 Cost so far: $49.56
+
+📸 Processing: Stay Kula London - Covent Garden Garrick Street (London, United Kingdom)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 500/543 (92.1%)
+   💰 Cost so far: $49.66
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 51: Processing 10 hotels
+================================================================================
+
+📸 Processing: Club Quarters Hotel Covent Garden Holborn (London, United Kingdom)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 501/543 (92.3%)
+   💰 Cost so far: $49.76
+
+📸 Processing: The Z Hotel Covent Garden (London, United Kingdom)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 502/543 (92.4%)
+   💰 Cost so far: $49.87
+
+📸 Processing: Mandarin Oriental Mayfair, London (London, United Kingdom)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 503/543 (92.6%)
+   💰 Cost so far: $49.97
+
+📸 Processing: 1 Hotel Mayfair (London, United Kingdom)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 504/543 (92.8%)
+   💰 Cost so far: $50.07
+
+📸 Processing: Hob Knob (Martha's Vineyard, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 505/543 (93.0%)
+   💰 Cost so far: $50.18
+
+📸 Processing: Mansion House Inn on Martha's Vineyard (Martha's Vineyard, United States)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 506/543 (93.2%)
+   💰 Cost so far: $50.28
+
+📸 Processing: The Richard (Martha's Vineyard, United States)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 507/543 (93.4%)
+   💰 Cost so far: $50.38
+
+📸 Processing: Nobnocket Boutique Inn (Martha's Vineyard, United States)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 508/543 (93.6%)
+   💰 Cost so far: $50.46
+
+📸 Processing: Martha's Vineyard Surfside Hotel (Martha's Vineyard, United States)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 509/543 (93.7%)
+   💰 Cost so far: $50.55
+
+📸 Processing: White Porch Inn Art Hotel (Martha's Vineyard, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 510/543 (93.9%)
+   💰 Cost so far: $50.66
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 52: Processing 10 hotels
+================================================================================
+
+📸 Processing: Winnetu Oceanside Resort (Martha's Vineyard, United States)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 511/543 (94.1%)
+   💰 Cost so far: $50.76
+
+📸 Processing: Big Sur Lodge (Big Sur, United States)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 512/543 (94.3%)
+   💰 Cost so far: $50.86
+
+📸 Processing: Glen Oaks Big Sur (Big Sur, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 513/543 (94.5%)
+   💰 Cost so far: $50.97
+
+📸 Processing: Carmel Valley Ranch - The Lodge (Big Sur, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 514/543 (94.7%)
+   💰 Cost so far: $51.07
+
+📸 Processing: Bernardus Lodge & Spa (Big Sur, United States)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 515/543 (94.8%)
+   💰 Cost so far: $51.16
+
+📸 Processing: Villa Mara Carmel (Big Sur, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 516/543 (95.0%)
+   💰 Cost so far: $51.26
+
+📸 Processing: Carmel Beach Hotel (Big Sur, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 517/543 (95.2%)
+   💰 Cost so far: $51.37
+
+📸 Processing: The Inn at Spanish Bay (Big Sur, United States)
+   ✅ Found 10 photos
+   ⚠️  Only 3 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 518/543 (95.4%)
+   💰 Cost so far: $51.47
+
+📸 Processing: Hyatt Carmel Highlands (Big Sur, United States)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 519/543 (95.6%)
+   💰 Cost so far: $51.58
+
+📸 Processing: The Quail (Big Sur, United States)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 520/543 (95.8%)
+   💰 Cost so far: $51.66
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 53: Processing 10 hotels
+================================================================================
+
+📸 Processing: Four Seasons Resort and Residences Napa Valley (Napa Valley, United States)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 521/543 (95.9%)
+   💰 Cost so far: $51.76
+
+📸 Processing: Rancho Caymus Inn (Napa Valley, United States)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 522/543 (96.1%)
+   💰 Cost so far: $51.85
+
+📸 Processing: Poetry Inn (Napa Valley, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 523/543 (96.3%)
+   💰 Cost so far: $51.95
+
+📸 Processing: Alila Napa Valley (Napa Valley, United States)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 524/543 (96.5%)
+   💰 Cost so far: $52.04
+
+📸 Processing: R INN NAPA (Napa Valley, United States)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 525/543 (96.7%)
+   💰 Cost so far: $52.13
+
+📸 Processing: THE BERGSON (Napa Valley, United States)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 526/543 (96.9%)
+   💰 Cost so far: $52.21
+
+📸 Processing: The Little Nell (Aspen, United States)
+   ✅ Found 10 photos
+   ⚠️  Only 1 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 527/543 (97.1%)
+   💰 Cost so far: $52.32
+
+📸 Processing: St. Regis Residence Club, Aspen (Aspen, United States)
+   ✅ Found 10 photos
+   ⚠️  Only 0 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 528/543 (97.2%)
+   💰 Cost so far: $52.42
+
+📸 Processing: Hotel Jerome, Auberge Resorts Collection (Aspen, United States)
+   ✅ Found 10 photos
+   ⚠️  Only 2 high-quality photos available (need 4 minimum)
+   ℹ️  Using 8 photos (some may be below 2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 529/543 (97.4%)
+   💰 Cost so far: $52.53
+
+📸 Processing: W Aspen (Aspen, United States)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 530/543 (97.6%)
+   💰 Cost so far: $52.63
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 54: Processing 10 hotels
+================================================================================
+
+📸 Processing: The Ritz-Carlton Club, Aspen Highlands (Aspen, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 531/543 (97.8%)
+   💰 Cost so far: $52.73
+
+📸 Processing: St Moritz Lodge (Aspen, United States)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 532/543 (98.0%)
+   💰 Cost so far: $52.83
+
+📸 Processing: Red Mountain Alpine Lodge (Aspen, United States)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 533/543 (98.2%)
+   💰 Cost so far: $52.92
+
+📸 Processing: Stonebridge Inn (Aspen, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 534/543 (98.3%)
+   💰 Cost so far: $53.02
+
+📸 Processing: The Lodge at Mountaineer Square (Aspen, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 535/543 (98.5%)
+   💰 Cost so far: $53.13
+
+📸 Processing: The Crestwood Condominiums (Aspen, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 536/543 (98.7%)
+   💰 Cost so far: $53.23
+
+📸 Processing: Viceroy Snowmass (Aspen, United States)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 537/543 (98.9%)
+   💰 Cost so far: $53.33
+
+📸 Processing: The Ritz-Carlton New York, Central Park (New York City, United States)
+   ✅ Found 10 photos
+   ✅ Selected 5 high-quality photos (≥2048px)
+   ✅ Updated with 5 photos
+   📊 Progress: 538/543 (99.1%)
+   💰 Cost so far: $53.42
+
+📸 Processing: Stanly Ranch, Auberge Resorts Collection (Napa Valley, United States)
+   ✅ Found 10 photos
+   ✅ Selected 6 high-quality photos (≥2048px)
+   ✅ Updated with 6 photos
+   📊 Progress: 539/543 (99.3%)
+   💰 Cost so far: $53.51
+
+📸 Processing: The George (Napa Valley, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 540/543 (99.4%)
+   💰 Cost so far: $53.61
+
+⏸️  Pausing 3 seconds before next batch...
+
+================================================================================
+📦 BATCH 55: Processing 3 hotels
+================================================================================
+
+📸 Processing: Harbor View Hotel (Martha's Vineyard, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 541/543 (99.6%)
+   💰 Cost so far: $53.72
+
+📸 Processing: Madison Inn (Martha's Vineyard, United States)
+   ✅ Found 10 photos
+   ✅ Selected 7 high-quality photos (≥2048px)
+   ✅ Updated with 7 photos
+   📊 Progress: 542/543 (99.8%)
+   💰 Cost so far: $53.82
+
+📸 Processing: Carmel Valley Ranch - The Unbound Collection by Hyatt (Big Sur, United States)
+   ✅ Found 10 photos
+   ✅ Selected 8 high-quality photos (≥2048px)
+   ✅ Updated with 8 photos
+   📊 Progress: 543/543 (100.0%)
+   💰 Cost so far: $53.92
+
+================================================================================
+📊 GOOGLE PLACES PHOTO FETCHER - FINAL REPORT
+================================================================================
+Completed: 10/7/2025, 6:45:50 PM
+Duration: 17.9 minutes
+================================================================================
+
+📈 RESULTS
+--------------------------------------------------------------------------------
+Total Hotels:              543
+Successfully Updated:      543 (100.0%)
+Failed:                    0 (0.0%)
+No Photos Found:           0
+Low Quality Skipped:       141
+Total Photos Fetched:      2775
+Avg Photos per Hotel:      5.1
+
+💰 COST ANALYSIS
+--------------------------------------------------------------------------------
+Total API Calls:           4988
+Estimated Total Cost:      $53.92
+Average Cost per Hotel:    $0.0993
+
+✅ QUALITY ASSURANCE
+--------------------------------------------------------------------------------
+✅ All photos are from Google Places API
+✅ All photos are from exact hotel locations
+✅ All photos are minimum 2048px resolution
+✅ 4-8 photos per hotel
+❌ Removed all Unsplash photos
+❌ Removed all source tagging
+
+================================================================================
+Report Complete
+================================================================================
+
+💾 Detailed report saved to: ./google-places-fetch-report.json
+

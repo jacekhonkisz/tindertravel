@@ -1,0 +1,2011 @@
+{
+  "timestamp": "2025-10-07T22:08:35.407Z",
+  "summary": {
+    "totalHotelsProcessed": 0,
+    "hotelsWithNewPhotos": 0,
+    "totalPhotosAdded": 0,
+    "hotelsNotFound": 204,
+    "errorCount": 0
+  },
+  "results": [
+    {
+      "hotelId": "google_ChIJLcpxhKcFdkgRfWjpSLIzZ_4",
+      "name": "1 Hotel Mayfair",
+      "city": "London",
+      "country": "United Kingdom",
+      "currentPhotos": 3,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJmclaFmrPmRQRMH49uzWYd9w",
+      "name": "Acroterra Rosa Luxury Suites & Spa",
+      "city": "Santorini",
+      "country": "Greece",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ7S4bblz2OxAR55U_5WYYQgI",
+      "name": "Admiralty Hotel Lekki",
+      "city": "Hong Kong",
+      "country": "Hong Kong",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJHZX6Kg6dLRgRSqI1Q_Tgcks",
+      "name": "Africa Safari Serengeti Bologonja",
+      "city": "Serengeti",
+      "country": "Tanzania",
+      "currentPhotos": 0,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ96vpHJ1QhIARR0OoEvyKYNU",
+      "name": "Alila Napa Valley",
+      "city": "Napa Valley",
+      "country": "United States",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJweE3dN1a0i0RpjAjIkXxCLY",
+      "name": "Alila Villas Uluwatu",
+      "city": "Bali",
+      "country": "Indonesia",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ10ox027wQ4wR3s0hHHezL4w",
+      "name": "All Seasons Resort Europa",
+      "city": "Barbados",
+      "country": "Barbados",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJZ3TuJd9qXz4Rv83p3TU08x4",
+      "name": "Aloft Palm Jumeirah",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJD_XW2NcEdkgRS6oeZ95kXGo",
+      "name": "Althoff St. James's Hotel & Club - Mayfair London",
+      "city": "London",
+      "country": "United Kingdom",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJFVLUloBz4TkRkTbZditPK6s",
+      "name": "Amankora Paro",
+      "city": "Bhutan",
+      "country": "Bhutan",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ7xZ3TVUZ2jERfjDHnlIvir8",
+      "name": "Amara Sanctuary Sentosa",
+      "city": "Singapore",
+      "country": "Singapore",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJhwcAADNBs44RoicxhGaiuDI",
+      "name": "Ambergris Cay Private Island Resort, Turks & Caicos - All Inclusive",
+      "city": "Turks and Caicos",
+      "country": "Turks and Caicos Islands",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJlzfufjoXEDERcOlmDT2e9Z4",
+      "name": "Anantara Angkor Resort",
+      "city": "Siem Reap",
+      "country": "Cambodia",
+      "currentPhotos": 2,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJY0hJGYrWT48R-DJMldOloxk",
+      "name": "Anat Tantric Boutique Hotel",
+      "city": "Tulum",
+      "country": "Mexico",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJKXSoRGm-ohQRJZGWm2Wda78",
+      "name": "Anax Resort & Spa",
+      "city": "Mykonos",
+      "country": "Greece",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJJYFdVVXfbZERt04PVAYcV40",
+      "name": "Andenia Boutique Hotel",
+      "city": "Machu Picchu",
+      "country": "Peru",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ4xk7jEzMmRQRW8rk7P7TXtQ",
+      "name": "Andronis Concept Wellness Resort",
+      "city": "Santorini",
+      "country": "Greece",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJPy0K0To7UDAR9VXTDWpryxM",
+      "name": "Anona Beachfront Phuket Resort",
+      "city": "Phuket",
+      "country": "Thailand",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJo2LYWUTWXhMR_zd6TTFD9g8",
+      "name": "Aria Suites",
+      "city": "Santorini",
+      "country": "Greece",
+      "currentPhotos": 3,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJsR8fPr6T9pQRsKLIE48Q5JQ",
+      "name": "Awasi Iguazú",
+      "city": "Iguazu Falls",
+      "country": "Argentina",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJbT_RRHT3OxARpo65iOMicqM",
+      "name": "Aylesburyhomes Luxury Apartments",
+      "city": "Hong Kong",
+      "country": "Hong Kong",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJFxCH3HZvXz4Rz8fIvmm2WZM",
+      "name": "Bab Al Shams, A Rare Finds Desert Resort, Dubai",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJqVDgSOoXXRgRjMDVkP20EOU",
+      "name": "Bamboo Zanzibar - Design Hotel",
+      "city": "Zanzibar",
+      "country": "Tanzania",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJbw88CFRrXz4RqukuUUB3E2w",
+      "name": "Barcelo Residences Dubai Marina",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJt9Knu0AFdkgRyPg99ftXn5U",
+      "name": "Beaufort House Knightsbridge, Serviced Apartments",
+      "city": "London",
+      "country": "United Kingdom",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJIc4W0aGc4TkRSmZcImOaW3A",
+      "name": "Bhutan Spirit Sanctuary",
+      "city": "Bhutan",
+      "country": "Bhutan",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJmzwxlesUmRIREWR_MOJ0Kkw",
+      "name": "Bless Hotel Ibiza",
+      "city": "Ibiza",
+      "country": "Spain",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ0ayFunIafGwR4s4j-NXWDj8",
+      "name": "Blue Lagoon Lodge",
+      "city": "Lord Howe Island",
+      "country": "Australia",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJEYb9xeyT9pQRXf-Pp50KM5Q",
+      "name": "Botanica The House Experience",
+      "city": "Iguazu Falls",
+      "country": "Argentina",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJWQxuC1ITL0cRPkB1U2I_JSc",
+      "name": "Boutique Hotel Central",
+      "city": "Hong Kong",
+      "country": "Hong Kong",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJt9v1fFTRT48RRoL7ySspYrk",
+      "name": "Boutique Hotel Posada 06 Tulum",
+      "city": "Tulum",
+      "country": "Mexico",
+      "currentPhotos": 2,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJD3KueOta0i0Rl2LFO5YakuE",
+      "name": "Bvlgari Resort Bali",
+      "city": "Bali",
+      "country": "Indonesia",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJAVjOgLPteGkR9M0VY2qmddo",
+      "name": "Cairns Rainforest Retreats",
+      "city": "Great Barrier Reef",
+      "country": "Australia",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJNcOUG0jPmRQR-0wsm0-KUnQ",
+      "name": "Cal Day Rooms Santorini",
+      "city": "Santorini",
+      "country": "Greece",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJV9SEmdBnzB0RWTn2Pxja2d4",
+      "name": "Camps Bay Retreat",
+      "city": "Cape Town",
+      "country": "South Africa",
+      "currentPhotos": 1,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJb2icGqe0vzsR7cIMbLL2eXE",
+      "name": "Caravela Beach Resort",
+      "city": "Goa",
+      "country": "India",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJyRWaWD3mjYAR4BoRez-kDL8",
+      "name": "Carmel Beach Hotel",
+      "city": "Big Sur",
+      "country": "United States",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJWfU5lIOabZERHfkiK8ptvJw",
+      "name": "Casa del Sol Machu Picchu Hotel Boutique",
+      "city": "Machu Picchu",
+      "country": "Peru",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJd1rlxBzBOxMRtSyg6OeI-y8",
+      "name": "Cava Resort Costa d'Amalfi",
+      "city": "Amalfi Coast",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJFUc9t6zNmRQRkb8MrzQR3A0",
+      "name": "Cavo Tagoo",
+      "city": "Santorini",
+      "country": "Greece",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJj7Ahv2nXT48RlNayYkyeemY",
+      "name": "Chiibal uh glamping Tulúm",
+      "city": "Tulum",
+      "country": "Mexico",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJyZHblRPwQ4wRnO3IXWR5BkE",
+      "name": "Colony Club, a Luxury Collection Resort, Barbados",
+      "city": "Barbados",
+      "country": "Barbados",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJCcMlWQcs4CIR4_Mn03IK090",
+      "name": "Constance Ephelia Mahe Seychelles",
+      "city": "Seychelles",
+      "country": "Seychelles",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJESLrFUc12GsRc-DB5-w9peQ",
+      "name": "Coral Sea Resort",
+      "city": "Great Barrier Reef",
+      "country": "Australia",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJo7JWI-NKr4YRnAUcTj4vhvQ",
+      "name": "Corazón Cabo Resort & Spa",
+      "city": "Los Cabos",
+      "country": "Mexico",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJe0XrMc0EdkgR73cT3U4ghp4",
+      "name": "Covent Garden Hotel",
+      "city": "London",
+      "country": "United Kingdom",
+      "currentPhotos": 0,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJyfFnoXpH0i0R4TCla_qdEyE",
+      "name": "Danu villas Bali",
+      "city": "Bali",
+      "country": "Indonesia",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJw1LH1Ufurw0RMqgGDtJybYc",
+      "name": "Dar Les Cigognes",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJTXwDfSxwICMR0ir6jIFCx18",
+      "name": "Denis Private Island",
+      "city": "Seychelles",
+      "country": "Seychelles",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJi9dmQpBhLxMRRMMQoSG6Qs4",
+      "name": "Divina Luxury Hotel",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJladaOEvXT48RxBWhaayiayQ",
+      "name": "ECo.Bañitas Hotel",
+      "city": "Tulum",
+      "country": "Mexico",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJW1UQsqfvrw0R125hph-GLVE",
+      "name": "El Morocco Hotel",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJaUtdtrRgqpoRPBM7joT8-CI",
+      "name": "Enchanted Galapagos Lodge",
+      "city": "Galápagos Islands",
+      "country": "Ecuador",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJcalLEczNmRQRne3nMJzh2Ww",
+      "name": "Ersi villas",
+      "city": "Santorini",
+      "country": "Greece",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJYT7W9Zx8GpYROzX7llPkPXs",
+      "name": "Estancia Peuma Hue",
+      "city": "Patagonia",
+      "country": "Chile",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJv7gvLjvKcFMRzvb0LKnpmQA",
+      "name": "Fairmont Banff Springs",
+      "city": "Banff",
+      "country": "Canada",
+      "currentPhotos": 2,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJI2DBjy1rXz4RNMB3Vz6-KeI",
+      "name": "Fairmont The Palm",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJd-ktlQqrlxIRnk2RqAKHTEI",
+      "name": "Finca Hotel Rural Es Turó",
+      "city": "Mallorca",
+      "country": "Spain",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ1c6qids1j0cRa6qvkG7W6ng",
+      "name": "Firefly Boutique Hotel",
+      "city": "Zermatt",
+      "country": "Switzerland",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJjXZdi1NgLxMRKs5abL0lFuQ",
+      "name": "Florio Luxury Rooms Spagna",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJs_UZm7KJPzsRIciVAxAka9I",
+      "name": "Four Seasons Resort Maldives at Kuda Huraa",
+      "city": "Maldives",
+      "country": "Maldives",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJLXhzwEWUMhgRVCI2uhMkkp8",
+      "name": "Four Seasons Safari Lodge Serengeti",
+      "city": "Serengeti",
+      "country": "Tanzania",
+      "currentPhotos": 1,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJo_C0Fv8pt0ARd_D61xADMAM",
+      "name": "G Danube Boutique Hotel",
+      "city": "Paris",
+      "country": "France",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJXWUPQPaT9pQRd5ruuVFgloE",
+      "name": "Glamping Selva Iguazú",
+      "city": "Iguazu Falls",
+      "country": "Argentina",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJZ904aCtEmRIRW9QxLNi33zo",
+      "name": "Grand Palladium White Island Resort & Spa",
+      "city": "Ibiza",
+      "country": "Spain",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJs5zZ0oV-QDsR0TqG5i9OtZs",
+      "name": "Grand Park Kodhipparu, Maldives",
+      "city": "Maldives",
+      "country": "Maldives",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJOa799XBOr4YRrLmKZhP-Md0",
+      "name": "Grand Velas",
+      "city": "Los Cabos",
+      "country": "Mexico",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJr5bDI3PbzRIRQ8hg-UCx31A",
+      "name": "Grand-Hotel du Cap-Ferrat, A Four Seasons Hotel",
+      "city": "French Riviera",
+      "country": "France",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJSe3-e1FrXz4Rm5MbMEP2imE",
+      "name": "Grosvenor House, a Luxury Collection Hotel, Dubai",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJLUJZXQZTNgYRPD6dvVT50Pg",
+      "name": "Hamares Boutique Hotel",
+      "city": "Fernando de Noronha",
+      "country": "Brazil",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJp0V_LeEHAWARYgvZEf59fCs",
+      "name": "Hana Nishijin",
+      "city": "Kyoto",
+      "country": "Japan",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJNZlQpGQJAWAR-0VBTxaUSsw",
+      "name": "Higashiyama Shikikaboku",
+      "city": "Kyoto",
+      "country": "Japan",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJGXzshKz3Q4wRoLrhJHDZMPg",
+      "name": "Hilton Barbados Resort",
+      "city": "Barbados",
+      "country": "Barbados",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJX-ln8UQJAWARCiiFrZs6sbA",
+      "name": "Homm Stay Nagi Shijo Kyoto",
+      "city": "Kyoto",
+      "country": "Japan",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJV-9u7nQ2j0cRQ6l7vxemVZY",
+      "name": "Hotel Alpen Resort & SPA",
+      "city": "Zermatt",
+      "country": "Switzerland",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJp_9V0bi9zhIRngvarU1KTs4",
+      "name": "Hôtel Cap Riviera",
+      "city": "French Riviera",
+      "country": "France",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJjfB9pAJu5kcR6sP61fKt0-Y",
+      "name": "Hôtel Caron de Beaumarchais Paris Marais",
+      "city": "Paris",
+      "country": "France",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJf6iQEld0qZYRYjumJ7jXFww",
+      "name": "Hotel Dunas | San Pedro de Atacama",
+      "city": "Atacama Desert",
+      "country": "Chile",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ5-zrFH05QIcRmN9eXOxSl4s",
+      "name": "Hotel Jerome, Auberge Resorts Collection",
+      "city": "Aspen",
+      "country": "United States",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ_3yyFzC9vXYREg9eLXJ2zGk",
+      "name": "Hotel Maitai Polynesia",
+      "city": "Bora Bora",
+      "country": "French Polynesia",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ359j3d41j0cRona2l90ea3k",
+      "name": "Hotel Matterhorn Lodge",
+      "city": "Zermatt",
+      "country": "Switzerland",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJJ5q9vApgLxMR3WPW2oorcDc",
+      "name": "Hotel NH Roma Villa Carpegna",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ15pw4t6WOxMRMoTdR1vyGoY",
+      "name": "Hotel Pellegrino",
+      "city": "Amalfi Coast",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJucwGqk6MQTkRxnh_4FGmvTo",
+      "name": "HOTEL RATAN VILAS",
+      "city": "Rajasthan",
+      "country": "India",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJG_v2IuVfLxMRjtb1Vlc2jKQ",
+      "name": "Hotel Villa Pamphili Roma",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 3,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ470wvvrojYARviTYKx4UeDg",
+      "name": "Hyatt Carmel Highlands",
+      "city": "Big Sur",
+      "country": "United States",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJsz99tyPVlxIR2BRrDY5OKK4",
+      "name": "Iberostar Selection Santa Eulalia Ibiza",
+      "city": "Ibiza",
+      "country": "Spain",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ06nI0syT9pQRKw9hN4ijl90",
+      "name": "Iguazu Jungle Lodge",
+      "city": "Iguazu Falls",
+      "country": "Argentina",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJG17jyFi9vXYR8lKksjmm_YE",
+      "name": "InterContinental Bora Bora Resort Thalasso Spa",
+      "city": "Bora Bora",
+      "country": "French Polynesia",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJfdKmUZmzEG4RuSO8MduYilk",
+      "name": "InterContinental Fiji Golf Resort & Spa by IHG",
+      "city": "Fiji",
+      "country": "Fiji",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ5VoQCpbrq5oR-EA2eLicDf4",
+      "name": "Isamar Hotel Galapagos",
+      "city": "Galápagos Islands",
+      "country": "Ecuador",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ7xqSgim3vzsRmNubqZI8nPI",
+      "name": "ITC Grand Goa, a Luxury Collection Resort & Spa, Goa",
+      "city": "Goa",
+      "country": "India",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ7f8mQM3XHyMRvU0vkBmjfDk",
+      "name": "JA Enchanted Island Resort",
+      "city": "Seychelles",
+      "country": "Seychelles",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJLc8UZFdqXz4ROODwebhx2rM",
+      "name": "Jumeirah Burj Al Arab",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 1,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJAyEepqdVLBgREciNv97-cao",
+      "name": "JW Marriott Masai Mara Lodge",
+      "city": "Masai Mara",
+      "country": "Kenya",
+      "currentPhotos": 3,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJDTdQPvDvvzsR91ZUjKGvIMs",
+      "name": "Kaiā Goa",
+      "city": "Goa",
+      "country": "India",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJDSq_RZni1KkRMmAyZCdXFuo",
+      "name": "Kamana Lakehouse",
+      "city": "Queenstown",
+      "country": "New Zealand",
+      "currentPhotos": 2,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJXYroDpOXE5YR3l6V9Aq_K20",
+      "name": "Kila Tai Tai Lodge",
+      "city": "Patagonia",
+      "country": "Chile",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJbxHJ0gmJlxIRlBhbBwUfx48",
+      "name": "Kimpton Aysla Mallorca",
+      "city": "Mallorca",
+      "country": "Spain",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJnTVNXz8FdkgRZOMjukO5KeQ",
+      "name": "Knightsbridge Hotel",
+      "city": "London",
+      "country": "United Kingdom",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJwRH9OACvMhgROwQevR-RELY",
+      "name": "Kuoom Lodge",
+      "city": "Serengeti",
+      "country": "Tanzania",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJl1r8x13vqpoRLl8oIwBxEkI",
+      "name": "La Isla Galapagos Hotel",
+      "city": "Galápagos Islands",
+      "country": "Ecuador",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJJ_K6cMzGzhIRLvhly4MtXxQ",
+      "name": "La Toison d'Or - Riviera Villages",
+      "city": "French Riviera",
+      "country": "France",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJVYJkJWYfhUcR1A9jw6ZgY4o",
+      "name": "La Val Hotel & Spa",
+      "city": "Swiss Alps",
+      "country": "Switzerland",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ0ZVhhQcrHiMRdX1EMKsGV2I",
+      "name": "laïla, Seychelles, a Tribute Portfolio Resort",
+      "city": "Seychelles",
+      "country": "Seychelles",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJmf-_3QKjczkR0f7PFUPADGE",
+      "name": "Laxmi Vilas Palace",
+      "city": "Rajasthan",
+      "country": "India",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJH4mb5268vXYRv4OyGEc8kr0",
+      "name": "Le Bora Bora by Pearl Resorts",
+      "city": "Bora Bora",
+      "country": "French Polynesia",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJyZVQ9WiDvXYR5oqrWj5MrBs",
+      "name": "Le Taha'a by Pearl Resorts",
+      "city": "Bora Bora",
+      "country": "French Polynesia",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJi4rHJaU9XRgRymJJp_hX_Zs",
+      "name": "Liquid Life Boutique Hotel Zanzibar",
+      "city": "Zanzibar",
+      "country": "Tanzania",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJdQHqnW-IGpYRH_Sudz25Qjo",
+      "name": "Llao Llao Hotel",
+      "city": "Patagonia",
+      "country": "Chile",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ59NZmr-T9pQRAhOS1aT4pqk",
+      "name": "Loi Suites Iguazú Hotel",
+      "city": "Iguazu Falls",
+      "country": "Argentina",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJt_WSqGH7LBgRmSoiaRC3JKI",
+      "name": "Lorian safari camp",
+      "city": "Masai Mara",
+      "country": "Kenya",
+      "currentPhotos": 1,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJb5Vig3vXQhgRRUtn1UIjA-0",
+      "name": "LUX Marijani, Zanzibar",
+      "city": "Zanzibar",
+      "country": "Tanzania",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJd-T2h9qFODsRrHqirPIcu_E",
+      "name": "Madifushi Private Island",
+      "city": "Maldives",
+      "country": "Maldives",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJgwfo1W4lUDAR6CMxPBROuzk",
+      "name": "Mandarava Resort & Spa",
+      "city": "Phuket",
+      "country": "Thailand",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ_cCLPZQo5YkRvEzfAY97S50",
+      "name": "Mansion House Inn on Martha's Vineyard",
+      "city": "Martha's Vineyard",
+      "country": "United States",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJtQshUej7LBgRT4pMCJz6FJ4",
+      "name": "Mara Explorer Tented Camp",
+      "city": "Masai Mara",
+      "country": "Kenya",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJBUiDayTRT48RZiPKql6pMCE",
+      "name": "Maria del Mar Boutique Hotel & Spa",
+      "city": "Tulum",
+      "country": "Mexico",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJNay7alhrXz4RVCPrkrca9aM",
+      "name": "Marriott Resort Palm Jumeirah, Dubai",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJezpBqWFgLxMR1wQHxl7eI6s",
+      "name": "MDM Luxury Rooms",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJS2CxV3hhXz4RVhj5Hr37TQo",
+      "name": "Meliá Desert Palm member of Meliá Collection",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJFbeNsI7WQhgRiULdJ9KPTPg",
+      "name": "Meliá Zanzibar",
+      "city": "Zanzibar",
+      "country": "Tanzania",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "RTNCEMER",
+      "name": "MERCURE NICE PROM D ANGLAIS 3*",
+      "city": "French Riviera",
+      "country": "France",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJjavHVGiT9pQRFdr0glXN5WM",
+      "name": "Miraselva Lodge",
+      "city": "Iguazu Falls",
+      "country": "Argentina",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJkSxE9Mguf2kRGBGuMbqkzm4",
+      "name": "Mission Reef Resort",
+      "city": "Great Barrier Reef",
+      "country": "Australia",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJS6sfcA9VEZYRXjEK0KDobAQ",
+      "name": "Montaña Mágica Lodge",
+      "city": "Patagonia",
+      "country": "Chile",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ203sRcNZnWkRR-xprNc_V7k",
+      "name": "Noah Creek Eco-Retreat - Eco-Huts & Hiking Trail Reserve",
+      "city": "Great Barrier Reef",
+      "country": "Australia",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ10lh6Pg1r4YRrvtcw6IZmu4",
+      "name": "Nobu Hotel Los Cabos",
+      "city": "Los Cabos",
+      "country": "Mexico",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJQYQusiNnzB0RFS7-SwLzies",
+      "name": "O on Kloof Boutique Hotel & Spa",
+      "city": "Cape Town",
+      "country": "South Africa",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJc7wRCnf2Q4wROMltZJzcn1A",
+      "name": "O2 Beach Club & Spa",
+      "city": "Barbados",
+      "country": "Barbados",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJnZlzdnh3TDARQFSc6oTk988",
+      "name": "Ocean Lodge Langkawi",
+      "city": "Langkawi",
+      "country": "Malaysia",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJcT1G7x0xXRgRjCxKBnmJsXM",
+      "name": "Oleza Boutique Hotel",
+      "city": "Zanzibar",
+      "country": "Tanzania",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ-UWJAuxcfmkRenxeC-_c_mc",
+      "name": "Orpheus Island Lodge",
+      "city": "Great Barrier Reef",
+      "country": "Australia",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJCRp-lGdgLxMRyGWQtSuJTf4",
+      "name": "Palazzo Cardinal Cesi",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJGW86_B9hLxMR3sD7kv5WsyE",
+      "name": "Palazzo delle Pietre",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJTVNJb7dhLxMRdE-kPPU1f_o",
+      "name": "Palazzo Manfredi",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ2Wv2609hLxMR0n-2a02EdbY",
+      "name": "Palazzo Roma",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJjWYZigJhLxMRNToNJneUel0",
+      "name": "Palazzo Shedir",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ75GPPEY12GsR0f7YS2ATQ1k",
+      "name": "Palm Bay Resort",
+      "city": "Great Barrier Reef",
+      "country": "Australia",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJYyt4v8Nv5kcRqArzsLx7ENk",
+      "name": "Paris Marriott Champs Elysees Hotel",
+      "city": "Paris",
+      "country": "France",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ7RlVqwm0bTkRZISybPIzj7s",
+      "name": "Pearl Palace Heritage",
+      "city": "Rajasthan",
+      "country": "India",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJQW2dttJuARURExcBhMm6tc8",
+      "name": "Petra Jewel Luxury Hotel",
+      "city": "Petra",
+      "country": "Jordan",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJlTAsPtNvARURFnVqV6e18EY",
+      "name": "Petra La Vie Boutique Hotel",
+      "city": "Petra",
+      "country": "Jordan",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ1d04feBvARURGMtS-p03fL0",
+      "name": "Petra Moon Luxury Hotel",
+      "city": "Petra",
+      "country": "Jordan",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJMydLi44lUDARIb28ev0T65s",
+      "name": "Phuket Kata Resotel",
+      "city": "Phuket",
+      "country": "Thailand",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJJxwm3UVgLxMRiS7-u3Nk6PQ",
+      "name": "Piazza Farnese Luxury Suites",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJbQFnQTeS9pQRciC7Xwj0kUM",
+      "name": "Posada Portal del Iguazu",
+      "city": "Iguazu Falls",
+      "country": "Argentina",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ69j5xnxSNgYR6-0hebmqE_c",
+      "name": "Pousada Alto da Vila",
+      "city": "Fernando de Noronha",
+      "country": "Brazil",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJiZY-yx9TNgYRptwNAW3_sJk",
+      "name": "Pousada do Mirante - Fernando de Noronha",
+      "city": "Fernando de Noronha",
+      "country": "Brazil",
+      "currentPhotos": 0,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJoXtnmnpSNgYRNHXMh4Cocv0",
+      "name": "Pousada Maria Bonita",
+      "city": "Fernando de Noronha",
+      "country": "Brazil",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ64esjG9SNgYRCFKa76bR3ko",
+      "name": "Pousada Vila Sal Boutique Noronha",
+      "city": "Fernando de Noronha",
+      "country": "Brazil",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJO-3lH18c1akRQ5v3-yZ1Q74",
+      "name": "Queenstown Top 10 Holiday Park",
+      "city": "Queenstown",
+      "country": "New Zealand",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJkRkFwdJrXz4R6MvU4EME7E0",
+      "name": "Radisson Beach Resort Palm Jumeirah",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJAQAAAJS2bTkRWUWQ2VmlhSA",
+      "name": "Rajasthan Palace - A Heritage Boutique Hotel in Jaipur",
+      "city": "Rajasthan",
+      "country": "India",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJA2YVJVtgLxMRDDZgfK9goC8",
+      "name": "Relais Palazzo Taverna",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJS_fR4TYXEDERC0jmuYgQRJw",
+      "name": "Reservoir Hotels | Yoga & Wellness Retreat",
+      "city": "Siem Reap",
+      "country": "Cambodia",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJTS163qx4iUcRp7HO-fZKev8",
+      "name": "Résidence premium Les Chalets du Forum Pierre & Vacances",
+      "city": "Courchevel",
+      "country": "France",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJP1VkCmBgLxMRiCtiU61Ptoc",
+      "name": "Residenza Scipioni Luxury Rooms",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJge3fXmXurw0RqtZZiDT5u9I",
+      "name": "Riad Charai",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJy44eWWjurw0R9Bxr9a7tWCc",
+      "name": "Riad Dar Saad - Hammam & Spa",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ44Q6i0Purw0Rr0ecN_V9zhs",
+      "name": "Riad Espagne",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJz1x4iGjurw0R3W49nayCIFU",
+      "name": "Riad Trois Cours",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJd1VmSmburw0RjJtxAMTnH2Q",
+      "name": "Riad Vendome & Spa",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJU5XOs1vurw0RDO5_DNjJRVE",
+      "name": "Riad Viva",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJKanmECmMGGARXiz7aIqLSNI",
+      "name": "Ryokan Katsutaro Tokyo",
+      "city": "Tokyo",
+      "country": "Japan",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJd7nLjDmbbZERVNdoTMppha8",
+      "name": "Sacred Stone Boutique Hotel",
+      "city": "Machu Picchu",
+      "country": "Peru",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJHY97KUIHbTkRylJcRkcO1ZA",
+      "name": "Samode Palace",
+      "city": "Rajasthan",
+      "country": "India",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJpcb2nU_NmRQR_bh0r6f6Dao",
+      "name": "Santa Mar ECO suites",
+      "city": "Santorini",
+      "country": "Greece",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJx9AWKWG-ohQRc_7gfyskSU4",
+      "name": "Santa Marina, a Luxury Collection Resort, Mykonos",
+      "city": "Mykonos",
+      "country": "Greece",
+      "currentPhotos": 0,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJPYkjTLo50i0RJrvhNTEO82Y",
+      "name": "Sau Bali Beach House",
+      "city": "Bali",
+      "country": "Indonesia",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJESWj1uUo4CIRFdRshusJzW4",
+      "name": "Savoy Seychelles Resort & Spa",
+      "city": "Seychelles",
+      "country": "Seychelles",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJtdf9eEyS9pQROu9y2LKbPo4",
+      "name": "SecretGardenIguazu B&B",
+      "city": "Iguazu Falls",
+      "country": "Argentina",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJv5LQwVVXr4YRPhG7nu8uAAY",
+      "name": "Secrets Puerto Los Cabos Golf & Spa Resort",
+      "city": "Los Cabos",
+      "country": "Mexico",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJca4y5qjWT48RDhpVPa0KvcE",
+      "name": "Secrets Tulum Resort & Beach Club",
+      "city": "Tulum",
+      "country": "Mexico",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJi3i1liSV9pQRdmw0v6dIVzM",
+      "name": "Selvaje Lodge Iguazú",
+      "city": "Iguazu Falls",
+      "country": "Argentina",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJr1w7f1XcMhgR8_kYtISZU9I",
+      "name": "Serengeti Serena Safari Lodge",
+      "city": "Serengeti",
+      "country": "Tanzania",
+      "currentPhotos": 1,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJee670qJPS4kRI97K_fTRoaQ",
+      "name": "Seven Stars Resort and Spa",
+      "city": "Turks and Caicos",
+      "country": "Turks and Caicos Islands",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJfTIQrflaF24Rr0rmuSA8EjY",
+      "name": "Sheraton Fiji Golf & Beach Resort",
+      "city": "Fiji",
+      "country": "Fiji",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJI6BjaVETXz4RSkZOXGwJiAY",
+      "name": "Signature Hotel Apartments & Spa Marina",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJrWV4LIjvrw0R8KD05Qp6yYc",
+      "name": "Sillage palace",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ9a1-MIzFcFMRJUAWyV90SpQ",
+      "name": "Silver Creek Lodge",
+      "city": "Banff",
+      "country": "Canada",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJcWxkxoTBMhgR24siid83oMU",
+      "name": "Siringit Serengeti Camp",
+      "city": "Serengeti",
+      "country": "Tanzania",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJyyaE0q4e2jERSZ9xGmqPcI0",
+      "name": "Sofitel Hotel Sentosa Singapore",
+      "city": "Singapore",
+      "country": "Singapore",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ-ZAJGJL2Q4wR-Zmlp6WjAUc",
+      "name": "Southern Palms Beach Club & Resort Hotel",
+      "city": "Barbados",
+      "country": "Barbados",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJwaZuYsTfDYwRrQNQmSovR6g",
+      "name": "St barts Villa Coco Rock",
+      "city": "St. Barts",
+      "country": "Saint Barthélemy",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJjyjkVgA5QIcRD4P2THr2jRI",
+      "name": "St. Regis Residence Club, Aspen",
+      "city": "Aspen",
+      "country": "United States",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJz_EgpYMJhYARQBnC7XArOy8",
+      "name": "Stanly Ranch, Auberge Resorts Collection",
+      "city": "Napa Valley",
+      "country": "United States",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJnzeczKxdKRMRBz6UGKyoTV8",
+      "name": "Stelle di Monte",
+      "city": "Tuscany",
+      "country": "Italy",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJJ_tQgFFCDDURBdr6v5TdT3Y",
+      "name": "Sun and Moon Resort",
+      "city": "Jeju Island",
+      "country": "South Korea",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJiwt_-OzvZzkRQ3QXDjqVCCc",
+      "name": "Taj Lake Palace, Udaipur",
+      "city": "Rajasthan",
+      "country": "India",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJIZ_gBcbdH24ROAqQfIDGsUg",
+      "name": "Taveuni Island Resort & Spa",
+      "city": "Fiji",
+      "country": "Fiji",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJadbONb99Xz4RTYgDWMDE-Ls",
+      "name": "Terra Solis Dubai Desert Destination",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJRWnOrK5hLxMRe5SAqtfUjZY",
+      "name": "Terrace Marco Antonio Luxury Suite Rome",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJh9eFj3WogmkRefzpFRfSSus",
+      "name": "Thala Beach Nature Reserve",
+      "city": "Great Barrier Reef",
+      "country": "Australia",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJFVqJmZ-MQ4wRAjYGifb5Lso",
+      "name": "The Crane Resort, Barbados",
+      "city": "Barbados",
+      "country": "Barbados",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJT5UPDc9HQIcRgumXqa-SokY",
+      "name": "The Crestwood Condominiums",
+      "city": "Aspen",
+      "country": "United States",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJWXZGfiJxTDAR84FmKVf47oI",
+      "name": "The Datai Langkawi",
+      "city": "Langkawi",
+      "country": "Malaysia",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJg5U6ZSzhjYARB3Fn6P-20FM",
+      "name": "The Inn at Spanish Bay",
+      "city": "Big Sur",
+      "country": "United States",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJRXICg9g7QIcRG0qn6wMCd40",
+      "name": "The Little Nell",
+      "city": "Aspen",
+      "country": "United States",
+      "currentPhotos": 2,
+      "result": "no_photos",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ4UGPEQsFdkgRsqKd9Hn4Dig",
+      "name": "The Mayfair Townhouse",
+      "city": "London",
+      "country": "United Kingdom",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJo7XvmZlKUDARnUvb6mxk-2I",
+      "name": "The Naka Island, a Luxury Collection Resort & Spa, Phuket",
+      "city": "Phuket",
+      "country": "Thailand",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJxe5ffzkFdkgRr0b_4c0aues",
+      "name": "The Park Tower Knightsbridge, a Luxury Collection Hotel, London",
+      "city": "London",
+      "country": "United Kingdom",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJI_jCt6bvjYAR94hzdEB1ZaQ",
+      "name": "The Quail",
+      "city": "Big Sur",
+      "country": "United States",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ9elo9DQFXRgRHI_dRD6vddE",
+      "name": "The Residence Zanzibar",
+      "city": "Zanzibar",
+      "country": "Tanzania",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJYRkjBcpqXz4RVKnVhBQ7Rso",
+      "name": "The Retreat Palm Dubai MGallery by Sofitel",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ4yNdwPBYwokRqc1lCC4n89w",
+      "name": "The Ritz-Carlton New York, Central Park",
+      "city": "New York City",
+      "country": "United States",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJSwzMYK9NvjsRDxpxGdB8NM0",
+      "name": "The St. Regis Goa Resort",
+      "city": "Goa",
+      "country": "India",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJZxNaamGASzARcopZ-mXo1S0",
+      "name": "The St. Regis Langkawi",
+      "city": "Langkawi",
+      "country": "Malaysia",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJF1gP2WvKur0RECj2QSiOe2A",
+      "name": "Tierra Patagonia",
+      "city": "Patagonia",
+      "country": "Chile",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJg95Qar6OGGARWFkOWVDVsTs",
+      "name": "Tokyo Ryokan (東京旅館) in Asakusa",
+      "city": "Tokyo",
+      "country": "Japan",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJYTGHhgIVXz4Ro8RKkHVQbC8",
+      "name": "Travelers Dubai Marina Hostel",
+      "city": "Dubai",
+      "country": "UAE",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJ336Ez6xhLxMRRRVCYVNqIOo",
+      "name": "Trevi Palace Luxury Inn",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJJTtgi1VTNgYRANL6A1ghYE4",
+      "name": "Triângulo Noronha",
+      "city": "Fernando de Noronha",
+      "country": "Brazil",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJtXIaqMv2DDURJuNslxgV9ww",
+      "name": "Uni Hotel Jeju | 유니호텔 제주",
+      "city": "Jeju Island",
+      "country": "South Korea",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJsx8tf0JgLxMRjg04QVXIOug",
+      "name": "Villa Agrippina Gran Meliá - The Leading Hotels of the World",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJ575mEKVLKhMRomcEInM0RfU",
+      "name": "Villa Bordoni",
+      "city": "Tuscany",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJk9CaJDLnjYARix0B51F2jpQ",
+      "name": "Villa Mara Carmel",
+      "city": "Big Sur",
+      "country": "United States",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJC_6RVtldLxMRvmWbgAvP1S4",
+      "name": "Villa Rome",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 2,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJJ5Qwx61hLxMRt0M5aa36Ot8",
+      "name": "Villa Spalletti Trivelli Dimora d'Epoca",
+      "city": "Rome",
+      "country": "Italy",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJVWraojK9vXYRN8BLKeIyxeM",
+      "name": "Villa Yrondi / Bora Bora",
+      "city": "Bora Bora",
+      "country": "French Polynesia",
+      "currentPhotos": 0,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "ChIJKROeR4fkQDsRrkTzCQpbbwk",
+      "name": "W Maldives",
+      "city": "Maldives",
+      "country": "Maldives",
+      "currentPhotos": 1,
+      "result": "not_found",
+      "photosAdded": 0
+    },
+    {
+      "hotelId": "google_ChIJI79h7kt1DowRJJN3XlmKdHI",
+      "name": "WIMCO St Barth Properties - Vacation villas with concierge services",
+      "city": "St. Barts",
+      "country": "Saint Barthélemy",
+      "currentPhotos": 3,
+      "result": "not_found",
+      "photosAdded": 0
+    }
+  ],
+  "errors": []
+}

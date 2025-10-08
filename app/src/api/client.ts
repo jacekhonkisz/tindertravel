@@ -1,10 +1,22 @@
+import { Image } from 'react-native';
 import { HotelCard, HotelsResponse, PersonalizationData, ApiResponse, OTPRequest, OTPVerification, AuthResponse } from '../types';
+import { getApiConfig, logApiConfig, printApiInstructions } from '../config/api';
 
-// FORCE CORRECT IP - NO ENV VARIABLES
-const API_BASE_URL = 'http://localhost:3001';
-const API_TIMEOUT = 10000;
+// Get API configuration based on environment
+const apiConfig = getApiConfig();
+const API_BASE_URL = apiConfig.baseUrl;
+const API_TIMEOUT = apiConfig.timeout;
 
-console.log('🌐 API Client FORCED to use base URL:', API_BASE_URL);
+// Log configuration on startup
+console.log('\n' + '='.repeat(60));
+console.log('🌐 API CLIENT - CONFIGURATION');
+console.log('='.repeat(60));
+logApiConfig(apiConfig);
+console.log('='.repeat(60));
+console.log('');
+
+// If connection fails, show instructions
+let hasShownInstructions = false;
 
 class ApiClient {
   private baseUrl: string;
@@ -47,14 +59,21 @@ class ApiClient {
     try {
       // Create AbortController for timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-      
+      const timeoutId = setTimeout(() => {
+        console.log(`🌐 Request timeout after ${this.timeout}ms: ${url}`);
+        controller.abort();
+      }, this.timeout);
+
       console.log(`🌐 Making request to: ${url}`);
+      console.log(`🌐 AbortController signal aborted before fetch:`, controller.signal.aborted);
+
       const response = await fetch(url, {
         ...config,
         signal: controller.signal,
       });
-      
+
+      console.log(`🌐 AbortController signal aborted after fetch:`, controller.signal.aborted);
+
       clearTimeout(timeoutId);
       console.log(`🌐 Response status: ${response.status}`);
       
@@ -71,6 +90,13 @@ class ApiClient {
       console.error(`🌐 API request failed: ${endpoint}`, error);
       console.error(`🌐 Base URL: ${this.baseUrl}`);
       console.error(`🌐 Full URL: ${url}`);
+      
+      // Show configuration instructions on first error
+      if (!hasShownInstructions) {
+        hasShownInstructions = true;
+        printApiInstructions();
+      }
+      
       throw error;
     }
   }
@@ -78,6 +104,53 @@ class ApiClient {
   // Health check
   async healthCheck(): Promise<{ status: string; seeded: boolean; hotelCount: number }> {
     return this.request('/health');
+  }
+
+  // Validate connection to API server
+  async validateConnection(): Promise<{ 
+    connected: boolean; 
+    message: string; 
+    details?: any 
+  }> {
+    try {
+      console.log('🔍 Validating API connection...');
+      const health = await this.healthCheck();
+      
+      if (health.status === 'ok') {
+        console.log('✅ API connection validated successfully');
+        console.log(`   Server Status: ${health.status}`);
+        console.log(`   Database: ${health.seeded ? 'Seeded' : 'Not seeded'}`);
+        console.log(`   Hotels Available: ${health.hotelCount}`);
+        
+        return {
+          connected: true,
+          message: 'API connection successful',
+          details: health,
+        };
+      } else {
+        return {
+          connected: false,
+          message: 'API returned unexpected status',
+          details: health,
+        };
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('❌ API connection validation failed:', errorMessage);
+      console.error('');
+      console.error('🔧 TROUBLESHOOTING:');
+      console.error('   1. Check if the server is running: lsof -i TCP:3001');
+      console.error('   2. Check your network IP: ifconfig | grep "inet "');
+      console.error(`   3. Current API URL: ${this.baseUrl}`);
+      console.error('   4. Update the IP in app/src/config/api.ts if needed');
+      console.error('');
+      
+      return {
+        connected: false,
+        message: `Connection failed: ${errorMessage}`,
+        details: { error: errorMessage, baseUrl: this.baseUrl },
+      };
+    }
   }
 
   // AUTHENTICATION METHODS
@@ -204,19 +277,30 @@ class ApiClient {
     return this.request(`/api/photos/hotel/${encodeURIComponent(hotelName)}?city=${encodeURIComponent(cityName)}&limit=${limit}`);
   }
 
-  // Preload images for better performance
+  // Preload images for better performance using React Native's Image.prefetch
   async preloadImage(url: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => reject(new Error(`Failed to preload image: ${url}`));
-      img.src = url;
-    });
+    if (!url || typeof url !== 'string' || url.trim() === '') {
+      console.warn(`Invalid image URL for preloading:`, url);
+      return Promise.resolve();
+    }
+
+    try {
+      await Image.prefetch(url);
+    } catch (error) {
+      throw new Error(`Failed to preload image: ${url}`);
+    }
   }
 
   // Batch preload multiple images
   async preloadImages(urls: string[]): Promise<void> {
-    const promises = urls.map(url => 
+    // Filter out undefined, null, or empty URLs
+    const validUrls = urls.filter(url => url && typeof url === 'string' && url.trim() !== '');
+    
+    if (validUrls.length === 0) {
+      return;
+    }
+
+    const promises = validUrls.map(url => 
       this.preloadImage(url).catch(error => {
         console.warn(`Failed to preload image ${url}:`, error);
         return Promise.resolve(); // Don't fail the whole batch
@@ -292,4 +376,4 @@ class ApiClient {
 
 // Export singleton instance
 export const apiClient = new ApiClient();
-export default apiClient; 
+export default apiClient;

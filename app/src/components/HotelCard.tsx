@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '../api/client';
 import { useTheme } from '../theme';
 import { GradientOverlay, DebugBadge, Chip } from '../ui';
+import PhotoSourceTag from './PhotoSourceTag';
+import { getPhotoSource } from '../utils/photoUtils';
+import { getImageSource } from '../utils/imageUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -26,14 +29,18 @@ interface HotelCardProps {
   isDevelopment?: boolean;
 }
 
-const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress, navigation, isDevelopment = false }) => {
+const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, isDevelopment = false }) => {
   const theme = useTheme();
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [photoManagerVisible, setPhotoManagerVisible] = useState(false);
   const fadeAnim = new Animated.Value(1);
 
-  const photos = hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto];
-  const totalPhotos = photos.length;
+  const photos = useMemo(() => 
+    hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto], 
+    [hotel.photos, hotel.heroPhoto]
+  );
+  
+  const totalPhotos = useMemo(() => photos.length, [photos.length]);
 
   const formatPrice = (price?: { amount: string; currency: string }) => {
     if (!price) return null;
@@ -44,7 +51,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress, navigation, isDev
     return `from ${currency}${Math.round(amount)}/night`;
   };
 
-  const changePhoto = (direction: 'next' | 'prev') => {
+  const changePhoto = useCallback((direction: 'next' | 'prev') => {
     // Haptic feedback
     IOSHaptics.buttonPress();
 
@@ -67,19 +74,19 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress, navigation, isDev
     } else {
       setCurrentPhotoIndex((prev) => (prev - 1 + totalPhotos) % totalPhotos);
     }
-  };
+  }, [totalPhotos, fadeAnim]);
 
-  const handleLeftTap = () => {
+  const handleLeftTap = useCallback(() => {
     if (totalPhotos > 1) {
       changePhoto('prev');
     }
-  };
+  }, [totalPhotos, changePhoto]);
 
-  const handleRightTap = () => {
+  const handleRightTap = useCallback(() => {
     if (totalPhotos > 1) {
       changePhoto('next');
     }
-  };
+  }, [totalPhotos, changePhoto]);
 
   const handlePhotoSave = async (updatedPhotos: any[]) => {
     try {
@@ -153,18 +160,16 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress, navigation, isDev
   };
 
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={onPress}
-      activeOpacity={0.95}
-    >
+    <View style={styles.container}>
       {/* Photo Carousel */}
       <Animated.View style={[styles.imageContainer, { opacity: fadeAnim }]}>
         <Image
-          source={{ uri: photos[currentPhotoIndex] }}
+          source={getImageSource(photos[currentPhotoIndex])}
           style={styles.heroImage}
           contentFit="cover"
           transition={200}
+          cachePolicy="memory-disk"
+          recyclingKey={hotel.id}
         />
       </Animated.View>
 
@@ -210,8 +215,8 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress, navigation, isDev
           <Text style={styles.hotelName} numberOfLines={2}>
             {hotel.name}
           </Text>
-          <Text style={styles.location}>
-            {hotel.city}, {hotel.country}
+          <Text style={styles.location} numberOfLines={2}>
+            {hotel.address || `${hotel.city}, ${hotel.country}`}
           </Text>
           {hotel.price && (
             <View style={[styles.pricePill, { backgroundColor: theme.accent }]}>
@@ -230,6 +235,14 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress, navigation, isDev
           <Text style={styles.photoCounterText}>
             {currentPhotoIndex + 1}/{totalPhotos}
           </Text>
+          
+          {/* Photo Source Tag - Dev Mode Only */}
+          {isDevelopment && (
+            <PhotoSourceTag
+              source={getPhotoSource(photos[currentPhotoIndex])}
+              visible={isDevelopment}
+            />
+          )}
         </View>
       )}
 
@@ -292,9 +305,9 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onPress, navigation, isDev
         photos={convertPhotosToManagerFormat()}
         onSave={handlePhotoSave}
       />
-    </TouchableOpacity>
+    </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

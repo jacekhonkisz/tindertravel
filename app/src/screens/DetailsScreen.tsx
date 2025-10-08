@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
+import UnsplashImage from '../components/UnsplashImage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
@@ -444,7 +445,9 @@ const DetailsScreen: React.FC = () => {
         {/* Hotel Information */}
         <View style={styles.infoSection}>
           <Text style={styles.hotelName}>{hotel.name}</Text>
-          <Text style={styles.location}>{hotel.city}, {hotel.country}</Text>
+          <Text style={styles.location}>
+            {hotel.address || `${hotel.city}, ${hotel.country}`}
+          </Text>
           <Text style={styles.price}>{formatPrice(hotel.price)}</Text>
           
           {/* Status indicators */}

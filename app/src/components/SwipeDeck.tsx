@@ -25,6 +25,9 @@ import HotelMapView from './HotelMapView';
 import { useAppStore } from '../store';
 import { useTheme } from '../theme';
 import { Button } from '../ui';
+import PhotoSourceTag from './PhotoSourceTag';
+import { getPhotoSource } from '../utils/photoUtils';
+import { getImageSource } from '../utils/imageUtils';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
@@ -72,117 +75,161 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const photoScrollViewRef = useRef<ScrollView>(null);
 
-  // Reset animations when currentIndex changes
-  useEffect(() => {
-    position.setValue({ x: 0, y: 0 });
-    rotate.setValue(0);
-    opacity.setValue(1);
-    // Close details if open when switching cards
-    if (showingDetails) {
-      hideDetails();
-    }
-  }, [currentIndex]);
+  // Centralized Animation Controller
+  const animationController = {
+    // Details animations
+    showDetails: (hotel: HotelCard) => {
+      setDetailsHotel(hotel);
+      setShowingDetails(true);
+      setCurrentPhotoIndex(0);
+      
+      IOSHaptics.navigationTransition();
+      
+      Animated.parallel([
+        Animated.timing(detailsTranslateY, {
+          toValue: 0,
+          duration: DETAILS_ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+        Animated.timing(detailsOpacity, {
+          toValue: 1,
+          duration: DETAILS_ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    },
 
-  const showDetails = (hotel: HotelCard) => {
-    setDetailsHotel(hotel);
-    setShowingDetails(true);
-    setCurrentPhotoIndex(0);
-    
-    IOSHaptics.navigationTransition();
-    
-    Animated.parallel([
-      Animated.timing(detailsTranslateY, {
-        toValue: 0,
-        duration: DETAILS_ANIMATION_DURATION,
-        useNativeDriver: false,
-      }),
-      Animated.timing(detailsOpacity, {
-        toValue: 1,
-        duration: DETAILS_ANIMATION_DURATION,
-        useNativeDriver: false,
-      }),
-    ]).start();
-  };
-
-  const hideDetails = () => {
-    IOSHaptics.navigationTransition();
-    
-    Animated.parallel([
-      Animated.timing(detailsTranslateY, {
-        toValue: SCREEN_HEIGHT,
-        duration: DETAILS_ANIMATION_DURATION,
-        useNativeDriver: false,
-      }),
-      Animated.timing(detailsOpacity, {
-        toValue: 0,
-        duration: DETAILS_ANIMATION_DURATION,
-        useNativeDriver: false,
-      }),
-    ]).start(() => {
+    hideDetails: () => {
       setShowingDetails(false);
-      setDetailsHotel(null);
-      // Reset card position to ensure smooth swiping continues
+      
+      Animated.parallel([
+        Animated.timing(detailsTranslateY, {
+          toValue: SCREEN_HEIGHT,
+          duration: DETAILS_ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+        Animated.timing(detailsOpacity, {
+          toValue: 0,
+          duration: DETAILS_ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setDetailsHotel(null);
+      });
+    },
+
+    // Preview animations
+    updateDetailsPreview: (progress: number) => {
+      const detailsPreviewY = SCREEN_HEIGHT - (progress * SCREEN_HEIGHT * 0.6);
+      detailsTranslateY.setValue(detailsPreviewY);
+      detailsOpacity.setValue(progress * 0.9);
+    },
+
+    resetDetailsPreview: () => {
+      detailsTranslateY.setValue(SCREEN_HEIGHT);
+      detailsOpacity.setValue(0);
+    },
+
+    // Card animations
+    animateCardOut: (direction: { x: number; y: number }, action: SwipeAction, onComplete: () => void) => {
+      Animated.parallel([
+        Animated.timing(position, {
+          toValue: direction,
+          duration: SWIPE_OUT_DURATION,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: SWIPE_OUT_DURATION,
+          useNativeDriver: true,
+        }),
+      ]).start(onComplete);
+    },
+
+    snapCardBack: () => {
+      Animated.parallel([
+        Animated.spring(position, {
+          toValue: { x: 0, y: 0 },
+          useNativeDriver: true,
+        }),
+        Animated.spring(rotate, {
+          toValue: 0,
+          useNativeDriver: true,
+        }),
+        Animated.spring(detailsTranslateY, {
+          toValue: SCREEN_HEIGHT,
+          useNativeDriver: true,
+        }),
+        Animated.spring(detailsOpacity, {
+          toValue: 0,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        if (detailsHotel && !showingDetails) {
+          setDetailsHotel(null);
+        }
+      });
+    },
+
+    // Reset all animations
+    resetAll: () => {
       position.setValue({ x: 0, y: 0 });
       rotate.setValue(0);
       opacity.setValue(1);
-    });
+      detailsTranslateY.setValue(SCREEN_HEIGHT);
+      detailsOpacity.setValue(0);
+    }
   };
 
-  // Pan responder for details view to allow swiping down to close
-  const detailsPanResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => showingDetails,
-    onMoveShouldSetPanResponder: (_, gesture) => {
-      // Only respond to vertical swipes when details are showing
-      return showingDetails && Math.abs(gesture.dy) > Math.abs(gesture.dx);
-    },
+  // Reset animations when currentIndex changes
+  useEffect(() => {
+    animationController.resetAll();
+    if (showingDetails) {
+      animationController.hideDetails();
+    }
+  }, [currentIndex]);
 
-    onPanResponderMove: (_, gesture) => {
-      if (!showingDetails) return;
-      
-      const { dy } = gesture;
-      
-      // Only allow downward swipes to close
-      if (dy > 0) {
-        detailsTranslateY.setValue(dy);
-        detailsOpacity.setValue(1 - (dy / SCREEN_HEIGHT) * 0.5);
-      }
-    },
-
-    onPanResponderRelease: (_, gesture) => {
-      if (!showingDetails) return;
-      
-      const { dy, vy } = gesture;
-      
-      // Close if swiped down enough or with enough velocity
-      if (dy > SCREEN_HEIGHT * 0.3 || vy > 0.5) {
-        hideDetails();
+const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true, // Always capture gestures
+    onMoveShouldSetPanResponder: (_, gesture: any) => {
+      // Smart gesture detection based on context and gesture type
+      if (showingDetails) {
+        // When details are open, prioritize vertical gestures for closing
+        return Math.abs(gesture.dy) > Math.abs(gesture.dx);
       } else {
-        // Snap back to open position
-        Animated.parallel([
-          Animated.spring(detailsTranslateY, {
-            toValue: 0,
-            useNativeDriver: false,
-          }),
-          Animated.spring(detailsOpacity, {
-            toValue: 1,
-            useNativeDriver: false,
-          }),
-        ]).start();
+        // When details are closed, prioritize horizontal gestures for swiping
+        return Math.abs(gesture.dx) > 10 || Math.abs(gesture.dy) > 10;
       }
     },
-  });
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => !showingDetails,
-    onMoveShouldSetPanResponder: () => !showingDetails,
-
-    onPanResponderMove: (_, gesture) => {
+    onPanResponderGrant: (_, gesture: any) => {
       if (showingDetails) return;
       
-      const { dx, dy } = gesture;
+      const { x0, y0 } = gesture;
+      const cardWidth = SCREEN_WIDTH;
+      const leftZoneWidth = cardWidth * 0.15;
+      const rightZoneWidth = cardWidth * 0.15;
       
-      // Update position
-      position.setValue({ x: dx, y: dy });
+      // Check if tap is in left or right photo navigation zones
+      if (x0 < leftZoneWidth) {
+        // Left tap - previous photo
+        const currentHotel = hotels[currentIndex];
+        if (currentHotel && currentHotel.photos && currentHotel.photos.length > 1) {
+          IOSHaptics.buttonPress();
+          // Handle photo navigation here - you'll need to add state for current photo index
+        }
+      } else if (x0 > cardWidth - rightZoneWidth) {
+        // Right tap - next photo
+        const currentHotel = hotels[currentIndex];
+        if (currentHotel && currentHotel.photos && currentHotel.photos.length > 1) {
+          IOSHaptics.buttonPress();
+          // Handle photo navigation here - you'll need to add state for current photo index
+        }
+      }
+    },
+
+    onPanResponderMove: (_, gesture: any) => {
+      const { dx, dy } = gesture;
       
       // Calculate rotation based on horizontal movement
       const rotateValue = dx * 0.1;
@@ -191,10 +238,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
       // Handle upward swipe - show details preview
       if (dy < 0) {
         const progress = Math.min(Math.abs(dy) / SWIPE_THRESHOLD, 1);
-        // Show more of the details as user swipes up
-        const detailsPreviewY = SCREEN_HEIGHT - (progress * SCREEN_HEIGHT * 0.6);
-        detailsTranslateY.setValue(detailsPreviewY);
-        detailsOpacity.setValue(progress * 0.9);
+        animationController.updateDetailsPreview(progress);
         
         // Set details hotel for preview
         if (!detailsHotel) {
@@ -205,8 +249,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         }
       } else {
         // Reset details preview when not swiping up
-        detailsTranslateY.setValue(SCREEN_HEIGHT);
-        detailsOpacity.setValue(0);
+        animationController.resetDetailsPreview();
       }
       
       // Provide haptic feedback at threshold
@@ -218,11 +261,30 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
       }
     },
 
-    onPanResponderRelease: (_, gesture) => {
-      if (showingDetails) return;
-      
+    onPanResponderRelease: (_, gesture: any) => {
       const { dx, dy, vx, vy } = gesture;
       
+      if (showingDetails) {
+        // Handle details closing
+        if (dy > SCREEN_HEIGHT * 0.3 || vy > 0.5) {
+          animationController.hideDetails();
+        } else {
+          // Snap back to open position
+          Animated.parallel([
+            Animated.spring(detailsTranslateY, {
+              toValue: 0,
+              useNativeDriver: true,
+            }),
+            Animated.spring(detailsOpacity, {
+              toValue: 1,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        }
+        return;
+      }
+      
+      // Handle card swiping
       // Determine swipe action based on direction and velocity
       let action: SwipeAction | null = null;
       let animateDirection = { x: 0, y: 0 };
@@ -241,26 +303,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         // Swipe up - Details (complete the rolling animation)
         const currentHotel = hotels[currentIndex];
         if (currentHotel) {
-          setShowingDetails(true);
-          setDetailsHotel(currentHotel);
-          setCurrentPhotoIndex(0);
-          
-          IOSHaptics.navigationTransition();
-          
-          // Complete the rolling animation
-          Animated.parallel([
-            Animated.timing(detailsTranslateY, {
-              toValue: 0,
-              duration: DETAILS_ANIMATION_DURATION,
-              useNativeDriver: false,
-            }),
-            Animated.timing(detailsOpacity, {
-              toValue: 1,
-              duration: DETAILS_ANIMATION_DURATION,
-              useNativeDriver: false,
-            }),
-          ]).start();
-          
+          animationController.showDetails(currentHotel);
           // Reset card position
           position.setValue({ x: 0, y: 0 });
           rotate.setValue(0);
@@ -274,18 +317,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
 
       if (action) {
         // Animate card out
-        Animated.parallel([
-          Animated.timing(position, {
-            toValue: animateDirection,
-            duration: SWIPE_OUT_DURATION,
-            useNativeDriver: false,
-          }),
-          Animated.timing(opacity, {
-            toValue: 0,
-            duration: SWIPE_OUT_DURATION,
-            useNativeDriver: false,
-          }),
-        ]).start(() => {
+        animationController.animateCardOut(animateDirection, action!, () => {
           // Trigger swipe callback
           const currentHotel = hotels[currentIndex];
           if (currentHotel) {
@@ -303,30 +335,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         }
       } else {
         // Snap back to center
-        Animated.parallel([
-          Animated.spring(position, {
-            toValue: { x: 0, y: 0 },
-            useNativeDriver: false,
-          }),
-          Animated.spring(rotate, {
-            toValue: 0,
-            useNativeDriver: false,
-          }),
-          // Hide details preview if it was showing
-          Animated.spring(detailsTranslateY, {
-            toValue: SCREEN_HEIGHT,
-            useNativeDriver: false,
-          }),
-          Animated.spring(detailsOpacity, {
-            toValue: 0,
-            useNativeDriver: false,
-          }),
-        ]).start(() => {
-          // Clear details hotel if we were just previewing
-          if (detailsHotel && !showingDetails) {
-            setDetailsHotel(null);
-          }
-        });
+        animationController.snapCardBack();
       }
     },
   });
@@ -532,7 +541,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
     if (detailsHotel.photos.length <= 1) {
       return (
         <Image
-          source={{ uri: detailsHotel.heroPhoto }}
+          source={getImageSource(detailsHotel.heroPhoto)}
           style={styles.singlePhoto}
           contentFit="cover"
         />
@@ -561,7 +570,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         {detailsHotel.photos.map((photo, index) => (
           <Image
             key={index}
-            source={{ uri: photo }}
+            source={getImageSource(photo)}
             style={styles.carouselPhoto}
             contentFit="cover"
           />
@@ -613,7 +622,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         ]}
       >
         {/* Swipe indicator */}
-        <View style={styles.swipeIndicatorContainer} {...detailsPanResponder.panHandlers}>
+        <View style={styles.swipeIndicatorContainer}>
           <View style={styles.swipeIndicatorBar} />
         </View>
 
@@ -622,12 +631,11 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
           blurType="dark" 
           blurAmount={20} 
           style={[styles.detailsHeader, { paddingTop: insets.top }] as any}
-          {...detailsPanResponder.panHandlers}
         >
           <View style={styles.headerContent}>
             <TouchableOpacity
               style={styles.closeButton}
-              onPress={hideDetails}
+              onPress={animationController.hideDetails}
             >
               <Text style={styles.closeButtonText}>✕</Text>
             </TouchableOpacity>
@@ -638,11 +646,12 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
 
         <ScrollView 
           style={styles.detailsContent} 
-          showsVerticalScrollIndicator={true}
-          bounces={true}
+          showsVerticalScrollIndicator={showingDetails}
+          bounces={showingDetails}
+          scrollEnabled={showingDetails}
           contentContainerStyle={[
             styles.scrollContentContainer,
-            { paddingBottom: insets.bottom + 20 } // Reduced since Book Now moved up
+            { paddingBottom: insets.bottom + 20 }
           ]}
         >
           {detailsHotel && (
@@ -653,6 +662,14 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
                   {renderPhotoCarousel()}
                 </View>
                 {renderPhotoDots()}
+
+              {/* Photo Source Tag - Dev Mode Only */}
+              {__DEV__ && (
+                <PhotoSourceTag
+                  source={getPhotoSource(detailsHotel.photos[currentPhotoIndex])}
+                  visible={__DEV__}
+                />
+              )}
               </View>
 
               {/* Hotel Information */}

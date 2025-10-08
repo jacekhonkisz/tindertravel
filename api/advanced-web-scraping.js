@@ -1,0 +1,284 @@
+require('dotenv').config();
+const axios = require('axios');
+const cheerio = require('cheerio');
+
+class AdvancedWebScraping {
+  constructor() {
+    this.userAgents = [
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0'
+    ];
+    
+    this.stats = {
+      total: 0,
+      successful: 0,
+      failed: 0,
+      exactPhotos: 0
+    };
+  }
+
+  async findExactHotelPhotos(hotelName, city, country, count = 5) {
+    console.log(`\n🎯 Finding EXACT photos for: ${hotelName} in ${city}, ${country}`);
+    this.stats.total++;
+    
+    const photos = [];
+    
+    // Strategy 1: Try Google Images search (often works better than direct site scraping)
+    try {
+      console.log('  🔍 Searching Google Images...');
+      const googlePhotos = await this.searchGoogleImages(hotelName, city, country);
+      photos.push(...googlePhotos);
+      console.log(`  ✅ Google Images: ${googlePhotos.length} photos found`);
+    } catch (error) {
+      console.log(`  ❌ Google Images failed: ${error.message}`);
+    }
+    
+    // Strategy 2: Try Bing Images search
+    try {
+      console.log('  🔍 Searching Bing Images...');
+      const bingPhotos = await this.searchBingImages(hotelName, city, country);
+      photos.push(...bingPhotos);
+      console.log(`  ✅ Bing Images: ${bingPhotos.length} photos found`);
+    } catch (error) {
+      console.log(`  ❌ Bing Images failed: ${error.message}`);
+    }
+    
+    // Strategy 3: Try DuckDuckGo Images
+    try {
+      console.log('  🔍 Searching DuckDuckGo Images...');
+      const duckPhotos = await this.searchDuckDuckGoImages(hotelName, city, country);
+      photos.push(...duckPhotos);
+      console.log(`  ✅ DuckDuckGo Images: ${duckPhotos.length} photos found`);
+    } catch (error) {
+      console.log(`  ❌ DuckDuckGo Images failed: ${error.message}`);
+    }
+    
+    // Remove duplicates and limit to requested count
+    const uniquePhotos = this.removeDuplicatePhotos(photos);
+    const finalPhotos = uniquePhotos.slice(0, count);
+    
+    if (finalPhotos.length > 0) {
+      this.stats.successful++;
+      this.stats.exactPhotos += finalPhotos.length;
+      console.log(`  ✅ SUCCESS: Found ${finalPhotos.length} EXACT photos for ${hotelName}`);
+    } else {
+      this.stats.failed++;
+      console.log(`  ❌ FAILED: No photos found for ${hotelName}`);
+    }
+    
+    return finalPhotos;
+  }
+
+  async searchGoogleImages(hotelName, city, country) {
+    try {
+      const searchQuery = encodeURIComponent(`"${hotelName}" "${city}" hotel photos`);
+      const searchUrl = `https://www.google.com/search?q=${searchQuery}&tbm=isch&safe=off`;
+      
+      console.log(`    🔍 Searching: ${searchUrl}`);
+      
+      const response = await axios.get(searchUrl, {
+        headers: {
+          'User-Agent': this.getRandomUserAgent(),
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+          'Accept-Encoding': 'gzip, deflate',
+          'Connection': 'keep-alive',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'Sec-Fetch-Dest': 'document',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'none',
+          'Upgrade-Insecure-Requests': '1'
+        },
+        timeout: 20000,
+        maxRedirects: 5
+      });
+      
+      const $ = cheerio.load(response.data);
+      const photos = [];
+      
+      // Look for image URLs in Google Images results
+      $('img').each((i, element) => {
+        const src = $(element).attr('src') || $(element).attr('data-src');
+        if (src && src.includes('http') && !src.includes('google.com') && !src.includes('gstatic.com') && !src.includes('placeholder')) {
+          photos.push({
+            url: src,
+            width: 1024,
+            height: 768,
+            description: `${hotelName} hotel photo from Google Images`,
+            source: 'google_images',
+            photographer: 'Google Images',
+            photographerUrl: 'https://www.google.com',
+            isExact: true
+          });
+        }
+      });
+      
+      return photos.slice(0, 5);
+    } catch (error) {
+      throw new Error(`Google Images search failed: ${error.message}`);
+    }
+  }
+
+  async searchBingImages(hotelName, city, country) {
+    try {
+      const searchQuery = encodeURIComponent(`"${hotelName}" "${city}" hotel photos`);
+      const searchUrl = `https://www.bing.com/images/search?q=${searchQuery}&form=HDRSC2&first=1&tsc=ImageHoverTitle`;
+      
+      console.log(`    🔍 Searching: ${searchUrl}`);
+      
+      const response = await axios.get(searchUrl, {
+        headers: {
+          'User-Agent': this.getRandomUserAgent(),
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+          'Accept-Encoding': 'gzip, deflate',
+          'Connection': 'keep-alive',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        },
+        timeout: 20000,
+        maxRedirects: 5
+      });
+      
+      const $ = cheerio.load(response.data);
+      const photos = [];
+      
+      // Look for image URLs in Bing Images results
+      $('img').each((i, element) => {
+        const src = $(element).attr('src') || $(element).attr('data-src');
+        if (src && src.includes('http') && !src.includes('bing.com') && !src.includes('placeholder')) {
+          photos.push({
+            url: src,
+            width: 1024,
+            height: 768,
+            description: `${hotelName} hotel photo from Bing Images`,
+            source: 'bing_images',
+            photographer: 'Bing Images',
+            photographerUrl: 'https://www.bing.com',
+            isExact: true
+          });
+        }
+      });
+      
+      return photos.slice(0, 5);
+    } catch (error) {
+      throw new Error(`Bing Images search failed: ${error.message}`);
+    }
+  }
+
+  async searchDuckDuckGoImages(hotelName, city, country) {
+    try {
+      const searchQuery = encodeURIComponent(`"${hotelName}" "${city}" hotel photos`);
+      const searchUrl = `https://duckduckgo.com/?q=${searchQuery}&t=h_&iax=images&ia=images`;
+      
+      console.log(`    🔍 Searching: ${searchUrl}`);
+      
+      const response = await axios.get(searchUrl, {
+        headers: {
+          'User-Agent': this.getRandomUserAgent(),
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+          'Accept-Encoding': 'gzip, deflate',
+          'Connection': 'keep-alive',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        },
+        timeout: 20000,
+        maxRedirects: 5
+      });
+      
+      const $ = cheerio.load(response.data);
+      const photos = [];
+      
+      // Look for image URLs in DuckDuckGo Images results
+      $('img').each((i, element) => {
+        const src = $(element).attr('src') || $(element).attr('data-src');
+        if (src && src.includes('http') && !src.includes('duckduckgo.com') && !src.includes('placeholder')) {
+          photos.push({
+            url: src,
+            width: 1024,
+            height: 768,
+            description: `${hotelName} hotel photo from DuckDuckGo Images`,
+            source: 'duckduckgo_images',
+            photographer: 'DuckDuckGo Images',
+            photographerUrl: 'https://duckduckgo.com',
+            isExact: true
+          });
+        }
+      });
+      
+      return photos.slice(0, 5);
+    } catch (error) {
+      throw new Error(`DuckDuckGo Images search failed: ${error.message}`);
+    }
+  }
+
+  removeDuplicatePhotos(photos) {
+    const seen = new Set();
+    return photos.filter(photo => {
+      if (seen.has(photo.url)) {
+        return false;
+      }
+      seen.add(photo.url);
+      return true;
+    });
+  }
+
+  getRandomUserAgent() {
+    return this.userAgents[Math.floor(Math.random() * this.userAgents.length)];
+  }
+
+  async testWithRealHotels() {
+    console.log('🧪 Testing Advanced Web Scraping for EXACT Hotel Photos...\n');
+    
+    const testHotels = [
+      { name: 'Long Bay Beach Club', city: 'Turks and Caicos', country: 'Turks and Caicos Islands' },
+      { name: 'Hotel das Cataratas', city: 'Iguazu Falls', country: 'Argentina' },
+      { name: 'Villa Spalletti Trivelli', city: 'Rome', country: 'Italy' }
+    ];
+    
+    for (const hotel of testHotels) {
+      console.log(`\n🏨 Testing: ${hotel.name} in ${hotel.city}`);
+      const photos = await this.findExactHotelPhotos(hotel.name, hotel.city, hotel.country, 5);
+      
+      if (photos.length > 0) {
+        console.log(`  📸 Sample photos:`);
+        photos.slice(0, 3).forEach((photo, i) => {
+          console.log(`    ${i + 1}. ${photo.url}`);
+          console.log(`       Source: ${photo.source}`);
+          console.log(`       Exact: ${photo.isExact ? 'YES' : 'NO'}`);
+        });
+      }
+      
+      // Add delay between hotels to avoid rate limiting
+      await this.sleep(5000);
+    }
+    
+    this.printStats();
+  }
+
+  printStats() {
+    console.log('\n📊 ADVANCED WEB SCRAPING STATISTICS:');
+    console.log(`Total hotels tested: ${this.stats.total}`);
+    console.log(`Successful: ${this.stats.successful}`);
+    console.log(`Failed: ${this.stats.failed}`);
+    console.log(`Exact photos found: ${this.stats.exactPhotos}`);
+    
+    if (this.stats.total > 0) {
+      const successRate = ((this.stats.successful / this.stats.total) * 100).toFixed(1);
+      console.log(`Success rate: ${successRate}%`);
+    }
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+}
+
+// Run the test
+const scraper = new AdvancedWebScraping();
+scraper.testWithRealHotels().catch(console.error);

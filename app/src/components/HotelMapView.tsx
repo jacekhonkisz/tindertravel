@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert, Platform } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 interface HotelMapViewProps {
@@ -107,8 +107,10 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
       
       <View style={styles.mapContainer}>
         {/* Interactive MapView with dragging enabled */}
+        {/* On iOS: Uses Apple Maps (default, no additional setup needed) */}
+        {/* On Android: Uses Google Maps via PROVIDER_GOOGLE */}
         <MapView
-          provider={PROVIDER_GOOGLE}
+          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
           style={styles.map}
           initialRegion={mapRegion}
           scrollEnabled={true} // Enable dragging

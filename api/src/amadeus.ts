@@ -1079,8 +1079,8 @@ export class AmadeusClient {
           },
           description: curatedHotel.description,
           amenityTags: curatedHotel.amenityTags,
-          photos: realPhotos.length > 0 ? realPhotos : this.getFallbackPhotos(curatedHotel.city),
-          heroPhoto: realPhotos.length > 0 ? realPhotos[0] : this.getFallbackPhotos(curatedHotel.city)[0],
+          photos: realPhotos.length > 0 ? realPhotos.map(photo => photo.url) : this.getFallbackPhotos(curatedHotel.city),
+          heroPhoto: realPhotos.length > 0 ? realPhotos[0].url : this.getFallbackPhotos(curatedHotel.city)[0],
           bookingUrl: this.generateBookingUrl(curatedHotel),
           rating: this.generateRealisticRating(curatedHotel.category)
         };
@@ -1254,11 +1254,23 @@ export class AmadeusClient {
         hotelCoords = await this.getAccurateHotelCoordinates(offer.hotel.name, city);
       }
 
+      // Extract address from Amadeus content if available
+      let hotelAddress: string | undefined;
+      if (content?.address) {
+        const addressParts = [
+          ...(content.address.lines || []),
+          content.address.cityName,
+          content.address.countryCode
+        ].filter(Boolean);
+        hotelAddress = addressParts.join(', ');
+      }
+
       return {
         id: offer.hotel.hotelId,
         name: offer.hotel.name || content?.name || 'Beautiful Hotel',
         city: city.name,
         country: this.getCountryName(city.countryCode),
+        address: hotelAddress, // Include full address from Amadeus
         coords: hotelCoords,
         price: offer.offers[0] ? {
           amount: offer.offers[0].price.total,

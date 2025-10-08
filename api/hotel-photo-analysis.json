@@ -1,0 +1,189 @@
+{
+  "serpApiAvailable": [
+    {
+      "id": "google_ChIJ7aFemPAb2jERQTmgdV0wbLM",
+      "name": "Shangri-La Rasa Sentosa, Singapore",
+      "city": "Singapore",
+      "country": "Singapore",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJjw8Jg5EXEDERyFsD24tyxn8",
+      "name": "Ravoeun Angkor Boutique",
+      "city": "Siem Reap",
+      "country": "Cambodia",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJFcxeNPIafGwR827UvW7Gzeg",
+      "name": "Earls Anchorage",
+      "city": "Lord Howe Island",
+      "country": "Australia",
+      "photoCount": 6,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJObU8B2SDbTkRBcf4gajPmNM",
+      "name": "Surya Bagh - A Luxury Hideaway",
+      "city": "Rajasthan",
+      "country": "India",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJ7diINk7KcFMRwVmpiME4R38",
+      "name": "Banff Aspen Lodge",
+      "city": "Banff",
+      "country": "Canada",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJ_____1sgnmkRrdNXWrMeNVw",
+      "name": "Lizard Island",
+      "city": "Great Barrier Reef",
+      "country": "Australia",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJDdNx-oEd1akRzlEBC8baI1w",
+      "name": "Browns Boutique Hotel Queenstown",
+      "city": "Queenstown",
+      "country": "New Zealand",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJdRwD14FQr4YRpptEoLvtacM",
+      "name": "Playa Grande Resort & Grand Spa",
+      "city": "Los Cabos",
+      "country": "Mexico",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJ7RlVqwm0bTkRZISybPIzj7s",
+      "name": "Pearl Palace Heritage",
+      "city": "Rajasthan",
+      "country": "India",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJced2CE4XEDERNvRFG-OA2IA",
+      "name": "Zannier Phum Baitang",
+      "city": "Siem Reap",
+      "country": "Cambodia",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJubyY2MiNQTkR0BpA6ja0LCo",
+      "name": "Shangri-La The Heritage Haveli",
+      "city": "Rajasthan",
+      "country": "India",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJd-ktlQqrlxIRnk2RqAKHTEI",
+      "name": "Finca Hotel Rural Es Turó",
+      "city": "Mallorca",
+      "country": "Spain",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJYVg6Z03KcFMRexfIPqr0KYE",
+      "name": "Banff Caribou Lodge & Spa",
+      "city": "Banff",
+      "country": "Canada",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJ4_ShkMzrvzsRL1XJL8I7P_I",
+      "name": "Treebo Green Park Mapusa - Hotel in Goa",
+      "city": "Goa",
+      "country": "India",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJW47UQ8vQT48R38A7HJssZAQ",
+      "name": "Casa Ambar Hotel & Boutique Tulum",
+      "city": "Tulum",
+      "country": "Mexico",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJiY3WuCPkjYARzcKpuYuDbY0",
+      "name": "Hyatt Regency Monterey Hotel and Spa on Del Monte Golf Course",
+      "city": "Big Sur",
+      "country": "United States",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    },
+    {
+      "id": "ChIJ6fRaswrAvzsRiIG0p32g5TM",
+      "name": "Highland Heritage Goa",
+      "city": "Goa",
+      "country": "India",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "CAN_UPDATE_WITH_SERPAPI"
+    }
+  ],
+  "googlePlacesOnly": [
+    {
+      "id": "ChIJ67XliEnKcFMR1aetCfP6tG8",
+      "name": "Buffalo Mountain Lodge",
+      "city": "Banff",
+      "country": "Canada",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "GOOGLE_PLACES_ONLY"
+    },
+    {
+      "id": "ChIJYf4AqXwXEDERgkylzYS-pZA",
+      "name": "Golden Temple Retreat",
+      "city": "Siem Reap",
+      "country": "Cambodia",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "GOOGLE_PLACES_ONLY"
+    },
+    {
+      "id": "ChIJ2Zny1uKPjYARqUzA2EV0S-0",
+      "name": "Big Sur Campground and Cabins",
+      "city": "Big Sur",
+      "country": "United States",
+      "photoCount": 10,
+      "currentSource": "google_places",
+      "status": "GOOGLE_PLACES_ONLY"
+    }
+  ],
+  "noPhotos": [],
+  "total": 20,
+  "generated": "2025-09-29T12:59:24.077Z"
+}

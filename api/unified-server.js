@@ -242,6 +242,46 @@ app.get('/api/hotels', async (req, res) => {
         const searchQuery = encodeURIComponent(`${hotel.name} ${hotel.city}`);
         bookingUrl = `https://www.booking.com/searchresults.html?ss=${searchQuery}`;
       }
+      // Process photos - convert JSON strings to URL strings
+      let processedPhotos = [];
+      let processedHeroPhoto = '';
+      
+      if (hotel.photos && Array.isArray(hotel.photos)) {
+        processedPhotos = hotel.photos.map(photo => {
+          try {
+            // If photo is a JSON string, parse it and extract URL
+            if (typeof photo === 'string' && photo.startsWith('{')) {
+              const photoObj = JSON.parse(photo);
+              return photoObj.url || photo;
+            }
+            // If photo is already a URL string, use it directly
+            return photo;
+          } catch (error) {
+            console.log('Error parsing photo:', photo);
+            return photo; // Return original if parsing fails
+          }
+        }).filter(photo => photo && photo.trim() !== ''); // Remove empty photos
+      }
+      
+      // Process hero photo
+      if (hotel.hero_photo) {
+        try {
+          if (typeof hotel.hero_photo === 'string' && hotel.hero_photo.startsWith('{')) {
+            const heroPhotoObj = JSON.parse(hotel.hero_photo);
+            processedHeroPhoto = heroPhotoObj.url || hotel.hero_photo;
+          } else {
+            processedHeroPhoto = hotel.hero_photo;
+          }
+        } catch (error) {
+          processedHeroPhoto = hotel.hero_photo;
+        }
+      }
+      
+      // Fallback to first photo if no hero photo
+      if (!processedHeroPhoto && processedPhotos.length > 0) {
+        processedHeroPhoto = processedPhotos[0];
+      }
+
 
       return {
         id: hotel.id,
@@ -252,8 +292,8 @@ app.get('/api/hotels', async (req, res) => {
         price: hotel.price,
         description: hotel.description || '',
         amenityTags: [],
-        photos: hotel.photos || [],
-        heroPhoto: hotel.hero_photo || (hotel.photos && hotel.photos[0]) || '',
+        photos: processedPhotos,
+        heroPhoto: processedHeroPhoto,
         bookingUrl,
         rating: hotel.rating
       };

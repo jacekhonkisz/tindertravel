@@ -43,6 +43,7 @@ class DatabaseService {
                 name: hotel.name,
                 city: hotel.city,
                 country: hotel.country,
+                address: hotel.address || null,
                 coords: hotel.coords,
                 price: hotel.price || null,
                 description: hotel.description,
@@ -91,6 +92,7 @@ class DatabaseService {
                 name: row.name,
                 city: row.city,
                 country: row.country,
+                address: row.address,
                 coords: row.coords,
                 price: row.price,
                 description: row.description,
@@ -128,6 +130,7 @@ class DatabaseService {
                 name: data.name,
                 city: data.city,
                 country: data.country,
+                address: data.address,
                 coords: data.coords,
                 price: data.price,
                 description: data.description,
@@ -213,6 +216,7 @@ class DatabaseService {
             name TEXT NOT NULL,
             city TEXT NOT NULL,
             country TEXT NOT NULL,
+            address TEXT,
             coords JSONB,
             price JSONB,
             description TEXT,
@@ -248,3 +252,4 @@ class DatabaseService {
 }
 exports.DatabaseService = DatabaseService;
 exports.default = DatabaseService;
+//# sourceMappingURL=database.js.map

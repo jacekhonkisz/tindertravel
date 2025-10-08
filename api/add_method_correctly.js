@@ -1,0 +1,52 @@
+const fs = require('fs');
+
+// Read the file
+let content = fs.readFileSync('src/google-places.ts', 'utf8');
+
+// Find the last method before the closing brace and add the new method
+const methodToAdd = `
+  /**
+   * Get specific hotel photos by hotel name and location
+   */
+  async getSpecificHotelPhotos(hotelName: string, cityName: string, maxPhotos: number = 6): Promise<GooglePlacesPhoto[]> {
+    if (!this.checkAccess()) {
+      return [];
+    }
+
+    try {
+      // Search for the specific hotel
+      const searchQuery = \`\${hotelName} \${cityName}\`;
+      const searchUrl = \`\${this.baseUrl}/textsearch/json\`;
+      const params = {
+        query: searchQuery,
+        key: this.apiKey,
+        type: 'lodging'
+      };
+
+      const response = await this.client.get(searchUrl, { params });
+      
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        // Get the first result (most relevant)
+        const place = response.data.results[0];
+        
+        // Get detailed information including photos
+        const hotelDetails = await this.getHotelDetails(place.place_id);
+        
+        if (hotelDetails && hotelDetails.photos) {
+          return hotelDetails.photos.slice(0, maxPhotos);
+        }
+      }
+      
+      return [];
+    } catch (error) {
+      console.error(\`Failed to get specific hotel photos for \${hotelName} in \${cityName}:\`, error);
+      return [];
+    }
+  }`;
+
+// Insert the method before the last closing brace
+content = content.replace(/\n}$/, methodToAdd + '\n}');
+
+// Write the file back
+fs.writeFileSync('src/google-places.ts', content);
+console.log('✅ Added getSpecificHotelPhotos method correctly');

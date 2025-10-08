@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-10-07T16:45:50.850Z",
+  "duration": "17.9 minutes",
+  "stats": {
+    "totalHotels": 543,
+    "processed": 543,
+    "successful": 543,
+    "failed": 0,
+    "noPhotosFound": 0,
+    "lowQualitySkipped": 141,
+    "totalPhotos": 2775,
+    "totalApiCalls": 4988,
+    "estimatedCost": 53.92099999999785,
+    "startTime": 1759854474783,
+    "errors": []
+  }
+}

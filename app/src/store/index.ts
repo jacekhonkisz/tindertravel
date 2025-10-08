@@ -71,6 +71,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
+      // Validate connection on first load
+      if (state.hotels.length === 0 && !refresh) {
+        console.log('🔍 First load - validating API connection...');
+        const validation = await apiClient.validateConnection();
+        
+        if (!validation.connected) {
+          set({ 
+            error: `Cannot connect to server: ${validation.message}. Please check server is running and IP is correct.`,
+            loading: false 
+          });
+          return;
+        }
+      }
+      
       const offset = refresh ? 0 : state.hotels.length;
       const response = await apiClient.getHotels({
         limit: 20,

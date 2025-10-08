@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
+  FlatList,
   View,
   Text,
   StyleSheet,
   StatusBar,
-  ScrollView,
   TouchableOpacity,
   Alert,
   Dimensions,
@@ -13,8 +13,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList, HotelCard } from '../types';
-import { useAppStore } from '../store';
+import {
+  RootStackParamList, HotelCard } from '../types';
+import {
+  useAppStore } from '../store';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -58,7 +60,15 @@ const HotelCollectionScreen: React.FC = () => {
     );
   };
 
-  const renderHotelCard = (hotel: HotelCard) => (
+  const keyExtractor = useCallback((item: HotelCard) => item.id, []);
+
+  const getItemLayout = useCallback((data: any, index: number) => ({
+    length: 130, // Fixed height of each item
+    offset: 130 * index,
+    index,
+  }), []);
+
+  const renderHotelCard = useCallback((hotel: HotelCard) => (
     <TouchableOpacity
       key={hotel.id}
       style={styles.hotelCard}
@@ -95,7 +105,7 @@ const HotelCollectionScreen: React.FC = () => {
         </Text>
       </View>
     </TouchableOpacity>
-  );
+  ), [type, handleHotelPress, handleRemoveHotel]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -137,18 +147,28 @@ const HotelCollectionScreen: React.FC = () => {
         </View>
       ) : (
         // Hotels list
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.hotelsGrid}>
-            {hotels.map(hotel => renderHotelCard(hotel))}
-          </View>
-          
-          {/* Instructions */}
-          <View style={styles.instructions}>
-            <Text style={styles.instructionText}>
-              Tap to view details • Long press to remove
-            </Text>
-          </View>
-        </ScrollView>
+        <FlatList
+          data={hotels}
+          renderItem={({ item }) => renderHotelCard(item)}
+          keyExtractor={keyExtractor}
+          getItemLayout={getItemLayout}
+          initialNumToRender={10}
+          maxToRenderPerBatch={5}
+          windowSize={10}
+          removeClippedSubviews={true}
+          showsVerticalScrollIndicator={false}
+          decelerationRate="fast"
+          scrollEventThrottle={16}
+          style={styles.content}
+          contentContainerStyle={styles.hotelsGrid}
+          ListFooterComponent={() => (
+            <View style={styles.instructions}>
+              <Text style={styles.instructionText}>
+                Tap to view details • Long press to remove
+              </Text>
+            </View>
+          )}
+        />
       )}
     </SafeAreaView>
   );

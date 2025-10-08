@@ -8,20 +8,22 @@
     "install:all": "npm install && cd api && npm install && cd ../app && npm install",
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:app\"",
     "dev:api": "cd api && npm run dev",
-    "dev:app": "cd app && npm start",
+    "dev:app": "cd app && npx expo start --dev-client",
     "build": "npm run build:api && npm run build:app",
     "build:api": "cd api && npm run build",
-    "build:app": "cd app && expo build:ios",
+    "build:app": "cd app && npx expo build:ios",
     "start": "npm run build:api && cd api && npm start",
-    "ios": "cd app && npm run ios",
-    "ios:device": "cd app && expo run:ios --device",
+    "ios": "cd app && npx expo run:ios",
+    "ios:build": "cd app && npx expo run:ios --configuration Release",
+    "ios:device": "cd app && npx expo run:ios --device",
     "clean": "npm run clean:api && npm run clean:app",
     "clean:api": "cd api && rm -rf node_modules dist *.log",
     "clean:app": "cd app && rm -rf node_modules .expo",
-    "clean:ios": "cd app && expo r -c && rm -rf ios/build",
+    "clean:ios": "cd app && rm -rf ios/build ios/Pods && cd ios && pod install",
+    "prebuild": "cd app && npx expo prebuild --clean",
     "test": "echo \"Tests will be added in future versions\"",
     "lint": "echo \"Linting will be added in future versions\"",
-    "android": "expo run:android"
+    "android": "cd app && npx expo run:android"
   },
   "keywords": [
     "travel",
@@ -53,7 +55,8 @@
     "url": "https://github.com/glintz/travel-app"
   },
   "dependencies": {
-    "expo": "~54.0.9",
+    "expo": "^54.0.12",
+    "expo-dev-client": "~6.0.13",
     "react": "19.1.0",
     "react-native": "0.81.4"
   }

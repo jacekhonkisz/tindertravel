@@ -1,0 +1,35 @@
+# HOTEL PHOTO SOURCE REFERENCE
+
+Generated: 2025-09-29T12:59:24.077Z
+Total Hotels: 20
+SerpApi Available: 17
+Google Places Only: 3
+No Photos: 0
+
+## 🚫 DO NOT TOUCH - ALREADY HAVE SERPAPI PHOTOS
+
+## ✅ CAN UPDATE WITH SERPAPI PHOTOS
+- ID: google_ChIJ7aFemPAb2jERQTmgdV0wbLM | Shangri-La Rasa Sentosa, Singapore (Singapore, Singapore) | 10 photos
+- ID: ChIJjw8Jg5EXEDERyFsD24tyxn8 | Ravoeun Angkor Boutique (Siem Reap, Cambodia) | 10 photos
+- ID: ChIJFcxeNPIafGwR827UvW7Gzeg | Earls Anchorage (Lord Howe Island, Australia) | 6 photos
+- ID: ChIJObU8B2SDbTkRBcf4gajPmNM | Surya Bagh - A Luxury Hideaway (Rajasthan, India) | 10 photos
+- ID: ChIJ7diINk7KcFMRwVmpiME4R38 | Banff Aspen Lodge (Banff, Canada) | 10 photos
+- ID: ChIJ_____1sgnmkRrdNXWrMeNVw | Lizard Island (Great Barrier Reef, Australia) | 10 photos
+- ID: ChIJDdNx-oEd1akRzlEBC8baI1w | Browns Boutique Hotel Queenstown (Queenstown, New Zealand) | 10 photos
+- ID: ChIJdRwD14FQr4YRpptEoLvtacM | Playa Grande Resort & Grand Spa (Los Cabos, Mexico) | 10 photos
+- ID: ChIJ7RlVqwm0bTkRZISybPIzj7s | Pearl Palace Heritage (Rajasthan, India) | 10 photos
+- ID: ChIJced2CE4XEDERNvRFG-OA2IA | Zannier Phum Baitang (Siem Reap, Cambodia) | 10 photos
+- ID: ChIJubyY2MiNQTkR0BpA6ja0LCo | Shangri-La The Heritage Haveli (Rajasthan, India) | 10 photos
+- ID: ChIJd-ktlQqrlxIRnk2RqAKHTEI | Finca Hotel Rural Es Turó (Mallorca, Spain) | 10 photos
+- ID: ChIJYVg6Z03KcFMRexfIPqr0KYE | Banff Caribou Lodge & Spa (Banff, Canada) | 10 photos
+- ID: ChIJ4_ShkMzrvzsRL1XJL8I7P_I | Treebo Green Park Mapusa - Hotel in Goa (Goa, India) | 10 photos
+- ID: ChIJW47UQ8vQT48R38A7HJssZAQ | Casa Ambar Hotel & Boutique Tulum (Tulum, Mexico) | 10 photos
+- ID: ChIJiY3WuCPkjYARzcKpuYuDbY0 | Hyatt Regency Monterey Hotel and Spa on Del Monte Golf Course (Big Sur, United States) | 10 photos
+- ID: ChIJ6fRaswrAvzsRiIG0p32g5TM | Highland Heritage Goa (Goa, India) | 10 photos
+
+## ⏭️ GOOGLE PLACES ONLY
+- ID: ChIJ67XliEnKcFMR1aetCfP6tG8 | Buffalo Mountain Lodge (Banff, Canada) | 10 photos
+- ID: ChIJYf4AqXwXEDERgkylzYS-pZA | Golden Temple Retreat (Siem Reap, Cambodia) | 10 photos
+- ID: ChIJ2Zny1uKPjYARqUzA2EV0S-0 | Big Sur Campground and Cabins (Big Sur, United States) | 10 photos
+
+## ❌ NO PHOTOS

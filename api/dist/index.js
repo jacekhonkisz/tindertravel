@@ -48,6 +48,7 @@ const curation_1 = require("./curation");
 const hotel_discovery_controller_1 = require("./hotel-discovery-controller");
 const photo_quality_auditor_1 = require("./photo-quality-auditor");
 const photo_curation_1 = require("./photo-curation");
+const network_utils_1 = require("./network-utils");
 // Load environment variables
 dotenv.config();
 const app = (0, express_1.default)();
@@ -861,7 +862,37 @@ app.get('/api/hotels/glintz', async (req, res) => {
         });
     }
 });
-// Get hotels with personalization
+// Helper function to parse photo strings - now preserves source metadata
+const parsePhotoUrls = (photos) => {
+    if (!photos || !Array.isArray(photos)) {
+        return [];
+    }
+    return photos.map(photo => {
+        // If it's already a plain string URL (no metadata), return it
+        if (typeof photo === 'string' && !photo.startsWith('{')) {
+            return photo;
+        }
+        // If it's a JSON string with metadata, preserve it as JSON string
+        if (typeof photo === 'string' && photo.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(photo);
+                // Validate it has a URL
+                if (parsed.url) {
+                    return photo; // Return original JSON string to preserve metadata
+                }
+            }
+            catch (e) {
+                console.warn('Failed to parse photo JSON:', photo.substring(0, 100));
+                return '';
+            }
+        }
+        // If it's an object with URL property, stringify it to preserve metadata
+        if (typeof photo === 'object' && photo && photo.url) {
+            return JSON.stringify(photo); // Convert object to JSON string to preserve source
+        }
+        return '';
+    }).filter(url => url && url.length > 0); // Remove empty strings
+};
 app.get('/api/hotels', async (req, res) => {
     try {
         if (!supabaseService) {
@@ -894,6 +925,13 @@ app.get('/api/hotels', async (req, res) => {
                 const searchQuery = encodeURIComponent(`${hotel.name} ${hotel.city}`);
                 bookingUrl = `https://www.booking.com/searchresults.html?ss=${searchQuery}`;
             }
+            // Parse photos into clean URL strings
+            const parsedPhotos = parsePhotoUrls(hotel.photos);
+            const parsedHeroPhoto = hotel.hero_photo
+                ? (typeof hotel.hero_photo === 'string' && hotel.hero_photo.startsWith('{')
+                    ? parsePhotoUrls([hotel.hero_photo])[0]
+                    : hotel.hero_photo)
+                : (parsedPhotos[0] || '');
             return {
                 id: hotel.id,
                 name: hotel.name,
@@ -903,8 +941,8 @@ app.get('/api/hotels', async (req, res) => {
                 price: hotel.price,
                 description: hotel.description || '',
                 amenityTags: hotel.amenity_tags || [],
-                photos: hotel.photos || [], // REAL Google Places photos!
-                heroPhoto: hotel.hero_photo || (hotel.photos && hotel.photos[0]) || '', // REAL Google Places hero photo!
+                photos: parsedPhotos, // Clean URL strings with metadata!
+                heroPhoto: parsedHeroPhoto, // Clean URL string with metadata!
                 bookingUrl,
                 rating: hotel.rating
             };
@@ -953,7 +991,13 @@ app.get('/api/hotels/:id', async (req, res) => {
                 error: 'Hotel not found'
             });
         }
-        // Convert Supabase format to HotelCard format
+        // Convert Supabase format to HotelCard format with parsed photos
+        const parsedPhotos = parsePhotoUrls(supabaseHotel.photos);
+        const parsedHeroPhoto = supabaseHotel.hero_photo
+            ? (typeof supabaseHotel.hero_photo === 'string' && supabaseHotel.hero_photo.startsWith('{')
+                ? parsePhotoUrls([supabaseHotel.hero_photo])[0]
+                : supabaseHotel.hero_photo)
+            : (parsedPhotos[0] || '');
         const hotel = {
             id: supabaseHotel.id,
             name: supabaseHotel.name,
@@ -963,8 +1007,8 @@ app.get('/api/hotels/:id', async (req, res) => {
             price: supabaseHotel.price,
             description: supabaseHotel.description,
             amenityTags: supabaseHotel.amenity_tags,
-            photos: supabaseHotel.photos, // REAL Google Places photos!
-            heroPhoto: supabaseHotel.hero_photo, // REAL Google Places hero photo!
+            photos: parsedPhotos, // Clean URL strings with metadata!
+            heroPhoto: parsedHeroPhoto, // Clean URL string with metadata!
             bookingUrl: supabaseHotel.booking_url,
             rating: supabaseHotel.rating
         };
@@ -990,7 +1034,8 @@ app.get('/api/photos/:cityName', async (req, res) => {
             });
         }
         console.log(`Fetching photos for ${cityName}...`);
-        const photos = await googlePlacesClient.getHotelPhotos(cityName, parseInt(limit));
+        const hotels = await googlePlacesClient.searchHotels(cityName, parseInt(limit));
+        const photos = hotels.flatMap(hotel => hotel.photos.map(photo => photo.url));
         res.json({
             city: cityName,
             photos,
@@ -1430,17 +1475,22 @@ app.use((req, res) => {
 });
 // Start server
 app.listen(port, () => {
-    console.log(`🚀 Glintz API server running on port ${port}`);
-    console.log(`📍 Health check: http://localhost:${port}/health`);
-    console.log(`🏨 Seed hotels: POST http://localhost:${port}/api/seed`);
-    console.log(`🔍 Get hotels: GET http://localhost:${port}/api/hotels`);
+    // Display comprehensive network information
+    (0, network_utils_1.displayServerInfo)(Number(port));
     // Check if database is seeded on startup
     database.isSeeded().then(seeded => {
         if (!seeded) {
-            console.log('\n⚠️  Database not seeded. Call POST /api/seed to populate with hotels.');
+            console.log('⚠️  DATABASE STATUS: Not seeded');
+            console.log('   Call POST /api/seed to populate with hotels.');
+            console.log('');
+        }
+        else {
+            console.log('✅ DATABASE STATUS: Ready with hotel data');
+            console.log('');
         }
     }).catch(() => {
-        console.log('\n⚠️  Could not check database status. You may need to seed hotels.');
+        console.log('⚠️  DATABASE STATUS: Could not check status');
+        console.log('');
     });
 });
 exports.default = app;

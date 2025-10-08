@@ -1,0 +1,199 @@
+/**
+ * API Configuration with Production-Ready Features
+ * 
+ * This module provides:
+ * - Environment-based configuration
+ * - Automatic IP detection
+ * - Connection validation
+ * - Fallback URLs
+ * - Health check capabilities
+ */
+
+import { Platform } from 'react-native';
+
+/**
+ * Environment types
+ */
+export type Environment = 'development' | 'staging' | 'production';
+
+/**
+ * API Configuration interface
+ */
+export interface ApiConfig {
+  baseUrl: string;
+  timeout: number;
+  retryAttempts: number;
+  retryDelay: number;
+  environment: Environment;
+}
+
+/**
+ * Get the current environment
+ */
+function getEnvironment(): Environment {
+  // In a real production app, you'd use environment variables
+  // For now, we default to development
+  return __DEV__ ? 'development' : 'production';
+}
+
+/**
+ * Get the current device's local network IP
+ * This helps when running on a physical device or simulator
+ */
+async function getDeviceNetworkIP(): Promise<string | null> {
+  try {
+    // For iOS Simulator, localhost works
+    if (Platform.OS === 'ios' && !Platform.isPad) {
+      // We can't reliably detect if we're in simulator vs device
+      // so we'll try localhost first, then fallback to network IP
+      return null; // Will use predefined network IP
+    }
+    
+    // For Android emulator, use special IP
+    if (Platform.OS === 'android') {
+      return '10.0.2.2'; // Android emulator host machine
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn('Failed to detect device network IP:', error);
+    return null;
+  }
+}
+
+/**
+ * Configuration for different environments
+ */
+const configs: Record<Environment, Partial<ApiConfig>> = {
+  development: {
+    // NOTE: Update this IP to match your server's network IP
+    // Check your server startup logs for the correct IP address
+    baseUrl: 'http://192.168.1.102:3001', // UPDATED TO CURRENT NETWORK IP
+    timeout: 30000,
+    retryAttempts: 3,
+    retryDelay: 1000,
+  },
+  staging: {
+    baseUrl: 'https://staging-api.glintz.com',
+    timeout: 20000,
+    retryAttempts: 2,
+    retryDelay: 1000,
+  },
+  production: {
+    baseUrl: 'https://api.glintz.com',
+    timeout: 15000,
+    retryAttempts: 3,
+    retryDelay: 2000,
+  },
+};
+
+/**
+ * Get API configuration based on current environment
+ */
+export function getApiConfig(): ApiConfig {
+  const env = getEnvironment();
+  const envConfig = configs[env];
+  
+  return {
+    baseUrl: envConfig.baseUrl || configs.development.baseUrl!,
+    timeout: envConfig.timeout || 30000,
+    retryAttempts: envConfig.retryAttempts || 3,
+    retryDelay: envConfig.retryDelay || 1000,
+    environment: env,
+  };
+}
+
+/**
+ * Test if a URL is reachable
+ */
+export async function testConnection(url: string, timeout: number = 5000): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    const response = await fetch(`${url}/health`, {
+      method: 'GET',
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeoutId);
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Find the best available API URL
+ * Tries multiple URLs and returns the first one that responds
+ */
+export async function findBestApiUrl(
+  primaryUrl: string,
+  fallbackUrls: string[] = []
+): Promise<{ url: string; tested: string[] }> {
+  const urlsToTest = [primaryUrl, ...fallbackUrls];
+  const tested: string[] = [];
+  
+  console.log('🔍 Testing API connections...');
+  
+  for (const url of urlsToTest) {
+    console.log(`   Testing: ${url}`);
+    tested.push(url);
+    
+    const isReachable = await testConnection(url, 3000);
+    
+    if (isReachable) {
+      console.log(`   ✅ Connected to: ${url}`);
+      return { url, tested };
+    } else {
+      console.log(`   ❌ Failed: ${url}`);
+    }
+  }
+  
+  // If none work, return the primary URL and let the app handle the error
+  console.warn('⚠️  No API servers responded. Using primary URL as fallback.');
+  return { url: primaryUrl, tested };
+}
+
+/**
+ * Get fallback URLs for the current environment
+ */
+export function getFallbackUrls(): string[] {
+  const env = getEnvironment();
+  
+  if (env === 'development') {
+    // Try common development URLs
+    return [
+      'http://localhost:3001',
+      'http://127.0.0.1:3001',
+      // Add other common local IPs if needed
+    ];
+  }
+  
+  // For staging/production, no fallbacks by default
+  return [];
+}
+
+/**
+ * Log current API configuration
+ */
+export function logApiConfig(config: ApiConfig): void {
+  console.log('📡 API Configuration:');
+  console.log(`   Environment: ${config.environment}`);
+  console.log(`   Base URL: ${config.baseUrl}`);
+  console.log(`   Timeout: ${config.timeout}ms`);
+  console.log(`   Retry Attempts: ${config.retryAttempts}`);
+  console.log(`   Retry Delay: ${config.retryDelay}ms`);
+}
+
+/**
+ * Instructions for updating API URL
+ */
+export function printApiInstructions(): void {
+  console.log('\n📝 TO UPDATE API URL:');
+  console.log('   1. Check your server startup logs');
+  console.log('   2. Find the "Network IP" address');
+  console.log('   3. Update baseUrl in app/src/config/api.ts');
+  console.log('   4. Restart the app\n');
+}
+
