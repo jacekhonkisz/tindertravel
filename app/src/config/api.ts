@@ -38,23 +38,13 @@ function getEnvironment(): Environment {
 
 /**
  * Get the current device's local network IP
- * This helps when running on a physical device or simulator
+ * This helps when running on a physical iOS device or simulator
  */
 async function getDeviceNetworkIP(): Promise<string | null> {
   try {
     // For iOS Simulator, localhost works
-    if (Platform.OS === 'ios' && !Platform.isPad) {
-      // We can't reliably detect if we're in simulator vs device
-      // so we'll try localhost first, then fallback to network IP
-      return null; // Will use predefined network IP
-    }
-    
-    // For Android emulator, use special IP
-    if (Platform.OS === 'android') {
-      return '10.0.2.2'; // Android emulator host machine
-    }
-    
-    return null;
+    // For iOS device, we use the network IP configured below
+    return null; // Will use predefined network IP
   } catch (error) {
     console.warn('Failed to detect device network IP:', error);
     return null;
