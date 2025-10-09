@@ -61,6 +61,7 @@ jspm_packages/
 .env.test
 .env.local
 .env.production
+.env.*.local
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -157,4 +158,75 @@ local.properties
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
-fastlane/test_output 
+fastlane/test_output
+
+# Security - API keys and secrets (comprehensive patterns)
+*api*key*
+*secret*
+*token*
+*password*
+*credential*
+*auth*
+*private*key*
+*public*key*
+*sdk*key*
+
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+
+# Google Services
+google-services.json
+GoogleService-Info.plist
+
+# AWS
+.aws/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Certificates
+*.cer
+*.crt
+*.der
+*.p7b
+*.p7c
+*.p7r
+*.p7s
+*.p8
+*.pfx
+*.spc
+
+# Keystore files
+*.jks
+*.keystore
+
+# Debug files that might contain secrets
+debug.log
+*.debug
+server.log
+
+# Backup files that might contain secrets
+*.bak
+*.backup
+*~
+.#* 
+# Environment variables
+.env
+.env.local
+.env.production
+.env.staging
+*.env
+
+# API Keys and Secrets
+*secret*
+*key*
+*password*
+*token*
+
+# Sensitive data
+config/secrets.js
+secrets.json
+api-keys.json

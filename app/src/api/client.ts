@@ -2,18 +2,32 @@ import { Image } from 'react-native';
 import { HotelCard, HotelsResponse, PersonalizationData, ApiResponse, OTPRequest, OTPVerification, AuthResponse } from '../types';
 import { getApiConfig, logApiConfig, printApiInstructions } from '../config/api';
 
-// Get API configuration based on environment
-const apiConfig = getApiConfig();
-const API_BASE_URL = apiConfig.baseUrl;
-const API_TIMEOUT = apiConfig.timeout;
+// Get API configuration based on environment (async)
+let apiConfig: any = null;
+let API_BASE_URL = 'http://localhost:3001'; // Default fallback
+let API_TIMEOUT = 30000; // Default timeout
 
-// Log configuration on startup
-console.log('\n' + '='.repeat(60));
-console.log('🌐 API CLIENT - CONFIGURATION');
-console.log('='.repeat(60));
-logApiConfig(apiConfig);
-console.log('='.repeat(60));
-console.log('');
+// Initialize API configuration
+(async () => {
+  try {
+    apiConfig = await getApiConfig();
+    API_BASE_URL = apiConfig.baseUrl;
+    API_TIMEOUT = apiConfig.timeout;
+
+    // Update the API client instance
+    apiClient.updateConfig(API_BASE_URL, API_TIMEOUT);
+
+    // Log configuration on startup
+    console.log('\n' + '='.repeat(60));
+    console.log('🌐 API CLIENT - CONFIGURATION');
+    console.log('='.repeat(60));
+    logApiConfig(apiConfig);
+    console.log('='.repeat(60));
+    console.log('');
+  } catch (error) {
+    console.error('Failed to initialize API config:', error);
+  }
+})();
 
 // If connection fails, show instructions
 let hasShownInstructions = false;
@@ -26,6 +40,12 @@ class ApiClient {
   constructor() {
     this.baseUrl = API_BASE_URL;
     this.timeout = API_TIMEOUT;
+  }
+
+  // Update configuration if it becomes available later
+  updateConfig(newBaseUrl: string, newTimeout: number) {
+    this.baseUrl = newBaseUrl;
+    this.timeout = newTimeout;
   }
 
   // Set auth token for authenticated requests

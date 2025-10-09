@@ -5,6 +5,7 @@ import {
   Dimensions,
   PanResponder,
   Animated,
+  Easing,
   Text,
   Platform,
   ScrollView,
@@ -25,14 +26,12 @@ import HotelMapView from './HotelMapView';
 import { useAppStore } from '../store';
 import { useTheme } from '../theme';
 import { Button } from '../ui';
-import PhotoSourceTag from './PhotoSourceTag';
-import { getPhotoSource } from '../utils/photoUtils';
 import { getImageSource } from '../utils/imageUtils';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
-const SWIPE_OUT_DURATION = 250;
-const DETAILS_ANIMATION_DURATION = 300;
+const SWIPE_OUT_DURATION = 220; // Faster, smoother swipe (was 250ms)
+const DETAILS_ANIMATION_DURATION = 280; // Snappier details animation (was 300ms)
 
 // True fullscreen card sizing - covers entire screen
 const getCardDimensions = (insets: any) => {
@@ -73,6 +72,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
   const [showingDetails, setShowingDetails] = useState(false);
   const [detailsHotel, setDetailsHotel] = useState<HotelCard | null>(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [isActivelyGesturing, setIsActivelyGesturing] = useState(false);
   const photoScrollViewRef = useRef<ScrollView>(null);
 
   // Centralized Animation Controller
@@ -89,11 +89,13 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         Animated.timing(detailsTranslateY, {
           toValue: 0,
           duration: DETAILS_ANIMATION_DURATION,
+          easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(detailsOpacity, {
           toValue: 1,
           duration: DETAILS_ANIMATION_DURATION,
+          easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
       ]).start();
@@ -106,11 +108,13 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         Animated.timing(detailsTranslateY, {
           toValue: SCREEN_HEIGHT,
           duration: DETAILS_ANIMATION_DURATION,
+          easing: Easing.in(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(detailsOpacity, {
           toValue: 0,
           duration: DETAILS_ANIMATION_DURATION,
+          easing: Easing.in(Easing.ease),
           useNativeDriver: true,
         }),
       ]).start(() => {
@@ -136,11 +140,13 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
         Animated.timing(position, {
           toValue: direction,
           duration: SWIPE_OUT_DURATION,
+          easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(opacity, {
           toValue: 0,
           duration: SWIPE_OUT_DURATION,
+          easing: Easing.in(Easing.ease),
           useNativeDriver: true,
         }),
       ]).start(onComplete);
@@ -150,18 +156,26 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
       Animated.parallel([
         Animated.spring(position, {
           toValue: { x: 0, y: 0 },
+          damping: 18, // iOS-style spring with 18 damping
+          stiffness: 150,
           useNativeDriver: true,
         }),
         Animated.spring(rotate, {
           toValue: 0,
+          damping: 18,
+          stiffness: 150,
           useNativeDriver: true,
         }),
         Animated.spring(detailsTranslateY, {
           toValue: SCREEN_HEIGHT,
+          damping: 18,
+          stiffness: 150,
           useNativeDriver: true,
         }),
         Animated.spring(detailsOpacity, {
           toValue: 0,
+          damping: 18,
+          stiffness: 150,
           useNativeDriver: true,
         }),
       ]).start(() => {
@@ -184,6 +198,7 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
   // Reset animations when currentIndex changes
   useEffect(() => {
     animationController.resetAll();
+    setIsActivelyGesturing(false); // Hide indicators for new card
     if (showingDetails) {
       animationController.hideDetails();
     }
@@ -205,6 +220,9 @@ const panResponder = PanResponder.create({
     onPanResponderGrant: (_, gesture: any) => {
       if (showingDetails) return;
       
+      // Mark that user is actively gesturing - show indicators
+      setIsActivelyGesturing(true);
+      
       const { x0, y0 } = gesture;
       const cardWidth = SCREEN_WIDTH;
       const leftZoneWidth = cardWidth * 0.15;
@@ -212,17 +230,19 @@ const panResponder = PanResponder.create({
       
       // Check if tap is in left or right photo navigation zones
       if (x0 < leftZoneWidth) {
-        // Left tap - previous photo
+        // Left tap - previous photo (not a swipe gesture)
         const currentHotel = hotels[currentIndex];
         if (currentHotel && currentHotel.photos && currentHotel.photos.length > 1) {
           IOSHaptics.buttonPress();
+          setIsActivelyGesturing(false); // This is a tap, not a swipe
           // Handle photo navigation here - you'll need to add state for current photo index
         }
       } else if (x0 > cardWidth - rightZoneWidth) {
-        // Right tap - next photo
+        // Right tap - next photo (not a swipe gesture)
         const currentHotel = hotels[currentIndex];
         if (currentHotel && currentHotel.photos && currentHotel.photos.length > 1) {
           IOSHaptics.buttonPress();
+          setIsActivelyGesturing(false); // This is a tap, not a swipe
           // Handle photo navigation here - you'll need to add state for current photo index
         }
       }
@@ -230,6 +250,9 @@ const panResponder = PanResponder.create({
 
     onPanResponderMove: (_, gesture: any) => {
       const { dx, dy } = gesture;
+      
+      // Update card position (CRITICAL for indicator opacity calculations!)
+      position.setValue({ x: dx, y: dy });
       
       // Calculate rotation based on horizontal movement
       const rotateValue = dx * 0.1;
@@ -263,6 +286,9 @@ const panResponder = PanResponder.create({
 
     onPanResponderRelease: (_, gesture: any) => {
       const { dx, dy, vx, vy } = gesture;
+      
+      // User released - stop showing indicators immediately
+      setIsActivelyGesturing(false);
       
       if (showingDetails) {
         // Handle details closing
@@ -444,8 +470,8 @@ const panResponder = PanResponder.create({
           isDevelopment={__DEV__} 
         />
         
-        {/* Swipe indicators - only show on current card */}
-        {isCurrentCard && (
+        {/* Swipe indicators - only show on current card during active gesture */}
+        {isCurrentCard && isActivelyGesturing && (
           <>
             {/* Like indicator */}
             <Animated.View
@@ -663,13 +689,6 @@ const panResponder = PanResponder.create({
                 </View>
                 {renderPhotoDots()}
 
-              {/* Photo Source Tag - Dev Mode Only */}
-              {__DEV__ && (
-                <PhotoSourceTag
-                  source={getPhotoSource(detailsHotel.photos[currentPhotoIndex])}
-                  visible={__DEV__}
-                />
-              )}
               </View>
 
               {/* Hotel Information */}
@@ -787,53 +806,54 @@ const styles = StyleSheet.create({
   },
   swipeIndicator: {
     position: 'absolute',
-    padding: 12,
-    borderRadius: 15,
-    borderWidth: 2,
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 4,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 8,
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 10,
   },
   likeIndicator: {
-    top: 100,
-    right: 50,
-    borderColor: 'rgba(76, 175, 80, 0.8)',
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    top: '45%', // Centered vertically
+    right: '30%', // More toward center
+    borderColor: 'rgba(76, 175, 80, 1)',
+    backgroundColor: 'rgba(76, 175, 80, 0.3)',
     transform: [{ rotate: '15deg' }],
   },
   dislikeIndicator: {
-    top: 100,
-    left: 50,
-    borderColor: 'rgba(244, 67, 54, 0.8)',
-    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+    top: '45%', // Centered vertically
+    left: '30%', // More toward center
+    borderColor: 'rgba(244, 67, 54, 1)',
+    backgroundColor: 'rgba(244, 67, 54, 0.3)',
     transform: [{ rotate: '-15deg' }],
   },
   superlikeIndicator: {
-    bottom: 150,
+    top: '50%', // Centered vertically
     alignSelf: 'center',
-    borderColor: 'rgba(33, 150, 243, 0.8)',
-    backgroundColor: 'rgba(33, 150, 243, 0.1)',
-    paddingHorizontal: 20,
+    borderColor: 'rgba(33, 150, 243, 1)',
+    backgroundColor: 'rgba(33, 150, 243, 0.3)',
+    paddingHorizontal: 24,
   },
   detailsIndicator: {
-    top: 70,
+    top: '40%', // Centered vertically
     alignSelf: 'center',
-    borderColor: 'rgba(255, 152, 0, 0.8)',
-    backgroundColor: 'rgba(255, 152, 0, 0.1)',
-    paddingHorizontal: 16,
+    borderColor: 'rgba(255, 152, 0, 1)',
+    backgroundColor: 'rgba(255, 152, 0, 0.3)',
+    paddingHorizontal: 20,
   },
   indicatorText: {
     color: '#fff',
-    fontWeight: '600',
-    fontSize: 17,
-    textShadowColor: 'rgba(0, 0, 0, 0.7)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    fontWeight: '800',
+    fontSize: 28,
+    letterSpacing: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 5,
   },
   detailsContainer: {
     position: 'absolute',

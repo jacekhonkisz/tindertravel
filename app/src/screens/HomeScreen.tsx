@@ -109,16 +109,21 @@ const HomeScreen: React.FC = () => {
     return (
       <View style={styles.container}>
         <StatusBar 
-          barStyle="light-content"
+          barStyle="dark-content"
           backgroundColor={theme.bg}
-          hidden={true} // Hide status bar for consistency
+          hidden={false} // Show status bar
         />
         
         <View style={styles.errorContainer}>
           <Text style={styles.errorTitle}>
-            {isNotSeeded ? 'Welcome to Glintz!' : 'Oops!'}
+            {isNotSeeded ? 'Your next stay is waiting ✦' : 'Oops!'}
           </Text>
-          <Text style={styles.errorMessage}>{error}</Text>
+          <Text style={styles.errorMessage}>
+            {isNotSeeded 
+              ? 'Swipe to discover, tap to fall in love with your perfect boutique hotel.' 
+              : error
+            }
+          </Text>
           
           <View style={styles.errorActions}>
             {isNotSeeded ? (
@@ -145,7 +150,7 @@ const HomeScreen: React.FC = () => {
       <StatusBar 
         barStyle="light-content"
         backgroundColor={theme.bg}
-        hidden={true} // Hide status bar for true full-screen photos
+        hidden={true} // Hide status bar for true full-screen hotel photos
       />
       
       {/* Swipe Deck - Fullscreen */}

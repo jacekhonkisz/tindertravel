@@ -16,8 +16,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '../api/client';
 import { useTheme } from '../theme';
 import { GradientOverlay, DebugBadge, Chip } from '../ui';
-import PhotoSourceTag from './PhotoSourceTag';
-import { getPhotoSource } from '../utils/photoUtils';
 import { getImageSource } from '../utils/imageUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -235,14 +233,6 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
           <Text style={styles.photoCounterText}>
             {currentPhotoIndex + 1}/{totalPhotos}
           </Text>
-          
-          {/* Photo Source Tag - Dev Mode Only */}
-          {isDevelopment && (
-            <PhotoSourceTag
-              source={getPhotoSource(photos[currentPhotoIndex])}
-              visible={isDevelopment}
-            />
-          )}
         </View>
       )}
 
@@ -344,7 +334,7 @@ const styles = StyleSheet.create({
   },
   photoIndicators: {
     position: 'absolute',
-    top: 50, // Moved higher to avoid collision with content
+    top: 50,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -353,32 +343,43 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   indicator: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     marginHorizontal: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
   },
   activeIndicator: {
     backgroundColor: 'rgba(255, 255, 255, 1.0)',
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
   },
   photoCounter: {
     position: 'absolute',
-    top: 20, // Moved up slightly
-    right: 15, // Moved closer to edge
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 15,
+    top: 20,
+    right: 15,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     zIndex: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
   },
   photoCounterText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
+    letterSpacing: 0.02,
   },
 
   infoOverlay: {
@@ -394,22 +395,28 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   hotelName: {
-    fontSize: 32, // Larger font for fullscreen
-    fontWeight: 'bold',
+    fontSize: 30, // Editorial display size
+    fontWeight: '600',
+    fontFamily: 'Georgia', // Serif for editorial feel (iOS: New York, Android: Serif)
     color: '#fff',
-    marginBottom: 5,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
+    marginBottom: 8,
+    letterSpacing: 0.01,
+    lineHeight: 38,
+    textShadowColor: 'rgba(0, 0, 0, 0.35)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
   },
   location: {
-    fontSize: 20, // Larger font for fullscreen
+    fontSize: 18, // Refined body size
+    fontWeight: '400',
     color: '#fff',
-    opacity: 1.0,
-    marginBottom: 8,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
+    opacity: 0.95,
+    marginBottom: 12,
+    letterSpacing: 0.01,
+    lineHeight: 24,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 6,
   },
   price: {
     fontSize: 18, // Larger font for fullscreen
@@ -420,41 +427,51 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   pricePill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 22,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 32,
     alignSelf: 'flex-start',
+    shadowColor: '#FFBE82',
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 2 },
   },
   priceText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#FFFFFF',
     fontWeight: '600',
+    letterSpacing: 0.01,
   },
   attribution: {
     position: 'absolute',
-    bottom: 12, // Moved up slightly
-    right: 15, // Moved closer to edge
+    bottom: 12,
+    right: 15,
   },
   attributionText: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: 10,
     fontWeight: '400',
-    opacity: 0.6,
+    letterSpacing: 0.02,
   },
   profileButton: {
     position: 'absolute',
     top: 20,
     left: 15,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     zIndex: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
   },
   profileButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
   },
   devPhotoButton: {
     position: 'absolute',

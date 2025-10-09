@@ -179,3 +179,4 @@ If the process stops before completion:
 ---
 
 *This process is running in the background and will complete automatically. You can close this terminal and check back later using the progress checker script.*
+

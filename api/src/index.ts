@@ -1024,6 +1024,116 @@ const parsePhotoUrls = (photos: any[]): string[] => {
   }).filter(url => url && url.length > 0); // Remove empty strings
 };
 
+// Get best quality photos for onboarding backgrounds
+app.get('/api/onboarding/photos', async (req, res) => {
+  try {
+    if (!supabaseService) {
+      return res.status(503).json({
+        error: 'Supabase service not available',
+        message: 'Database service not initialized'
+      });
+    }
+
+    const limit = parseInt(req.query.limit as string) || 30;
+    
+    console.log(`📸 Fetching top ${limit} best quality hotel photos for onboarding...`);
+    
+    // Fetch hotels with photos - get a large pool to select from
+    const hotels = await supabaseService.getHotels(200, 0);
+    const hotelsWithPhotos = hotels.filter((h: SupabaseHotel) => h.photos && h.photos.length > 0);
+    
+    console.log(`✅ Fetched ${hotelsWithPhotos.length} hotels with photos`);
+    
+    // Collect all photos with metadata
+    const allPhotos: Array<{
+      url: string;
+      width: number;
+      hotelName: string;
+      city: string;
+      country: string;
+      isHero: boolean;
+      caption: string;
+    }> = [];
+    
+    hotelsWithPhotos.forEach((hotel: SupabaseHotel) => {
+      if (hotel.photos && Array.isArray(hotel.photos)) {
+        hotel.photos.forEach((photo: any, index: number) => {
+          try {
+            let photoUrl = photo;
+            let photoWidth = 0;
+            
+            // Parse if it's a JSON string
+            if (typeof photo === 'string' && photo.startsWith('{')) {
+              const photoObj = JSON.parse(photo);
+              photoUrl = photoObj.url || photo;
+              photoWidth = photoObj.width || 0;
+            }
+            
+            // Extract width from Google Places URL if available
+            if (typeof photoUrl === 'string' && photoUrl.includes('maxwidth=')) {
+              const match = photoUrl.match(/maxwidth=(\d+)/);
+              if (match) {
+                photoWidth = parseInt(match[1], 10);
+              }
+            }
+            
+            allPhotos.push({
+              url: photoUrl,
+              width: photoWidth,
+              hotelName: hotel.name,
+              city: hotel.city,
+              country: hotel.country,
+              isHero: index === 0, // First photo is usually best
+              caption: `Photo: ${hotel.name}, ${hotel.city}`,
+            });
+          } catch (error) {
+            console.log('Error parsing photo:', photo);
+          }
+        });
+      }
+    });
+    
+    console.log(`📊 Total photos collected: ${allPhotos.length}`);
+    
+    // Sort by quality:
+    // 1. Higher width = better quality
+    // 2. Hero photos first
+    // 3. Filter out low quality photos
+    const qualityPhotos = allPhotos
+      .filter(photo => {
+        // Only keep high quality photos (typically Google Places ultra = 2048)
+        // Or at least 1200px wide
+        return photo.width >= 1200 || photo.url.includes('maxwidth=2048');
+      })
+      .sort((a, b) => {
+        // Sort by: isHero first, then by width
+        if (a.isHero && !b.isHero) return -1;
+        if (!a.isHero && b.isHero) return 1;
+        return b.width - a.width;
+      })
+      .slice(0, limit); // Take top N photos
+    
+    console.log(`✅ Selected ${qualityPhotos.length} best quality photos`);
+    if (qualityPhotos.length > 0) {
+      const avgWidth = Math.round(qualityPhotos.reduce((sum, p) => sum + p.width, 0) / qualityPhotos.length);
+      console.log(`📏 Average width: ${avgWidth}px`);
+    }
+    
+    res.json({
+      photos: qualityPhotos,
+      total: qualityPhotos.length,
+      message: `Top ${qualityPhotos.length} best quality hotel photos`,
+    });
+    
+  } catch (error) {
+    console.error('Failed to fetch onboarding photos:', error);
+    res.status(500).json({
+      error: 'Failed to fetch photos',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
 app.get('/api/hotels', async (req, res) => {
   try {
     if (!supabaseService) {

@@ -217,6 +217,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
           ],
         },
       });
+      
+      // Persist data immediately
+      get().persistData();
     }
   },
 

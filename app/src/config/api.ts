@@ -56,9 +56,9 @@ async function getDeviceNetworkIP(): Promise<string | null> {
  */
 const configs: Record<Environment, Partial<ApiConfig>> = {
   development: {
-    // NOTE: Update this IP to match your server's network IP
-    // Check your server startup logs for the correct IP address
-    baseUrl: 'http://192.168.1.102:3001', // UPDATED TO CURRENT NETWORK IP
+    // NOTE: localhost works reliably for development
+    // Network IP provided as fallback for iOS device testing
+    baseUrl: 'http://localhost:3001', // Primary: localhost for development
     timeout: 30000,
     retryAttempts: 3,
     retryDelay: 1000,
@@ -79,18 +79,42 @@ const configs: Record<Environment, Partial<ApiConfig>> = {
 
 /**
  * Get API configuration based on current environment
+ * Automatically finds the best available API URL
  */
-export function getApiConfig(): ApiConfig {
+export async function getApiConfig(): Promise<ApiConfig> {
   const env = getEnvironment();
   const envConfig = configs[env];
-  
-  return {
+
+  // Get base configuration
+  const config: ApiConfig = {
     baseUrl: envConfig.baseUrl || configs.development.baseUrl!,
     timeout: envConfig.timeout || 30000,
     retryAttempts: envConfig.retryAttempts || 3,
     retryDelay: envConfig.retryDelay || 1000,
     environment: env,
   };
+
+  // In development, try to find the best available URL
+  if (env === 'development') {
+    try {
+      console.log('🔍 Finding best API URL...');
+      const primaryUrl = config.baseUrl;
+      const fallbackUrls = getFallbackUrls();
+
+      const { url: bestUrl } = await findBestApiUrl(primaryUrl, fallbackUrls);
+
+      if (bestUrl !== primaryUrl) {
+        console.log(`✅ Using best available URL: ${bestUrl}`);
+        config.baseUrl = bestUrl;
+      } else {
+        console.log(`✅ Using primary URL: ${bestUrl}`);
+      }
+    } catch (error) {
+      console.warn('⚠️  Failed to find best API URL, using configured URL:', error);
+    }
+  }
+
+  return config;
 }
 
 /**
@@ -152,10 +176,11 @@ export function getFallbackUrls(): string[] {
   const env = getEnvironment();
   
   if (env === 'development') {
-    // Try common development URLs
+    // Try common development URLs in order of preference
     return [
-      'http://localhost:3001',
-      'http://127.0.0.1:3001',
+      'http://localhost:3001',        // Primary: localhost (works in simulator)
+      'http://127.0.0.1:3001',       // Secondary: loopback
+      'http://192.168.1.105:3001',   // Tertiary: current network IP
       // Add other common local IPs if needed
     ];
   }

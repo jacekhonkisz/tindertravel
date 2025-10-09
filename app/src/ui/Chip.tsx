@@ -51,8 +51,9 @@ const Chip: React.FC<ChipProps> = ({
 
   const getTextStyle = (): TextStyle => {
     return {
-      fontSize: 13,
+      fontSize: theme.typography?.captionSize || 13,
       fontWeight: '500',
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
       color: selected ? '#FFFFFF' : theme.textPrimary,
     };
   };

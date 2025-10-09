@@ -48,12 +48,22 @@ const Card: React.FC<CardProps> = ({
     }
   };
 
+  // Fake glass panel style (pre-rendered background, not live blur)
+  const getGlassStyle = (): ViewStyle => {
+    return {
+      backgroundColor: theme.glassBg || 'rgba(255,255,255,0.65)',
+      borderWidth: 1,
+      borderColor: theme.glassBorder || 'rgba(255,255,255,0.4)',
+      ...theme.shadow.subtle,
+    };
+  };
+
   if (withBlur) {
     return (
       <BlurView
         intensity={blurIntensity}
         tint="systemThinMaterial"
-        style={[getCardStyle(), style]}
+        style={[getCardStyle(), getGlassStyle(), style]}
         {...props}
       >
         {children}

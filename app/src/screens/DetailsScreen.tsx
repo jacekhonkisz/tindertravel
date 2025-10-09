@@ -23,6 +23,7 @@ import IOSHaptics from '../utils/IOSHaptics';
 import HotelMapView from '../components/HotelMapView';
 import { useTheme } from '../theme';
 import { Button, Card, Chip } from '../ui';
+import { getImageSource } from '../utils/imageUtils';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -115,7 +116,7 @@ const DetailsScreen: React.FC = () => {
     if (hotel.photos.length <= 1) {
       return (
         <Image
-          source={{ uri: hotel.heroPhoto }}
+          source={getImageSource(hotel.heroPhoto)}
           style={[styles.singlePhoto, { height: dimensions.photoHeight }]}
           contentFit="cover"
         />
@@ -145,7 +146,7 @@ const DetailsScreen: React.FC = () => {
           {hotel.photos.map((photo, index) => (
             <Image
               key={index}
-              source={{ uri: photo }}
+              source={getImageSource(photo)}
               style={[styles.carouselPhoto, { 
                 height: dimensions.photoHeight,
                 width: SCREEN_WIDTH 

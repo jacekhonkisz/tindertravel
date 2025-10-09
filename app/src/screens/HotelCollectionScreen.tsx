@@ -17,6 +17,7 @@ import {
   RootStackParamList, HotelCard } from '../types';
 import {
   useAppStore } from '../store';
+import { getImageSource } from '../utils/imageUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -76,7 +77,7 @@ const HotelCollectionScreen: React.FC = () => {
       onLongPress={() => handleRemoveHotel(hotel.id)}
     >
       <Image
-        source={{ uri: hotel.heroPhoto }}
+        source={getImageSource(hotel.heroPhoto)}
         style={styles.hotelImage}
         contentFit="cover"
       />

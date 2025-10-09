@@ -18,6 +18,7 @@ import { RootStackParamList, HotelCard } from '../types';
 import { useAppStore } from '../store';
 import { useTheme } from '../theme';
 import { Button, Card, Chip } from '../ui';
+import { getImageSource } from '../utils/imageUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 2 cards per row with margins
@@ -92,7 +93,7 @@ const SavedScreen: React.FC = () => {
     >
       <Card variant="surface">
         <Image
-          source={{ uri: hotel.heroPhoto }}
+          source={getImageSource(hotel.heroPhoto)}
           style={styles.hotelImage}
           contentFit="cover"
         />
@@ -132,7 +133,7 @@ const SavedScreen: React.FC = () => {
       onLongPress={() => handleRemoveHotel(hotel.id, type)}
     >
       <Image
-        source={{ uri: hotel.heroPhoto }}
+        source={getImageSource(hotel.heroPhoto)}
         style={styles.compactHotelImage}
         contentFit="cover"
       />
@@ -221,14 +222,17 @@ const SavedScreen: React.FC = () => {
       alignItems: 'center',
     },
     headerTitle: {
-      fontSize: 22,
+      fontSize: theme.typography?.titleSize || 22,
       fontWeight: '600',
       color: theme.textPrimary,
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
+      lineHeight: theme.typography?.titleLineHeight || 28,
     },
     userEmail: {
-      fontSize: 13,
+      fontSize: theme.typography?.captionSize || 13,
       color: theme.textSecondary,
       marginTop: 2,
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
     },
     headerRight: {
       width: 80,
@@ -266,16 +270,19 @@ const SavedScreen: React.FC = () => {
       fontWeight: '600',
       color: theme.textPrimary,
       marginBottom: theme.spacing.xs,
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
     },
     hotelLocation: {
-      fontSize: 13,
+      fontSize: theme.typography?.captionSize || 13,
       color: theme.textSecondary,
       marginBottom: theme.spacing.xs,
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
     },
     hotelPrice: {
-      fontSize: 13,
+      fontSize: theme.typography?.captionSize || 13,
       color: theme.accent,
       fontWeight: '500',
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
     },
     typeIndicator: {
       position: 'absolute',
@@ -312,11 +319,13 @@ const SavedScreen: React.FC = () => {
       fontSize: 24,
       fontWeight: '600',
       marginBottom: theme.spacing.xs,
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
     },
     statLabel: {
       color: theme.textSecondary,
-      fontSize: 13,
+      fontSize: theme.typography?.captionSize || 13,
       textAlign: 'center',
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
     },
     statDivider: {
       width: 1,
@@ -335,13 +344,15 @@ const SavedScreen: React.FC = () => {
       color: theme.textPrimary,
       textAlign: 'center',
       marginBottom: theme.spacing.l,
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
     },
     emptyDescription: {
-      fontSize: 17,
+      fontSize: theme.typography?.bodySize || 17,
       color: theme.textSecondary,
       textAlign: 'center',
-      lineHeight: 24,
+      lineHeight: theme.typography?.bodyLineHeight || 24,
       marginBottom: theme.spacing.xl,
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
     },
     categorySection: {
       marginBottom: theme.spacing.xl,
@@ -355,8 +366,10 @@ const SavedScreen: React.FC = () => {
     },
     categoryTitle: {
       color: theme.textPrimary,
-      fontSize: 22,
+      fontSize: theme.typography?.titleSize || 22,
       fontWeight: '600',
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
+      lineHeight: theme.typography?.titleLineHeight || 28,
     },
     seeAllButton: {
       backgroundColor: theme.chipBg,
@@ -481,6 +494,7 @@ const SavedScreen: React.FC = () => {
       fontWeight: '600',
       color: theme.textPrimary,
       marginBottom: theme.spacing.xl,
+      letterSpacing: theme.typography?.letterSpacing || 0.01,
     },
     hotelsGrid: {
       flexDirection: 'row',
@@ -509,7 +523,7 @@ const SavedScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar 
-        barStyle="light-content" 
+        barStyle="dark-content" 
         backgroundColor={theme.bg} 
       />
       
@@ -557,13 +571,13 @@ const SavedScreen: React.FC = () => {
       {totalSaved === 0 ? (
         // Empty state
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>Your Profile is Empty</Text>
+          <Text style={styles.emptyTitle}>Your journey awaits ✦</Text>
           <Text style={styles.emptyDescription}>
-            Start discovering amazing hotels to build your collection!{'\n'}
-            Swipe right to like, swipe down to super like.
+            Start swiping to discover boutique hotels that speak to you.{'\n'}
+            Like what you see? Save it for later. Love it? Give it a superlike.
           </Text>
           <Button
-            title="Discover Hotels"
+            title="Start Discovering"
             onPress={() => navigation.goBack()}
             variant="primary"
           />
@@ -593,8 +607,8 @@ const SavedScreen: React.FC = () => {
               >
                 {savedHotels.superliked.length === 0 ? (
                   <View style={styles.emptyRowMessage}>
-                    <Text style={styles.emptyRowText}>No super liked hotels yet</Text>
-                    <Text style={styles.emptyRowSubtext}>Swipe down on hotels you absolutely love!</Text>
+                    <Text style={styles.emptyRowText}>Your favorites will appear here</Text>
+                    <Text style={styles.emptyRowSubtext}>Swipe down on hotels that make your heart skip ♡</Text>
                   </View>
                 ) : (
                   savedHotels.superliked.map(hotel => renderCompactHotelCard(hotel, 'superlike'))
@@ -630,8 +644,8 @@ const SavedScreen: React.FC = () => {
               >
                 {savedHotels.liked.length === 0 ? (
                   <View style={styles.emptyRowMessage}>
-                    <Text style={styles.emptyRowText}>No liked hotels yet</Text>
-                    <Text style={styles.emptyRowSubtext}>Swipe right on hotels you like!</Text>
+                    <Text style={styles.emptyRowText}>Hotels you like live here</Text>
+                    <Text style={styles.emptyRowSubtext}>Swipe right when something catches your eye</Text>
                   </View>
                 ) : (
                   savedHotels.liked.map(hotel => renderCompactHotelCard(hotel, 'like'))
