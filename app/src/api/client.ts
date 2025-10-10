@@ -276,6 +276,155 @@ class ApiClient {
     });
   }
 
+  // USER METRICS ENDPOINTS
+
+  // Save user preferences to database
+  async saveUserPreferences(data: {
+    userId: string;
+    countryAffinity: Record<string, number>;
+    amenityAffinity: Record<string, number>;
+    seenHotels: string[];
+  }): Promise<{ success: boolean; message?: string; error?: string }> {
+    return this.request('/api/user/preferences', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Load user preferences from database
+  async loadUserPreferences(userId: string): Promise<{
+    success: boolean;
+    preferences?: {
+      countryAffinity: Record<string, number>;
+      amenityAffinity: Record<string, number>;
+      seenHotels: string[];
+      lastUpdated: string;
+    } | null;
+    error?: string;
+  }> {
+    return this.request(`/api/user/preferences?userId=${encodeURIComponent(userId)}`);
+  }
+
+  // Save user interaction (swipe action)
+  async saveUserInteraction(data: {
+    userId: string;
+    hotelId: string;
+    actionType: 'like' | 'superlike' | 'dismiss';
+    sessionId?: string;
+  }): Promise<{ success: boolean; error?: string }> {
+    return this.request('/api/user/interactions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Save hotel to user's saved list
+  async saveUserHotel(data: {
+    userId: string;
+    hotelId: string;
+    saveType: 'like' | 'superlike';
+    hotelData: HotelCard;
+  }): Promise<{ success: boolean; error?: string }> {
+    return this.request('/api/user/saved-hotels', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Load user's saved hotels
+  async loadUserSavedHotels(
+    userId: string,
+    type?: 'like' | 'superlike'
+  ): Promise<{
+    success: boolean;
+    hotels: HotelCard[];
+    error?: string;
+  }> {
+    const url = type
+      ? `/api/user/saved-hotels?userId=${encodeURIComponent(userId)}&type=${type}`
+      : `/api/user/saved-hotels?userId=${encodeURIComponent(userId)}`;
+    return this.request(url);
+  }
+
+  // Remove hotel from saved list
+  async removeUserSavedHotel(
+    userId: string,
+    hotelId: string
+  ): Promise<{ success: boolean; error?: string }> {
+    return this.request(`/api/user/saved-hotels/${userId}/${hotelId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Get user stats
+  async getUserStats(userId: string): Promise<{
+    success: boolean;
+    stats?: {
+      totalInteractions: number;
+      likes: number;
+      superlikes: number;
+      dismisses: number;
+      savedLikes: number;
+      savedSuperlikes: number;
+    };
+    error?: string;
+  }> {
+    return this.request(`/api/user/stats?userId=${encodeURIComponent(userId)}`);
+  }
+
+  // Get personalized hotel recommendations
+  // Changed to POST to avoid HTTP 431 errors with large datasets
+  async getRecommendations(params: {
+    userId: string;
+    limit?: number;
+    offset?: number;
+    countryAffinity?: Record<string, number>;
+    amenityAffinity?: Record<string, number>;
+    seenHotels?: string[];
+    likedHotels?: HotelCard[];
+    superlikedHotels?: HotelCard[];
+  }): Promise<{
+    hotels: HotelCard[];
+    total: number;
+    hasMore: boolean;
+    algorithm: string;
+    algorithmVersion: string;
+    metrics: {
+      averageScore: number;
+      topScore: number;
+      bottomScore: number;
+    };
+  }> {
+    const {
+      userId,
+      limit = 20,
+      offset = 0,
+      countryAffinity = {},
+      amenityAffinity = {},
+      seenHotels = [],
+      likedHotels = [],
+      superlikedHotels = []
+    } = params;
+
+    // Send data in POST body instead of URL to avoid HTTP 431 errors
+    return this.request('/api/hotels/recommendations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        limit,
+        offset,
+        countryAffinity,
+        amenityAffinity,
+        seenHotels,
+        likedHotels,
+        superlikedHotels
+      })
+    });
+  }
+
   // Get real hotel photos for a city using Google Places
   async getCityPhotos(cityName: string, limit: number = 6): Promise<{
     city: string;

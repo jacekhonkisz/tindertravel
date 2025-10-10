@@ -62,12 +62,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
   isVerifyingOTP: false,
   otpEmail: null,
 
-  // Load hotels from API
+  // Load hotels from API using recommendation algorithm
   loadHotels: async (refresh = false) => {
     const state = get();
-    
+
     if (state.loading) return;
-    
+
     set({ loading: true, error: null });
 
     try {
@@ -75,60 +75,53 @@ export const useAppStore = create<AppStore>((set, get) => ({
       if (state.hotels.length === 0 && !refresh) {
         console.log('🔍 First load - validating API connection...');
         const validation = await apiClient.validateConnection();
-        
+
         if (!validation.connected) {
-          set({ 
+          set({
             error: `Cannot connect to server: ${validation.message}. Please check server is running and IP is correct.`,
-            loading: false 
+            loading: false
           });
           return;
         }
       }
-      
-      const offset = refresh ? 0 : state.hotels.length;
-      const response = await apiClient.getHotels({
-        limit: 20,
-        offset,
-        personalization: state.personalization,
-      });
 
-      if (response.message && response.hotels.length === 0) {
-        // Database not seeded
-        set({ 
-          error: response.message,
-          loading: false 
+      const offset = refresh ? 0 : state.hotels.length;
+
+      // Use recommendation algorithm if we have personalization data
+      let response;
+      if (Object.keys(state.personalization.countryAffinity).length > 0 ||
+          Object.keys(state.personalization.amenityAffinity).length > 0 ||
+          state.personalization.seenHotels.length > 0) {
+
+        console.log('🎯 Using recommendation algorithm with personalization data');
+        response = await apiClient.getRecommendations({
+          userId: state.user?.id || 'anonymous',
+          limit: 20,
+          offset,
+          countryAffinity: state.personalization.countryAffinity,
+          amenityAffinity: state.personalization.amenityAffinity,
+          seenHotels: state.personalization.seenHotels,
+          likedHotels: state.savedHotels.liked,
+          superlikedHotels: state.savedHotels.superliked
+        });
+      } else {
+        console.log('🔄 Using basic hotel fetch (no personalization data)');
+        response = await apiClient.getHotels({
+          limit: 20,
+          offset,
+          personalization: state.personalization,
+        });
+      }
+
+      if (response.hotels.length === 0) {
+        set({
+          error: 'No hotels available',
+          loading: false
         });
         return;
       }
 
       let hotelsToAdd = response.hotels;
-
-      // DEV MODE: Create infinite loop of hotels by duplicating them
-      if (response.hotels.length > 0) {
-        const baseHotels = response.hotels;
-        
-        // If we don't have more hotels from API, or if we're loading additional batches
-        if (!response.hasMore || !refresh) {
-          // Calculate how many loops we need to create ~20 hotels
-          const targetCount = 20;
-          const loopCount = Math.ceil(targetCount / baseHotels.length);
-          
-          hotelsToAdd = [];
-          const currentTime = Date.now();
-          
-          for (let i = 0; i < loopCount; i++) {
-            const duplicatedHotels = baseHotels.map((hotel, hotelIndex) => ({
-              ...hotel,
-              // Create unique ID using timestamp, loop iteration, and hotel index
-              id: `${hotel.id}-${currentTime}-${i}-${hotelIndex}`,
-            }));
-            hotelsToAdd.push(...duplicatedHotels);
-          }
-          
-          // Trim to exactly the target count
-          hotelsToAdd = hotelsToAdd.slice(0, targetCount);
-        }
-      }
 
       // Preload hero images for better performance
       const heroImages = hotelsToAdd.map(hotel => hotel.heroPhoto);
@@ -136,15 +129,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       set({
         hotels: refresh ? hotelsToAdd : [...state.hotels, ...hotelsToAdd],
-        hasMore: true, // Always true in dev mode for infinite scrolling
+        hasMore: response.hasMore || false,
         currentIndex: refresh ? 0 : state.currentIndex,
         loading: false,
       });
+
+      // Log recommendation metrics if available
+      if (response.metrics) {
+        console.log(`📊 Recommendation metrics: avg=${response.metrics.averageScore.toFixed(2)}, top=${response.metrics.topScore.toFixed(2)}, algorithm=${response.algorithm}`);
+      }
     } catch (error) {
       console.error('Failed to load hotels:', error);
-      set({ 
+      set({
         error: error instanceof Error ? error.message : 'Failed to load hotels',
-        loading: false 
+        loading: false
       });
     }
   },
@@ -156,6 +154,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
     
     if (!hotel) return;
 
+    const userId = state.user?.id;
+
     // Update seen hotels
     const newSeenHotels = [...state.personalization.seenHotels, hotelId];
     
@@ -163,7 +163,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
     if (action !== 'details') {
       get().updatePersonalization(hotel.country, hotel.amenityTags, action);
       
-      // Send to API for server-side tracking
+      // Track interaction in database
+      if (userId) {
+        try {
+          await apiClient.saveUserInteraction({
+            userId,
+            hotelId,
+            actionType: action as 'like' | 'dismiss' | 'superlike',
+          });
+        } catch (error) {
+          console.warn('Failed to track interaction:', error);
+        }
+      }
+      
+      // Send to API for server-side tracking (legacy)
       try {
         await apiClient.updatePersonalization({
           hotelId,
@@ -204,6 +217,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   // Save hotel to favorites
   saveHotel: (hotel: HotelCard, type: 'like' | 'superlike') => {
     const state = get();
+    const userId = state.user?.id;
     const existingIndex = state.savedHotels[type === 'like' ? 'liked' : 'superliked']
       .findIndex(h => h.id === hotel.id);
 
@@ -218,6 +232,18 @@ export const useAppStore = create<AppStore>((set, get) => ({
         },
       });
       
+      // Save to database
+      if (userId) {
+        apiClient.saveUserHotel({
+          userId,
+          hotelId: hotel.id,
+          saveType: type,
+          hotelData: hotel,
+        }).catch(error => {
+          console.warn('Failed to save hotel to database:', error);
+        });
+      }
+      
       // Persist data immediately
       get().persistData();
     }
@@ -226,6 +252,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   // Remove saved hotel
   removeSavedHotel: (hotelId: string, type: 'like' | 'superlike') => {
     const state = get();
+    const userId = state.user?.id;
     const key = type === 'like' ? 'liked' : 'superliked';
     
     set({
@@ -234,6 +261,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
         [key]: state.savedHotels[key].filter(h => h.id !== hotelId),
       },
     });
+    
+    // Remove from database
+    if (userId) {
+      apiClient.removeUserSavedHotel(userId, hotelId).catch(error => {
+        console.warn('Failed to remove hotel from database:', error);
+      });
+    }
     
     get().persistData();
   },
@@ -304,10 +338,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  // Persist data to AsyncStorage
+  // Persist data to AsyncStorage and sync to database
   persistData: async () => {
     try {
       const state = get();
+      const userId = state.user?.id;
+      
+      // Save to AsyncStorage
       await Promise.all([
         AsyncStorage.setItem(
           STORAGE_KEYS.PERSONALIZATION,
@@ -318,6 +355,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
           JSON.stringify(state.savedHotels)
         ),
       ]);
+      
+      // Sync to database if user is logged in
+      if (userId) {
+        try {
+          await apiClient.saveUserPreferences({
+            userId,
+            countryAffinity: state.personalization.countryAffinity,
+            amenityAffinity: state.personalization.amenityAffinity,
+            seenHotels: state.personalization.seenHotels,
+          });
+        } catch (error) {
+          console.warn('Failed to sync preferences to database:', error);
+        }
+      }
     } catch (error) {
       console.error('Failed to persist data:', error);
     }
@@ -396,6 +447,37 @@ export const useAppStore = create<AppStore>((set, get) => ({
           AsyncStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.token),
           AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user)),
         ]);
+        
+        // Load user preferences from database
+        try {
+          const prefsResult = await apiClient.loadUserPreferences(response.user.id);
+          if (prefsResult.success && prefsResult.preferences) {
+            console.log('✅ Loaded user preferences from database');
+            set({
+              personalization: {
+                countryAffinity: prefsResult.preferences.countryAffinity,
+                amenityAffinity: prefsResult.preferences.amenityAffinity,
+                seenHotels: prefsResult.preferences.seenHotels,
+              },
+            });
+          }
+          
+          // Load saved hotels from database
+          const savedResult = await apiClient.loadUserSavedHotels(response.user.id);
+          if (savedResult.success && savedResult.hotels) {
+            const liked = savedResult.hotels.filter((h: any) => h.saveType === 'like');
+            const superliked = savedResult.hotels.filter((h: any) => h.saveType === 'superlike');
+            console.log(`✅ Loaded ${liked.length} liked and ${superliked.length} superliked hotels`);
+            set({
+              savedHotels: {
+                liked,
+                superliked,
+              },
+            });
+          }
+        } catch (error) {
+          console.warn('Failed to load user data from database:', error);
+        }
         
         // Set auth token in API client
         apiClient.setAuthToken(response.token);

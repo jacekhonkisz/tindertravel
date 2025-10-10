@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 import { AmadeusClient } from './amadeus';
 import DatabaseService from './database';
 import { GooglePlacesClient } from './google-places';
-import { SupabaseService } from './supabase';
+import { SupabaseService, supabase } from './supabase';
 import { HotelCard, PersonalizationData } from './types';
 import { glintzCurate, RawHotel } from './curation';
 import { SupabaseHotel } from './supabase';
@@ -235,8 +235,9 @@ app.post('/api/auth/verify-otp', async (req, res) => {
     }
 
     // Create a simple user object and token
+    // Using a fixed UUID for test user (compatible with database)
     const user = {
-      id: 'test-user-id',
+      id: '123e4567-e89b-12d3-a456-426614174000', // UUID format
       email: 'test@glintz.io',
       name: 'Test User',
     };
@@ -283,7 +284,7 @@ app.get('/api/auth/verify-token', async (req, res) => {
     res.json({
       valid: true,
       user: {
-        id: 'test-user-id',
+        id: '123e4567-e89b-12d3-a456-426614174000', // UUID format
         email: 'test@glintz.io',
         name: 'Test User',
       },
@@ -293,6 +294,144 @@ app.get('/api/auth/verify-token', async (req, res) => {
     res.status(500).json({
       valid: false,
       error: 'Internal server error',
+    });
+  }
+});
+
+// Get personalized hotel recommendations based on user preferences
+app.post('/api/hotels/recommendations', async (req, res) => {
+  try {
+    if (!supabaseService) {
+      return res.status(503).json({
+        error: 'Supabase service not available',
+        message: 'Database service not initialized'
+      });
+    }
+
+    const {
+      userId,
+      limit = 20,
+      offset = 0,
+      countryAffinity = {},
+      amenityAffinity = {},
+      seenHotels = [],
+      likedHotels = [],
+      superlikedHotels = []
+    } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        error: 'User ID is required',
+        message: 'Please provide a valid userId'
+      });
+    }
+
+    const limitNum = parseInt(limit as string);
+    const offsetNum = parseInt(offset as string);
+
+    console.log(`🎯 Personalized recommendations request for user ${userId}`);
+    console.log(`   Limit: ${limitNum}, Offset: ${offsetNum}`);
+    console.log(`   Seen: ${seenHotels.length}, Liked: ${likedHotels.length}, Superliked: ${superlikedHotels.length}`);
+
+    // Get hotels from Supabase
+    const supabaseHotels = await supabaseService.getHotels(limitNum * 2, offsetNum); // Get extra for filtering
+
+    // Convert Supabase format to HotelCard format
+    const hotels: HotelCard[] = supabaseHotels.map(hotel => {
+      // Generate a proper booking URL if none exists
+      let bookingUrl = hotel.booking_url;
+      if (!bookingUrl || bookingUrl.trim() === '') {
+        // Generate a fallback booking.com search URL
+        const searchQuery = encodeURIComponent(`${hotel.name} ${hotel.city}`);
+        bookingUrl = `https://www.booking.com/searchresults.html?ss=${searchQuery}`;
+      }
+
+      // Parse photos into clean URL strings
+      const parsedPhotos = parsePhotoUrls(hotel.photos);
+      const parsedHeroPhoto = hotel.hero_photo
+        ? (typeof hotel.hero_photo === 'string' && hotel.hero_photo.startsWith('{')
+            ? parsePhotoUrls([hotel.hero_photo])[0]
+            : hotel.hero_photo)
+        : (parsedPhotos[0] || '');
+
+      return {
+        id: hotel.id,
+        name: hotel.name,
+        city: hotel.city,
+        country: hotel.country,
+        coords: hotel.coords,
+        price: hotel.price,
+        description: hotel.description || '',
+        amenityTags: hotel.amenity_tags || [],
+        photos: parsedPhotos, // Clean URL strings with metadata!
+        heroPhoto: parsedHeroPhoto, // Clean URL string with metadata!
+        bookingUrl,
+        rating: hotel.rating
+      };
+    });
+
+    // Enhanced personalization data including likes and superlikes
+    const enhancedPersonalization: PersonalizationData & {
+      likedHotels: string[];
+      superlikedHotels: string[];
+    } = {
+      countryAffinity,
+      amenityAffinity,
+      seenHotels: new Set(seenHotels),
+      likedHotels,
+      superlikedHotels
+    };
+
+    // Apply enhanced personalization scoring
+    const scoredHotels = hotels.map(hotel => ({
+      ...hotel,
+      score: calculateEnhancedPersonalizationScore(hotel, enhancedPersonalization)
+    }));
+
+    // Sort by score (highest first)
+    scoredHotels.sort((a, b) => b.score - a.score);
+    const responseHotels = scoredHotels.map(({ score, ...hotel }) => hotel);
+
+    // Get total available hotels count
+    const totalAvailable = await supabaseService.getHotelCount();
+
+    // Add recommendation metadata
+    const recommendationMetadata = {
+      totalAvailable,
+      filteredBy: {
+        seenHotels: seenHotels.length,
+        likedHotels: likedHotels.length,
+        superlikedHotels: superlikedHotels.length
+      },
+      personalization: {
+        topCountries: Object.entries(countryAffinity)
+          .sort(([,a], [,b]) => (b as number) - (a as number))
+          .slice(0, 3)
+          .map(([country, score]) => ({ country, score })),
+        topAmenities: Object.entries(amenityAffinity)
+          .sort(([,a], [,b]) => (b as number) - (a as number))
+          .slice(0, 5)
+          .map(([amenity, score]) => ({ amenity, score }))
+      },
+      algorithm: {
+        version: '2.0',
+        factors: ['rating', 'country_affinity', 'amenity_affinity', 'interaction_history', 'recency_bias'],
+        weights: { rating: 0.4, country: 0.25, amenity: 0.2, interactions: 0.1, recency: 0.05 }
+      }
+    };
+
+    res.json({
+      hotels: responseHotels,
+      metadata: recommendationMetadata,
+      total: responseHotels.length,
+      hasMore: offsetNum + limitNum < totalAvailable
+    });
+
+  } catch (error) {
+    console.error('Failed to get personalized recommendations:', error);
+    res.status(500).json({
+      error: 'Failed to get recommendations',
+      message: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });
@@ -1426,6 +1565,403 @@ app.post('/api/personalization', (req, res) => {
   }
 });
 
+// ==================== USER METRICS & PREFERENCES ENDPOINTS ====================
+
+// Save user preferences to database
+app.post('/api/user/preferences', async (req, res) => {
+  try {
+    if (!supabaseService) {
+      return res.status(503).json({
+        success: false,
+        error: 'Supabase service not available'
+      });
+    }
+
+    const { userId, countryAffinity, amenityAffinity, seenHotels } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'userId is required'
+      });
+    }
+
+    console.log(`💾 Saving preferences for user ${userId}`);
+
+    // Upsert user preferences
+    const { error } = await supabase
+      .from('user_preferences')
+      .upsert({
+        user_id: userId,
+        country_affinity: countryAffinity || {},
+        amenity_affinity: amenityAffinity || {},
+        seen_hotels: seenHotels || [],
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'
+      });
+
+    if (error) {
+      console.error('Failed to save preferences:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to save preferences',
+        message: error.message
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Preferences saved successfully'
+    });
+  } catch (error) {
+    console.error('Failed to save user preferences:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to save preferences',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Load user preferences from database
+app.get('/api/user/preferences', async (req, res) => {
+  try {
+    if (!supabaseService) {
+      return res.status(503).json({
+        success: false,
+        error: 'Supabase service not available'
+      });
+    }
+
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'userId is required'
+      });
+    }
+
+    console.log(`📥 Loading preferences for user ${userId}`);
+
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No preferences found yet
+        return res.json({
+          success: true,
+          preferences: null,
+          message: 'No preferences found for this user'
+        });
+      }
+      console.error('Failed to load preferences:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to load preferences',
+        message: error.message
+      });
+    }
+
+    res.json({
+      success: true,
+      preferences: {
+        countryAffinity: data.country_affinity || {},
+        amenityAffinity: data.amenity_affinity || {},
+        seenHotels: data.seen_hotels || [],
+        lastUpdated: data.updated_at
+      }
+    });
+  } catch (error) {
+    console.error('Failed to load user preferences:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load preferences',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Save user interaction (swipe action)
+app.post('/api/user/interactions', async (req, res) => {
+  try {
+    if (!supabaseService) {
+      return res.status(503).json({
+        success: false,
+        error: 'Supabase service not available'
+      });
+    }
+
+    const { userId, hotelId, actionType, sessionId } = req.body;
+
+    if (!userId || !hotelId || !actionType) {
+      return res.status(400).json({
+        success: false,
+        error: 'userId, hotelId, and actionType are required'
+      });
+    }
+
+    console.log(`👆 Saving interaction: ${userId} ${actionType} ${hotelId}`);
+
+    // Insert interaction
+    const { error } = await supabase
+      .from('user_interactions')
+      .insert({
+        user_id: userId,
+        hotel_id: hotelId,
+        action_type: actionType,
+        session_id: sessionId || null,
+        created_at: new Date().toISOString()
+      });
+
+    if (error) {
+      console.error('Failed to save interaction:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to save interaction',
+        message: error.message
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Interaction saved successfully'
+    });
+  } catch (error) {
+    console.error('Failed to save user interaction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to save interaction',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Save hotel to user's saved list
+app.post('/api/user/saved-hotels', async (req, res) => {
+  try {
+    if (!supabaseService) {
+      return res.status(503).json({
+        success: false,
+        error: 'Supabase service not available'
+      });
+    }
+
+    const { userId, hotelId, saveType, hotelData } = req.body;
+
+    if (!userId || !hotelId || !saveType || !hotelData) {
+      return res.status(400).json({
+        success: false,
+        error: 'userId, hotelId, saveType, and hotelData are required'
+      });
+    }
+
+    console.log(`💝 Saving hotel: ${userId} ${saveType} ${hotelId}`);
+
+    // Upsert saved hotel
+    const { error } = await supabase
+      .from('user_saved_hotels')
+      .upsert({
+        user_id: userId,
+        hotel_id: hotelId,
+        save_type: saveType,
+        hotel_data: hotelData,
+        created_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,hotel_id'
+      });
+
+    if (error) {
+      console.error('Failed to save hotel:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to save hotel',
+        message: error.message
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Hotel saved successfully'
+    });
+  } catch (error) {
+    console.error('Failed to save hotel:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to save hotel',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Load user's saved hotels
+app.get('/api/user/saved-hotels', async (req, res) => {
+  try {
+    if (!supabaseService) {
+      return res.status(503).json({
+        success: false,
+        error: 'Supabase service not available'
+      });
+    }
+
+    const { userId, type } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'userId is required'
+      });
+    }
+
+    console.log(`📚 Loading saved hotels for user ${userId}, type: ${type || 'all'}`);
+
+    let query = supabase
+      .from('user_saved_hotels')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (type) {
+      query = query.eq('save_type', type);
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Failed to load saved hotels:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to load saved hotels',
+        message: error.message
+      });
+    }
+
+    res.json({
+      success: true,
+      hotels: (data || []).map((item: any) => item.hotel_data)
+    });
+  } catch (error) {
+    console.error('Failed to load saved hotels:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load saved hotels',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Remove hotel from saved list
+app.delete('/api/user/saved-hotels/:userId/:hotelId', async (req, res) => {
+  try {
+    if (!supabaseService) {
+      return res.status(503).json({
+        success: false,
+        error: 'Supabase service not available'
+      });
+    }
+
+    const { userId, hotelId } = req.params;
+
+    console.log(`🗑️  Removing saved hotel: ${userId} - ${hotelId}`);
+
+    const { error } = await supabase
+      .from('user_saved_hotels')
+      .delete()
+      .eq('user_id', userId)
+      .eq('hotel_id', hotelId);
+
+    if (error) {
+      console.error('Failed to remove saved hotel:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to remove saved hotel',
+        message: error.message
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Hotel removed successfully'
+    });
+  } catch (error) {
+    console.error('Failed to remove saved hotel:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to remove saved hotel',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Get user stats
+app.get('/api/user/stats', async (req, res) => {
+  try {
+    if (!supabaseService) {
+      return res.status(503).json({
+        success: false,
+        error: 'Supabase service not available'
+      });
+    }
+
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'userId is required'
+      });
+    }
+
+    console.log(`📊 Loading stats for user ${userId}`);
+
+    // Get interaction counts
+    const { data: interactions, error: interactionsError } = await supabase
+      .from('user_interactions')
+      .select('action_type')
+      .eq('user_id', userId);
+
+    if (interactionsError) {
+      console.error('Failed to load interactions:', interactionsError);
+    }
+
+    // Get saved hotel counts
+    const { data: savedHotels, error: savedError } = await supabase
+      .from('user_saved_hotels')
+      .select('save_type')
+      .eq('user_id', userId);
+
+    if (savedError) {
+      console.error('Failed to load saved hotels:', savedError);
+    }
+
+    // Calculate stats
+    const stats = {
+      totalInteractions: interactions?.length || 0,
+      likes: interactions?.filter((i: any) => i.action_type === 'like').length || 0,
+      superlikes: interactions?.filter((i: any) => i.action_type === 'superlike').length || 0,
+      dismisses: interactions?.filter((i: any) => i.action_type === 'dismiss').length || 0,
+      savedLikes: savedHotels?.filter((h: any) => h.save_type === 'like').length || 0,
+      savedSuperlikes: savedHotels?.filter((h: any) => h.save_type === 'superlike').length || 0
+    };
+
+    res.json({
+      success: true,
+      stats
+    });
+  } catch (error) {
+    console.error('Failed to load user stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load user stats',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // Calculate personalization score for a hotel
 function calculatePersonalizationScore(hotel: HotelCard, personalization: PersonalizationData): number {
   // Base score from rating (if available) or default
@@ -1444,11 +1980,65 @@ function calculatePersonalizationScore(hotel: HotelCard, personalization: Person
   const seenPenalty = personalization.seenHotels.has(hotel.id) ? 0.2 : 0;
 
   // Weighted score calculation (matching the spec)
-  const score = 
+  const score =
     0.6 * baseScore +
     0.25 * Math.min(countryScore, 1) + // Normalize to max 1
     0.15 * Math.min(amenityScore, 1) - // Normalize to max 1
     0.2 * seenPenalty;
+
+  return Math.max(0, Math.min(1, score)); // Clamp between 0 and 1
+}
+
+// Enhanced personalization score calculation with interaction history
+function calculateEnhancedPersonalizationScore(
+  hotel: HotelCard,
+  personalization: PersonalizationData & { likedHotels: string[]; superlikedHotels: string[] }
+): number {
+  // Base score from rating (if available) or default
+  const baseScore = hotel.rating ? hotel.rating / 5 : 0.7;
+
+  // Country affinity score
+  const countryScore = personalization.countryAffinity[hotel.country] || 0;
+
+  // Amenity affinity score
+  const amenityTags = hotel.amenityTags || [];
+  const amenityScore = amenityTags.reduce((sum, tag) => {
+    return sum + (personalization.amenityAffinity[tag] || 0);
+  }, 0) / Math.max(amenityTags.length, 1);
+
+  // Interaction history scoring
+  let interactionScore = 0;
+
+  // Superliked hotels get highest boost (direct matches)
+  if (personalization.superlikedHotels.includes(hotel.id)) {
+    interactionScore += 0.8;
+  }
+  // Liked hotels get moderate boost (direct matches)
+  else if (personalization.likedHotels.includes(hotel.id)) {
+    interactionScore += 0.5;
+  }
+  // Hotels in same country as liked hotels get small boost
+  else {
+    const countryLikedCount = personalization.likedHotels.length > 0 ?
+      personalization.likedHotels.filter(id => {
+        // This would need access to other hotels data to check country matches
+        // For now, we'll use a simplified approach
+        return false; // Placeholder - would need hotel lookup
+      }).length / personalization.likedHotels.length : 0;
+
+    interactionScore += countryLikedCount * 0.2;
+  }
+
+  // Seen penalty (should be 0 since we filter out seen hotels, but keeping for completeness)
+  const seenPenalty = personalization.seenHotels.has(hotel.id) ? 0.3 : 0;
+
+  // Enhanced weighted score calculation
+  const score =
+    0.4 * baseScore +
+    0.25 * Math.min(countryScore, 1) +
+    0.15 * Math.min(amenityScore, 1) +
+    0.15 * Math.min(interactionScore, 1) -
+    0.3 * seenPenalty;
 
   return Math.max(0, Math.min(1, score)); // Clamp between 0 and 1
 }
