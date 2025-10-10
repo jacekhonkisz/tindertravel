@@ -81,6 +81,12 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log('🔍 REQUEST:', req.method, req.path, req.body);
+  next();
+});
+
 // Stricter rate limiting for seeding endpoint
 const seedLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
@@ -179,10 +185,40 @@ app.delete('/api/hotels', async (req, res) => {
   }
 });
 
-// SIMPLE DEV AUTHENTICATION ENDPOINTS
+// ==================== PRODUCTION AUTHENTICATION ENDPOINTS ====================
 
-// Simple passwordless auth - always accepts test@glintz.io with OTP 123456
-app.post('/api/auth/request-otp', async (req, res) => {
+import { otpService } from './services/otp-service';
+import { emailService } from './services/email-service';
+import { authService } from './services/auth-service';
+
+// Rate limiter for OTP requests (temporarily disabled for testing)
+// const otpLimiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 1000, // Max 1000 OTP requests per 15 minutes (increased for testing)
+//   keyGenerator: (req) => {
+//     // Use email + IP as key for more granular rate limiting
+//     const email = req.body?.email || 'unknown';
+//     const ip = req.ip || req.connection.remoteAddress || 'unknown';
+//     return `${email}:${ip}`;
+//   },
+//   message: {
+//     success: false,
+//     error: 'Too many OTP requests. Please try again later.'
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
+
+// Temporary: no rate limiting for testing
+const otpLimiter = (req: any, res: any, next: any) => next();
+
+/**
+ * Request OTP code for email authentication
+ * POST /api/auth/request-otp
+ * Body: { email: string }
+ */
+app.post('/api/auth/request-otp', otpLimiter, async (req, res) => {
+  console.log('🚨 OTP ENDPOINT CALLED');
   try {
     const { email } = req.body;
 
@@ -193,20 +229,47 @@ app.post('/api/auth/request-otp', async (req, res) => {
       });
     }
 
-    // In dev mode, only accept test@glintz.io
-    if (email.toLowerCase() !== 'test@glintz.io') {
-      return res.status(400).json({
+    console.log('📧 Processing OTP request for:', email);
+
+    // Generate and store OTP
+    const otpResult = await otpService.createOTP(email);
+
+    if (!otpResult.success) {
+      console.error('❌ Failed to create OTP:', otpResult.error);
+      return res.status(500).json({
         success: false,
-        error: 'Only test@glintz.io is allowed in dev mode',
+        error: otpResult.error || 'Failed to create OTP',
       });
     }
 
+    if (!otpResult.code) {
+      console.error('❌ OTP code not returned from service');
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to generate OTP code',
+      });
+    }
+
+    // Send OTP email
+    console.log('📨 Sending OTP email to:', email);
+    const emailResult = await emailService.sendOTPEmail(email, otpResult.code);
+
+    if (!emailResult.success) {
+      console.error('❌ Failed to send OTP email:', emailResult.error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to send verification email. Please try again.',
+      });
+    }
+
+    console.log('✅ OTP request completed successfully');
     res.json({
       success: true,
-      message: 'OTP sent successfully (dev mode: use 123456)',
+      message: 'Verification code sent to your email',
     });
   } catch (error) {
-    console.error('Request OTP error:', error);
+    console.error('🚨 OTP ENDPOINT ERROR:', error);
+    console.error('🚨 Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -214,44 +277,84 @@ app.post('/api/auth/request-otp', async (req, res) => {
   }
 });
 
-// Verify OTP code - always accepts 123456 for test@glintz.io
+/**
+ * Verify OTP code and authenticate user
+ * POST /api/auth/verify-otp
+ * Body: { email: string, code: string }
+ */
 app.post('/api/auth/verify-otp', async (req, res) => {
   try {
     const { email, code } = req.body;
 
+    console.log('🔍 ============================================');
+    console.log('🔍 OTP VERIFICATION received');
+    console.log('🔍 Email:', email);
+    console.log('🔍 Code length:', code?.length);
+    console.log('🔍 Timestamp:', new Date().toISOString());
+    console.log('🔍 ============================================');
+
+    // Validate input
     if (!email || !code) {
+      console.warn('⚠️  Missing email or code in request');
       return res.status(400).json({
         success: false,
         error: 'Email and code are required',
       });
     }
 
-    // In dev mode, only accept test@glintz.io with OTP 123456
-    if (email.toLowerCase() !== 'test@glintz.io' || code !== '123456') {
+    // Verify OTP
+    const verifyResult = await otpService.verifyOTP(email, code);
+    
+    if (!verifyResult.success) {
+      console.warn('⚠️  OTP verification failed:', verifyResult.error);
       return res.status(400).json({
         success: false,
-        error: 'Invalid email or OTP code',
+        error: verifyResult.error,
+        attemptsRemaining: verifyResult.attemptsRemaining,
       });
     }
 
-    // Create a simple user object and token
-    // Using a fixed UUID for test user (compatible with database)
-    const user = {
-      id: '123e4567-e89b-12d3-a456-426614174000', // UUID format
-      email: 'test@glintz.io',
-      name: 'Test User',
-    };
+    // OTP verified! Now authenticate the user
+    const authResult = await authService.authenticateUser(email);
+    
+    if (!authResult.success || !authResult.user || !authResult.token) {
+      console.error('❌ Failed to authenticate user');
+      return res.status(500).json({
+        success: false,
+        error: 'Authentication failed',
+      });
+    }
 
-    const token = 'dev-token-' + Date.now();
+    // Send welcome email for new users (async, don't wait)
+    if (authResult.user.created_at === authResult.user.last_login_at) {
+      emailService.sendWelcomeEmail(email, authResult.user.name).catch(err => {
+        console.error('Failed to send welcome email:', err);
+      });
+    }
+
+    console.log('✅ ============================================');
+    console.log('✅ OTP VERIFICATION completed successfully');
+    console.log('✅ User ID:', authResult.user.id);
+    console.log('✅ Email:', authResult.user.email);
+    console.log('✅ ============================================');
 
     res.json({
       success: true,
-      user,
-      token,
+      user: {
+        id: authResult.user.id,
+        email: authResult.user.email,
+        name: authResult.user.name,
+        created_at: authResult.user.created_at,
+        last_login_at: authResult.user.last_login_at,
+      },
+      token: authResult.token,
       message: 'Authentication successful',
     });
   } catch (error) {
-    console.error('Verify OTP error:', error);
+    console.error('❌ ============================================');
+    console.error('❌ OTP VERIFICATION failed with error:', error);
+    console.error('❌ ============================================');
+    
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -259,12 +362,22 @@ app.post('/api/auth/verify-otp', async (req, res) => {
   }
 });
 
-// Verify token - always valid for dev tokens
+/**
+ * Verify JWT token
+ * GET /api/auth/verify-token
+ * Headers: Authorization: Bearer <token>
+ */
 app.get('/api/auth/verify-token', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     
+    console.log('🔐 ============================================');
+    console.log('🔐 TOKEN VERIFICATION received');
+    console.log('🔐 Timestamp:', new Date().toISOString());
+    console.log('🔐 ============================================');
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.warn('⚠️  No authorization header or invalid format');
       return res.status(401).json({
         valid: false,
         error: 'No token provided',
@@ -273,27 +386,88 @@ app.get('/api/auth/verify-token', async (req, res) => {
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
-    // In dev mode, accept any token that starts with 'dev-token-'
-    if (!token.startsWith('dev-token-')) {
+    // Verify token
+    const verifyResult = authService.verifyToken(token);
+    
+    if (!verifyResult.valid || !verifyResult.payload) {
+      console.warn('⚠️  Invalid token:', verifyResult.error);
       return res.status(401).json({
         valid: false,
-        error: 'Invalid token',
+        error: verifyResult.error,
       });
     }
+
+    // Get user data
+    const user = await authService.getUserById(verifyResult.payload.userId);
+    
+    if (!user) {
+      console.warn('⚠️  User not found for token');
+      return res.status(401).json({
+        valid: false,
+        error: 'User not found',
+      });
+    }
+
+    console.log('✅ ============================================');
+    console.log('✅ TOKEN VERIFICATION successful');
+    console.log('✅ User ID:', user.id);
+    console.log('✅ ============================================');
 
     res.json({
       valid: true,
       user: {
-        id: '123e4567-e89b-12d3-a456-426614174000', // UUID format
-        email: 'test@glintz.io',
-        name: 'Test User',
+        id: user.id,
+        email: user.email,
+        name: user.name,
       },
     });
   } catch (error) {
-    console.error('Verify token error:', error);
+    console.error('❌ ============================================');
+    console.error('❌ TOKEN VERIFICATION failed with error:', error);
+    console.error('❌ ============================================');
+    
     res.status(500).json({
       valid: false,
       error: 'Internal server error',
+    });
+  }
+});
+
+/**
+ * Get OTP statistics (admin/monitoring endpoint)
+ * GET /api/auth/otp-stats
+ */
+app.get('/api/auth/otp-stats', async (req, res) => {
+  try {
+    const stats = await otpService.getOTPStats();
+    res.json({
+      success: true,
+      stats,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Failed to get OTP stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get OTP statistics',
+    });
+  }
+});
+
+/**
+ * Test email configuration (admin endpoint)
+ * POST /api/auth/test-email
+ */
+app.post('/api/auth/test-email', async (req, res) => {
+  try {
+    const result = await emailService.testConfiguration();
+    res.json(result);
+  } catch (error) {
+    console.error('Failed to test email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to test email configuration',
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 });

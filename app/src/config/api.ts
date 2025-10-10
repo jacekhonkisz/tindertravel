@@ -56,9 +56,8 @@ async function getDeviceNetworkIP(): Promise<string | null> {
  */
 const configs: Record<Environment, Partial<ApiConfig>> = {
   development: {
-    // NOTE: localhost works reliably for development
-    // Network IP provided as fallback for iOS device testing
-    baseUrl: 'http://localhost:3001', // Primary: localhost for development
+    // NOTE: Using network IP for iOS simulator compatibility
+    baseUrl: 'http://192.168.1.105:3001', // Network IP for iOS simulator
     timeout: 30000,
     retryAttempts: 3,
     retryDelay: 1000,
