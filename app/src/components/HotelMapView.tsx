@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert, Platform } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { Ionicons } from '@expo/vector-icons';
+import { HotelCard } from '../types';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types';
+
+// Conditionally import react-native-maps for native platforms only
+let MapView: any;
+let Marker: any;
+let PROVIDER_GOOGLE: any;
+
+try {
+  // Only import on native platforms
+  if (Platform.OS !== 'web') {
+    const maps = require('react-native-maps');
+    MapView = maps.default || maps.MapView;
+    Marker = maps.Marker;
+    PROVIDER_GOOGLE = maps.PROVIDER_GOOGLE;
+  }
+} catch (error) {
+  // MapView will be undefined on web - we'll handle this in the component
+}
 
 interface HotelMapViewProps {
   coords: {
@@ -10,6 +31,7 @@ interface HotelMapViewProps {
   hotelName: string;
   city?: string;
   country?: string;
+  hotel?: HotelCard; // Full hotel data for modal preview
 }
 
 // Custom Pin Marker Component
@@ -20,8 +42,10 @@ const CustomPinMarker = () => (
   </View>
 );
 
-const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, country }) => {
-  const [isDetailedView, setIsDetailedView] = useState(false);
+type HotelMapViewNavigationProp = StackNavigationProp<RootStackParamList>;
+
+const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, country, hotel }) => {
+  const navigation = useNavigation<HotelMapViewNavigationProp>();
   
   // Debug coordinates
   useEffect(() => {
@@ -90,9 +114,9 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
     );
   }
 
-  // Single zoom level - closer view for better detail
-  const latitudeDelta = 0.005;
-  const longitudeDelta = 0.005;
+  // Tighter zoom level for more precise pin positioning
+  const latitudeDelta = 0.002;
+  const longitudeDelta = 0.002;
   
   const mapRegion = {
     latitude: coords.lat,
@@ -101,10 +125,27 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
     longitudeDelta,
   };
   
+  // Show placeholder for web builds
+  if (Platform.OS === 'web' || !MapView) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.sectionTitle}>Location</Text>
+
+        <View style={styles.mapPlaceholder}>
+          <Text style={styles.mapPlaceholderText}>📍 Interactive Map</Text>
+          <Text style={styles.mapPlaceholderSubtext}>Available on mobile app</Text>
+          <TouchableOpacity onPress={handleOpenInMaps}>
+            <Text style={styles.directionsLink}>Get directions in Maps</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Location</Text>
-      
+
       <View style={styles.mapContainer}>
         {/* Interactive MapView with dragging enabled */}
         {/* On iOS: Uses Apple Maps (default, no additional setup needed) */}
@@ -125,6 +166,10 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
           showsTraffic={false}
           showsIndoors={true}
           mapType="standard"
+          moveOnMarkerPress={false}
+          loadingEnabled={true}
+          loadingIndicatorColor="#007AFF"
+          loadingBackgroundColor="#FFFFFF"
           onMapReady={() => {
             console.log('🗺️ Map is ready, coordinates:', coords);
           }}
@@ -145,8 +190,8 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
         </MapView>
       </View>
       
-      <TouchableOpacity style={styles.directionsButton} onPress={handleOpenInMaps}>
-        <Text style={styles.directionsText}>Get Directions</Text>
+      <TouchableOpacity onPress={handleOpenInMaps}>
+        <Text style={styles.directionsLink}>Get directions in Maps</Text>
       </TouchableOpacity>
     </View>
   );
@@ -154,19 +199,21 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 12,
+    marginBottom: 8,
+    marginTop: 20,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FFFFFF',
-    marginBottom: 12,
+    color: '#000000', // Changed from white to black
+    marginBottom: 8,
+    textAlign: 'center',
   },
   mapContainer: {
     height: 200,
     borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 12,
+    marginBottom: 8,
     position: 'relative',
     backgroundColor: '#1a1a1a',
     borderWidth: 1,
@@ -211,18 +258,12 @@ const styles = StyleSheet.create({
     borderTopColor: '#FF3B30',
     marginTop: -1,
   },
-  directionsButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  directionsText: {
-    color: '#FFFFFF',
+  directionsLink: {
+    color: '#8C7B6A',
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 12,
   },
   errorContainer: {
     padding: 20,
@@ -240,6 +281,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#FFFFFF',
     textAlign: 'center',
+  },
+  mapPlaceholder: {
+    height: 200,
+    backgroundColor: '#F8F8F8',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  mapPlaceholderText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  mapPlaceholderSubtext: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
   },
 });
 
