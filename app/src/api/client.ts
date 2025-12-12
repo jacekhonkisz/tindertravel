@@ -230,13 +230,40 @@ class ApiClient {
   }
 
   // Get hotels with personalization
+  // Option to use Partners API instead of Supabase
   async getHotels(params: {
     limit?: number;
     offset?: number;
     personalization?: PersonalizationData;
+    usePartners?: boolean; // Use Partners API instead of Supabase
   } = {}): Promise<HotelsResponse> {
-    const { limit = 20, offset = 0, personalization } = params;
+    const { limit = 20, offset = 0, personalization, usePartners = false } = params;
     
+    // Use local backend's Partners endpoint (has R2 photos integrated)
+    if (usePartners) {
+      const page = Math.floor(offset / limit) + 1;
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        per_page: limit.toString(),
+        status: 'active',
+        include_photos: 'true' // Important: request R2 photos
+      });
+
+      // Use local backend endpoint which has R2 photo mapping
+      console.log('🏨 Fetching hotels from backend Partners endpoint (with R2 photos)...');
+      const response = await this.request(`/api/hotels/partners?${queryParams.toString()}`);
+      
+      console.log(`✅ Loaded ${response.hotels?.length || 0} hotels with photos`);
+      
+      // Response is already in HotelsResponse format from our backend
+      return {
+        hotels: response.hotels || [],
+        total: response.total || 0,
+        hasMore: response.hasMore || false
+      };
+    }
+    
+    // Default: Use Supabase endpoint
     const queryParams = new URLSearchParams({
       limit: limit.toString(),
       offset: offset.toString(),

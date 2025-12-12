@@ -13,6 +13,8 @@ import { HotelDiscoveryController } from './hotel-discovery-controller';
 import { PhotoQualityAuditor } from './photo-quality-auditor';
 import { photoCurationService, CuratedPhoto } from './photo-curation';
 import { displayServerInfo } from './network-utils';
+// // import { LandingPageAPI } from './landing-page-api';
+import { partnersApi } from './services/partnersApi';
 // Load environment variables
 dotenv.config();
 
@@ -55,6 +57,16 @@ try {
   console.error('Failed to initialize Supabase service:', error);
   process.exit(1);
 }
+
+// Initialize Landing Page API
+// let landingPageAPI: LandingPageAPI;
+let landingPageAPI: any = null;
+// try {
+//   landingPageAPI = new LandingPageAPI();
+//   console.log('✅ Landing Page API initialized');
+// } catch (error) {
+//   console.error('Failed to initialize Landing Page API:', error);
+// }
 
 // Initialize Hotel Discovery Controller
 
@@ -236,7 +248,9 @@ app.post('/api/auth/request-otp', otpLimiter, async (req, res) => {
 
     if (!otpResult.success) {
       console.error('❌ Failed to create OTP:', otpResult.error);
-      return res.status(500).json({
+      // Rate limiting should return 400, not 500
+      const isRateLimit = otpResult.error?.includes('Too many OTP requests');
+      return res.status(isRateLimit ? 400 : 500).json({
         success: false,
         error: otpResult.error || 'Failed to create OTP',
       });
@@ -263,9 +277,19 @@ app.post('/api/auth/request-otp', otpLimiter, async (req, res) => {
     }
 
     console.log('✅ OTP request completed successfully');
+    console.log('🔐 ============================================');
+    console.log('🔐 OTP CODE FOR TESTING:');
+    console.log('🔐 Email:', email);
+    console.log('🔐 Code:', otpResult.code);
+    console.log('🔐 Use this code in the app!');
+    console.log('🔐 ============================================');
+    
     res.json({
       success: true,
       message: 'Verification code sent to your email',
+      // Always include debug code for development/testing
+      debugCode: otpResult.code,
+      debugMessage: 'Use this code in the app for testing'
     });
   } catch (error) {
     console.error('🚨 OTP ENDPOINT ERROR:', error);
@@ -273,6 +297,64 @@ app.post('/api/auth/request-otp', otpLimiter, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Internal server error',
+    });
+  }
+});
+
+/**
+ * Get OTP code for testing (development only)
+ * GET /api/auth/debug-otp?email=test@example.com
+ */
+app.get('/api/auth/debug-otp', async (req, res) => {
+  try {
+    const { email } = req.query;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email parameter required'
+      });
+    }
+
+    // Get the most recent OTP for this email
+    const { data: otpRecords, error } = await supabase
+      .from('otp_codes')
+      .select('*')
+      .eq('email', email.toString().toLowerCase())
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (error) {
+      console.error('Error fetching OTP:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch OTP'
+      });
+    }
+
+    if (!otpRecords || otpRecords.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'No valid OTP found. Please request a new code first.'
+      });
+    }
+
+    const otpRecord = otpRecords[0];
+    
+    res.json({
+      success: true,
+      email: email,
+      code: otpRecord.code,
+      expiresAt: otpRecord.expires_at,
+      attempts: otpRecord.attempts,
+      message: 'Use this code in the app for testing'
+    });
+  } catch (error) {
+    console.error('Debug OTP error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
     });
   }
 });
@@ -1337,8 +1419,96 @@ const parsePhotoUrls = (photos: any[]): string[] => {
   }).filter(url => url && url.length > 0); // Remove empty strings
 };
 
-// Get best quality photos for onboarding backgrounds
+// Get random R2 photos from partners for background rotation
 app.get('/api/onboarding/photos', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 30;
+    
+    console.log(`📸 Fetching ${limit} random R2 photos for background rotation...`);
+    
+    // Import R2 photo mapping
+    const { getPartnerR2Photos } = require('./services/r2PhotoMapping');
+    
+    // Fetch all active partners
+    const partnersResponse = await partnersApi.listPartners({
+      page: 1,
+      per_page: 100, // Get all partners
+      status: 'active'
+    });
+    
+    // Collect all R2 photos from all partners
+    const allPhotos: Array<{
+      url: string;
+      width: number;
+      hotelName: string;
+      city: string;
+      country: string;
+      caption: string;
+    }> = [];
+    
+    partnersResponse.partners.forEach((partner: any) => {
+      const r2Photos = getPartnerR2Photos(partner.id);
+      
+      r2Photos.forEach((photoUrl: string) => {
+        const location = partner.location_label || 
+          (partner.city && partner.country_code 
+            ? `${partner.city}, ${partner.country_code}` 
+            : partner.country_code || 'Unknown');
+        
+        const locationParts = location.split(',').map((s: string) => s.trim());
+        const city = partner.city || locationParts[0] || '';
+        const country = partner.country_code || locationParts[1] || location || '';
+        
+        // Optimize image URL for faster loading
+        // For background images, we can use a smaller size
+        // R2 doesn't support transformations, but we can note the optimization
+        // In the future, we could add Cloudflare Images or similar for resizing
+        const optimizedUrl = photoUrl; // Keep original for now, but ready for optimization
+        
+        allPhotos.push({
+          url: optimizedUrl,
+          width: 1920, // Optimized width for backgrounds (1080p is sufficient)
+          hotelName: partner.hotel_name,
+          city,
+          country,
+          caption: `${partner.hotel_name}, ${location}`
+        });
+      });
+    });
+    
+    console.log(`✅ Collected ${allPhotos.length} R2 photos from ${partnersResponse.partners.length} partners`);
+    
+    if (allPhotos.length === 0) {
+      return res.json({
+        photos: [],
+        total: 0,
+        message: 'No R2 photos available'
+      });
+    }
+    
+    // Randomize and take up to limit
+    const shuffled = allPhotos.sort(() => Math.random() - 0.5);
+    const selectedPhotos = shuffled.slice(0, Math.min(limit, allPhotos.length));
+    
+    console.log(`✅ Returning ${selectedPhotos.length} random R2 photos for backgrounds`);
+    
+    res.json({
+      photos: selectedPhotos,
+      total: allPhotos.length,
+      message: `Random selection of ${selectedPhotos.length} photos from ${allPhotos.length} available`
+    });
+    
+  } catch (error) {
+    console.error('Failed to fetch R2 photos for backgrounds:', error);
+    res.status(500).json({
+      error: 'Failed to fetch photos',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Legacy endpoint (kept for compatibility)
+app.get('/api/onboarding/photos-legacy', async (req, res) => {
   try {
     if (!supabaseService) {
       return res.status(503).json({
@@ -1447,6 +1617,43 @@ app.get('/api/onboarding/photos', async (req, res) => {
   }
 });
 
+// Get best photos for landing page mockup
+app.get('/api/landing/photos', async (req, res) => {
+  try {
+    if (!landingPageAPI) {
+      return res.status(503).json({
+        error: 'Landing Page API not available',
+        message: 'Landing Page API not initialized'
+      });
+    }
+
+    const limit = parseInt(req.query.limit as string) || 12;
+    
+    console.log(`🎨 Fetching ${limit} best photos for landing page mockup...`);
+    
+    const photos = await landingPageAPI.getLandingPagePhotos(limit);
+    
+    console.log(`✅ Returning ${photos.length} photos for landing page mockup`);
+    
+    res.json({
+      photos,
+      total: photos.length,
+      message: `Best ${photos.length} photos for landing page showcase`,
+      sources: {
+        hotelbeds: photos.filter((p: any) => p.source === 'hotelbeds').length,
+        google_places: photos.filter((p: any) => p.source === 'google_places').length,
+        curated: photos.filter((p: any) => p.source === 'unsplash').length
+      }
+    });
+  } catch (error) {
+    console.error('Failed to fetch landing page photos:', error);
+    res.status(500).json({
+      error: 'Failed to fetch landing page photos',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 app.get('/api/hotels', async (req, res) => {
   try {
     if (!supabaseService) {
@@ -1541,6 +1748,130 @@ app.get('/api/hotels', async (req, res) => {
     console.error('Failed to fetch hotels:', error);
     res.status(500).json({
       error: 'Failed to fetch hotels',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Partners cache for super-fast responses
+let partnersCache: any = null;
+let partnersCacheTime = 0;
+const PARTNERS_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
+// Get hotels from Partners API (with R2 photos) - OPTIMIZED
+app.get('/api/hotels/partners', async (req, res) => {
+  try {
+    const {
+      page = 1,
+      per_page = 20,
+      status = 'active',
+      country_code,
+      include_photos = 'true'
+    } = req.query;
+
+    const pageNum = parseInt(page as string);
+    const perPageNum = parseInt(per_page as string);
+    const includePhotos = include_photos === 'true';
+
+    const now = Date.now();
+    
+    // Use cached partners if fresh (massive speed improvement)
+    let partnersResponse;
+    if (partnersCache && (now - partnersCacheTime) < PARTNERS_CACHE_DURATION) {
+      console.log('⚡ Using cached partners data');
+      partnersResponse = partnersCache;
+    } else {
+      console.log('🔄 Fetching fresh partners data...');
+      partnersResponse = await partnersApi.listPartners({
+        page: 1,
+        per_page: 100, // Get all partners at once for caching
+        status: 'active'
+      });
+      partnersCache = partnersResponse;
+      partnersCacheTime = now;
+      console.log(`✅ Cached ${partnersResponse.partners.length} partners`);
+    }
+    
+    // Apply pagination from cache
+    const startIdx = (pageNum - 1) * perPageNum;
+    const paginatedPartners = {
+      ...partnersResponse,
+      partners: partnersResponse.partners.slice(startIdx, startIdx + perPageNum)
+    };
+
+    // Convert partners to hotel cards and fetch photos
+    const hotels: HotelCard[] = [];
+
+    // Import R2 photo mapping service (cached in memory)
+    const { getPartnerR2Photos } = require('./services/r2PhotoMapping');
+    
+    // PERFORMANCE: Process partners synchronously (R2 mapping is cached, no async needed)
+    // Images are now compressed (~150KB each), so we can show ALL photos!
+    // No limit needed - even 50 photos = 7.5MB (totally reasonable)
+    
+    const hotelPromises = paginatedPartners.partners.map((partner: any) => {
+      let photos: string[] = [];
+      
+      if (includePhotos) {
+        // R2 photos only (no Dropbox fallback - too slow)
+        const r2Photos = getPartnerR2Photos(partner.id);
+        if (r2Photos.length > 0) {
+          // Show ALL photos - no limit! Images are optimized (~150KB each)
+          photos = r2Photos;
+        }
+      }
+
+      // Use location_label or construct from city/country
+      const location = partner.location_label || 
+        (partner.city && partner.country_code 
+          ? `${partner.city}, ${partner.country_code}` 
+          : partner.country_code || 'Unknown');
+
+      // Split location into city and country
+      const locationParts = location.split(',').map((s: string) => s.trim());
+      const city = partner.city || locationParts[0] || '';
+      const country = partner.country_code || locationParts[1] || location || '';
+
+      // Use website as booking URL
+      const bookingUrl = partner.website || 
+        `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(partner.hotel_name)}`;
+
+      // Use tags as amenity tags
+      const amenityTags = partner.tags || [];
+
+      // Set hero photo (first photo or empty)
+      const heroPhoto = photos.length > 0 ? photos[0] : '';
+
+      return {
+        id: partner.id,
+        name: partner.hotel_name,
+        city,
+        country,
+        address: location,
+        coords: partner.lat && partner.lng ? {
+          lat: partner.lat,
+          lng: partner.lng
+        } : undefined,
+        description: partner.notes || `${partner.hotel_name} - ${location}`,
+        amenityTags,
+        photos,
+        heroPhoto,
+        bookingUrl,
+        rating: undefined
+      };
+    });
+
+    const hotelCards = await Promise.all(hotelPromises);
+
+    res.json({
+      hotels: hotelCards,
+      total: partnersResponse.total,
+      hasMore: partnersResponse.page < partnersResponse.total_pages
+    });
+  } catch (error) {
+    console.error('Failed to fetch partners hotels:', error);
+    res.status(500).json({
+      error: 'Failed to fetch partners hotels',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
   }

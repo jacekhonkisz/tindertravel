@@ -44,6 +44,7 @@ const AuthScreen: React.FC = () => {
   const [otp, setOtp] = useState('');
   const [bgData, setBgData] = useState<BgRotationResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isResending, setIsResending] = useState(false);
 
   // Animations
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -51,48 +52,36 @@ const AuthScreen: React.FC = () => {
   const buttonScaleAnim = useRef(new Animated.Value(1)).current;
   const otpSuccessAnim = useRef(new Animated.Value(1)).current;
 
-  // Load background on mount
+  // Load background on mount - non-blocking for instant UI
   useEffect(() => {
     const loadBackground = async () => {
       try {
-        console.log('🎨 AuthScreen: Loading background...');
-        const bg = await preloadBackground();
-        console.log('🎨 AuthScreen: Background loaded successfully');
-        setBgData(bg);
+        console.log('🎨 AuthScreen: Getting background (non-blocking)...');
+        
+        // Show UI immediately, load background in parallel
         setLoading(false);
+        
+        // Get background data (returns immediately)
+        const bg = await preloadBackground();
+        console.log('🎨 AuthScreen: Background data ready');
+        setBgData(bg);
+        
+        // expo-image will handle loading/caching in the background
+        // UI is already visible, image will fade in when ready
       } catch (error) {
         console.error('🎨 AuthScreen: Failed to load background:', error);
-        // Show error to user and allow them to continue without background
-        Alert.alert(
-          'Background Loading Error',
-          'Could not load background photo. This might be due to network connectivity. You can continue without it or retry.',
-          [
-            {
-              text: 'Continue Anyway',
-              style: 'default',
-              onPress: () => {
-                // Provide a fallback solid color background
-                setBgData({
-                  imageSource: require('../../assets/icon.png'), // Fallback to app icon
-                  index: 0,
-                  caption: 'Photo: Glintz',
-                  hotelName: 'Glintz',
-                });
-                setLoading(false);
-              }
-            },
-            {
-              text: 'Retry',
-              style: 'cancel',
-              onPress: () => {
-                setLoading(true);
-                setTimeout(() => loadBackground(), 500); // Retry after small delay
-              }
-            }
-          ]
-        );
+        // Set fallback but don't block UI
+        setBgData({
+          imageSource: require('../../assets/icon.png'),
+          index: 0,
+          caption: 'Welcome to Glintz',
+          hotelName: 'Glintz',
+        });
+        setLoading(false);
       }
     };
+    
+    // Start loading immediately but don't wait
     loadBackground();
   }, []);
 
@@ -167,10 +156,12 @@ const AuthScreen: React.FC = () => {
 
   // Handle OTP entry
   const handleOTPChange = (text: string) => {
+    console.log('🔢 OTP input changed:', text, 'length:', text.length);
     setOtp(text);
     
     // Auto-submit when 6 digits entered
     if (text.length === 6) {
+      console.log('✅ 6 digits entered, triggering auto-submit...');
       // Success animation
       Animated.sequence([
         Animated.timing(otpSuccessAnim, {
@@ -185,25 +176,40 @@ const AuthScreen: React.FC = () => {
         }),
       ]).start();
       
-      // Trigger login after animation
-      setTimeout(() => handleLogin(), 200);
+      // Trigger login after animation with the current text value
+      setTimeout(() => handleLogin(text), 200);
     }
   };
 
   // Handle login
-  const handleLogin = async () => {
-    if (!otp || otp.length !== 6) {
+  const handleLogin = async (otpCode?: string) => {
+    const currentOtp = otpCode || otp;
+    
+    console.log('🔐 handleLogin called with:');
+    console.log('   otpCode parameter:', otpCode);
+    console.log('   otp state:', otp);
+    console.log('   currentOtp:', currentOtp);
+    console.log('   currentOtp length:', currentOtp?.length);
+    
+    if (!currentOtp || currentOtp.length !== 6) {
+      console.log('❌ OTP validation failed:', { currentOtp, length: currentOtp?.length });
       Alert.alert('Error', 'Please enter the 6-digit code');
       return;
     }
 
     try {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      console.log('🔐 Attempting OTP verification...');
+      console.log('   Email:', email);
+      console.log('   Code:', currentOtp);
 
       // Verify OTP with backend
-      const response = await apiClient.verifyOTP({ email, code: otp });
+      const response = await apiClient.verifyOTP({ email, code: currentOtp });
+
+      console.log('🔐 OTP verification response:', response);
 
       if (response.success && response.user && response.token) {
+        console.log('✅ OTP verification successful!');
+        
         // Store auth data
         await AsyncStorage.setItem('@glintz_auth_token', response.token);
         await AsyncStorage.setItem('@glintz_user_data', JSON.stringify(response.user));
@@ -220,12 +226,38 @@ const AuthScreen: React.FC = () => {
         });
 
         console.log('✅ Authentication successful!');
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
+        console.warn('❌ OTP verification failed:', response.error);
         Alert.alert('Error', response.error || 'Invalid verification code');
       }
     } catch (error) {
-      console.error('Failed to verify OTP:', error);
+      console.error('❌ Failed to verify OTP:', error);
       Alert.alert('Error', 'Failed to verify code. Please try again.');
+    }
+  };
+
+  // Handle resend OTP
+  const handleResendOTP = async () => {
+    if (isResending) return;
+
+    try {
+      setIsResending(true);
+      console.log('📧 Resending OTP to:', email);
+
+      const response = await apiClient.requestOTP({ email });
+
+      if (response.success) {
+        Alert.alert('Code Sent', 'A new verification code has been sent to your email.');
+        setOtp(''); // Clear current OTP
+      } else {
+        Alert.alert('Error', response.error || 'Failed to resend code');
+      }
+    } catch (error) {
+      console.error('Failed to resend OTP:', error);
+      Alert.alert('Error', 'Failed to resend code. Please try again.');
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -253,20 +285,14 @@ const AuthScreen: React.FC = () => {
     }).start();
   };
 
-  if (loading || !bgData) {
-    return (
-      <View style={styles.loadingContainer}>
-        <MonogramGlow 
-          letter="G" 
-          size={120} 
-          tone="light"
-        />
-      </View>
-    );
-  }
-
+  // Show UI immediately - don't block on background loading
+  // Background will fade in when ready via expo-image
+  const backgroundSource = bgData?.imageSource || require('../../assets/icon.png');
+  
+  // Removed loading blocker - UI shows instantly, image loads progressively
+  
   return (
-    <AuthBackground imageSource={bgData.imageSource}>
+    <AuthBackground imageSource={backgroundSource}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
       <SafeAreaView style={styles.container}>
@@ -349,6 +375,18 @@ const AuthScreen: React.FC = () => {
                       </TouchableOpacity>
                     </Animated.View>
 
+                    {/* Resend Code Link */}
+                    <TouchableOpacity
+                      style={styles.resendLink}
+                      onPress={handleResendOTP}
+                      activeOpacity={0.7}
+                      disabled={isResending}
+                    >
+                      <Text style={[styles.resendLinkText, isResending && styles.resendLinkDisabled]}>
+                        {isResending ? 'Sending...' : "Didn't get the code? Resend"}
+                      </Text>
+                    </TouchableOpacity>
+
                     {/* Back to Email Link */}
                     <TouchableOpacity
                       style={styles.backLink}
@@ -384,9 +422,11 @@ const AuthScreen: React.FC = () => {
           </View>
 
           {/* Photo Credit */}
-          <View style={styles.footer}>
-            <Text style={styles.photoCredit}>{bgData.caption || `Photo: ${bgData.hotelName}`}</Text>
-          </View>
+          {bgData && (
+            <View style={styles.footer}>
+              <Text style={styles.photoCredit}>{bgData.caption || `Photo: ${bgData.hotelName}`}</Text>
+            </View>
+          )}
         </KeyboardAvoidingView>
       </SafeAreaView>
     </AuthBackground>
@@ -443,22 +483,22 @@ const styles = StyleSheet.create({
   label: {
     fontSize: FONT_SIZES.label,
     fontWeight: FONT_WEIGHTS.medium,
-    color: '#2E2E2E',
+    color: '#8e775a', // Warm brown color
     marginBottom: SPACING.s,
     letterSpacing: 0,
   },
   input: {
-    backgroundColor: COLOR_INPUT,
+    backgroundColor: 'rgba(255,255,255,0.95)', // Slightly more opaque white
     borderRadius: RADIUS_M,
     padding: 14,
     fontSize: FONT_SIZES.input,
-    color: COLOR_TEXT,
+    color: '#8e775a', // Warm brown text
     marginBottom: SPACING.l,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.08)',
+    borderColor: 'rgba(0,0,0,0.1)',
   },
   primaryButton: {
-    backgroundColor: COLOR_ACCENT,
+    backgroundColor: '#8e775a', // Warm brown button
     borderRadius: RADIUS_M,
     paddingVertical: 14,
     alignItems: 'center',
@@ -470,6 +510,21 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHTS.semibold,
     letterSpacing: 0.2,
   },
+  resendLink: {
+    marginTop: SPACING.m,
+    alignItems: 'center',
+    paddingVertical: SPACING.s,
+  },
+  resendLinkText: {
+    fontSize: FONT_SIZES.link,
+    color: '#8e775a', // Warm brown to match other text
+    fontWeight: FONT_WEIGHTS.medium,
+    letterSpacing: 0,
+  },
+  resendLinkDisabled: {
+    color: COLOR_TEXT_MID,
+    opacity: 0.6,
+  },
   backLink: {
     marginTop: SPACING.l,
     alignItems: 'center',
@@ -477,7 +532,7 @@ const styles = StyleSheet.create({
   },
   backLinkText: {
     fontSize: FONT_SIZES.link,
-    color: COLOR_TEXT_MID,
+    color: '#8e775a', // Warm brown to match other text
     fontWeight: FONT_WEIGHTS.regular,
     letterSpacing: 0,
   },
@@ -496,7 +551,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   legalLink: {
-    color: '#FDBA74',
+    color: '#8e775a', // Warm brown to match other elements
     fontWeight: '600',
     textDecorationLine: 'underline',
   },

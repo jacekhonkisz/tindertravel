@@ -87,31 +87,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       const offset = refresh ? 0 : state.hotels.length;
 
-      // Use recommendation algorithm if we have personalization data
-      let response;
-      if (Object.keys(state.personalization.countryAffinity).length > 0 ||
-          Object.keys(state.personalization.amenityAffinity).length > 0 ||
-          state.personalization.seenHotels.length > 0) {
-
-        console.log('🎯 Using recommendation algorithm with personalization data');
-        response = await apiClient.getRecommendations({
-          userId: state.user?.id || 'anonymous',
-          limit: 20,
-          offset,
-          countryAffinity: state.personalization.countryAffinity,
-          amenityAffinity: state.personalization.amenityAffinity,
-          seenHotels: state.personalization.seenHotels,
-          likedHotels: state.savedHotels.liked,
-          superlikedHotels: state.savedHotels.superliked
-        });
-      } else {
-        console.log('🔄 Using basic hotel fetch (no personalization data)');
-        response = await apiClient.getHotels({
-          limit: 20,
-          offset,
-          personalization: state.personalization,
-        });
-      }
+      // Always use Partners API as main source (Railway production API)
+      // The recommendations endpoint is not available on Railway
+      console.log('🔄 Loading hotels from Partners API...');
+      const response = await apiClient.getHotels({
+        limit: 20,
+        offset,
+        personalization: state.personalization,
+        usePartners: true, // Use Partners API as main source
+      });
 
       if (response.hotels.length === 0) {
         set({

@@ -7,29 +7,18 @@ import {
   Animated,
   Easing,
   Text,
-  Platform,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-  Alert,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { HotelCard, SwipeAction, RootStackParamList } from '../types';
+import MonogramGlow from './MonogramGlow';
 import HotelCardComponent from './HotelCard';
 import IOSHaptics from '../utils/IOSHaptics';
-import IOSBlurView from './IOSBlurView';
-import IOSPerformance from '../utils/IOSPerformance';
-import HotelMapView from './HotelMapView';
-import { useAppStore } from '../store';
 import { useTheme } from '../theme';
-import { Button } from '../ui';
-import { getImageSource } from '../utils/imageUtils';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const SWIPE_THRESHOLD = 120;
+const SWIPE_THRESHOLD = 60; // Further reduced for easier swipe detection
 const SWIPE_OUT_DURATION = 220; // Faster, smoother swipe (was 250ms)
 const DETAILS_ANIMATION_DURATION = 280; // Snappier details animation (was 300ms)
 
@@ -64,215 +53,152 @@ const SwipeDeck: React.FC<SwipeDeckProps> = ({
   const position = useRef(new Animated.ValueXY()).current;
   const rotate = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
-  const detailsTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-  const detailsOpacity = useRef(new Animated.Value(0)).current;
   const insets = useSafeAreaInsets();
   const cardDimensions = getCardDimensions(insets);
   
-  const [showingDetails, setShowingDetails] = useState(false);
-  const [detailsHotel, setDetailsHotel] = useState<HotelCard | null>(null);
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isActivelyGesturing, setIsActivelyGesturing] = useState(false);
-  const photoScrollViewRef = useRef<ScrollView>(null);
+  const gestureTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Centralized Animation Controller
-  const animationController = {
-    // Details animations
-    showDetails: (hotel: HotelCard) => {
-      setDetailsHotel(hotel);
-      setShowingDetails(true);
-      setCurrentPhotoIndex(0);
+  // Preload ALL photos for next cards - makes everything instant
+  useEffect(() => {
+    const preloadAllNextImages = async () => {
+      // Preload ALL photos for current + next 2 cards
+      const cardsToPreload = hotels.slice(currentIndex, currentIndex + 3);
       
-      IOSHaptics.navigationTransition();
+      const allUrls: string[] = [];
       
-      Animated.parallel([
-        Animated.timing(detailsTranslateY, {
-          toValue: 0,
-          duration: DETAILS_ANIMATION_DURATION,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(detailsOpacity, {
-          toValue: 1,
-          duration: DETAILS_ANIMATION_DURATION,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ]).start();
-    },
-
-    hideDetails: () => {
-      setShowingDetails(false);
-      
-      Animated.parallel([
-        Animated.timing(detailsTranslateY, {
-          toValue: SCREEN_HEIGHT,
-          duration: DETAILS_ANIMATION_DURATION,
-          easing: Easing.in(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(detailsOpacity, {
-          toValue: 0,
-          duration: DETAILS_ANIMATION_DURATION,
-          easing: Easing.in(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setDetailsHotel(null);
-      });
-    },
-
-    // Preview animations
-    updateDetailsPreview: (progress: number) => {
-      const detailsPreviewY = SCREEN_HEIGHT - (progress * SCREEN_HEIGHT * 0.6);
-      detailsTranslateY.setValue(detailsPreviewY);
-      detailsOpacity.setValue(progress * 0.9);
-    },
-
-    resetDetailsPreview: () => {
-      detailsTranslateY.setValue(SCREEN_HEIGHT);
-      detailsOpacity.setValue(0);
-    },
-
-    // Card animations
-    animateCardOut: (direction: { x: number; y: number }, action: SwipeAction, onComplete: () => void) => {
-      Animated.parallel([
-        Animated.timing(position, {
-          toValue: direction,
-          duration: SWIPE_OUT_DURATION,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: SWIPE_OUT_DURATION,
-          easing: Easing.in(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ]).start(onComplete);
-    },
-
-    snapCardBack: () => {
-      Animated.parallel([
-        Animated.spring(position, {
-          toValue: { x: 0, y: 0 },
-          damping: 18, // iOS-style spring with 18 damping
-          stiffness: 150,
-          useNativeDriver: true,
-        }),
-        Animated.spring(rotate, {
-          toValue: 0,
-          damping: 18,
-          stiffness: 150,
-          useNativeDriver: true,
-        }),
-        Animated.spring(detailsTranslateY, {
-          toValue: SCREEN_HEIGHT,
-          damping: 18,
-          stiffness: 150,
-          useNativeDriver: true,
-        }),
-        Animated.spring(detailsOpacity, {
-          toValue: 0,
-          damping: 18,
-          stiffness: 150,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        if (detailsHotel && !showingDetails) {
-          setDetailsHotel(null);
+      for (const hotel of cardsToPreload) {
+        if (hotel.photos && hotel.photos.length > 0) {
+          // Collect ALL photos from each card
+          hotel.photos.forEach((photo: string) => {
+            if (photo && photo.length > 0) {
+              allUrls.push(photo);
+            }
+          });
+        } else if (hotel.heroPhoto) {
+          allUrls.push(hotel.heroPhoto);
         }
-      });
-    },
+      }
+      
+      // Preload all in parallel for maximum speed
+      await Promise.all(
+        allUrls.map(url => Image.prefetch(url).catch(() => {}))
+      );
+    };
 
-    // Reset all animations
-    resetAll: () => {
-      position.setValue({ x: 0, y: 0 });
-      rotate.setValue(0);
-      opacity.setValue(1);
-      detailsTranslateY.setValue(SCREEN_HEIGHT);
-      detailsOpacity.setValue(0);
-    }
+    preloadAllNextImages();
+  }, [currentIndex, hotels]);
+
+  // Simple card animation functions
+  const animateCardOut = (direction: { x: number; y: number }, onComplete: () => void) => {
+    Animated.parallel([
+      Animated.timing(position, {
+        toValue: direction,
+        duration: SWIPE_OUT_DURATION,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: SWIPE_OUT_DURATION,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start(onComplete);
+  };
+
+  const snapCardBack = () => {
+    Animated.parallel([
+      Animated.spring(position, {
+        toValue: { x: 0, y: 0 },
+        damping: 18,
+        stiffness: 150,
+        useNativeDriver: true,
+      }),
+      Animated.spring(rotate, {
+        toValue: 0,
+        damping: 18,
+        stiffness: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
   // Reset animations when currentIndex changes
   useEffect(() => {
-    animationController.resetAll();
-    setIsActivelyGesturing(false); // Hide indicators for new card
-    if (showingDetails) {
-      animationController.hideDetails();
+    // Clear any pending gesture timeout
+    if (gestureTimeoutRef.current) {
+      clearTimeout(gestureTimeoutRef.current);
+      gestureTimeoutRef.current = null;
     }
+    
+    // Reset card animations
+    position.setValue({ x: 0, y: 0 });
+    rotate.setValue(0);
+    opacity.setValue(1);
+    setIsActivelyGesturing(false);
   }, [currentIndex]);
 
-const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true, // Always capture gestures
-    onMoveShouldSetPanResponder: (_, gesture: any) => {
-      // Smart gesture detection based on context and gesture type
-      if (showingDetails) {
-        // When details are open, prioritize vertical gestures for closing
-        return Math.abs(gesture.dy) > Math.abs(gesture.dx);
-      } else {
-        // When details are closed, prioritize horizontal gestures for swiping
-        return Math.abs(gesture.dx) > 10 || Math.abs(gesture.dy) > 10;
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (gestureTimeoutRef.current) {
+        clearTimeout(gestureTimeoutRef.current);
       }
-    },
+    };
+  }, []);
 
-    onPanResponderGrant: (_, gesture: any) => {
-      if (showingDetails) return;
+const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (evt) => {
+      // Only capture if it's not a simple tap - let taps pass through to TouchableOpacity
+      // We'll detect taps in onPanResponderRelease instead
+      return false; // Don't capture on start - let TouchableOpacity handle taps
+    },
+    onMoveShouldSetPanResponder: (_, gesture: any) => {
+      // Only capture if there's actual movement (swipe gesture)
+      return Math.abs(gesture.dx) > 5 || Math.abs(gesture.dy) > 5;
+    },
+    onPanResponderTerminationRequest: () => false, // Don't allow other components to steal the gesture
+
+    onPanResponderGrant: () => {
+      // Clear any existing timeout
+      if (gestureTimeoutRef.current) {
+        clearTimeout(gestureTimeoutRef.current);
+      }
       
       // Mark that user is actively gesturing - show indicators
       setIsActivelyGesturing(true);
       
-      const { x0, y0 } = gesture;
-      const cardWidth = SCREEN_WIDTH;
-      const leftZoneWidth = cardWidth * 0.15;
-      const rightZoneWidth = cardWidth * 0.15;
-      
-      // Check if tap is in left or right photo navigation zones
-      if (x0 < leftZoneWidth) {
-        // Left tap - previous photo (not a swipe gesture)
-        const currentHotel = hotels[currentIndex];
-        if (currentHotel && currentHotel.photos && currentHotel.photos.length > 1) {
-          IOSHaptics.buttonPress();
-          setIsActivelyGesturing(false); // This is a tap, not a swipe
-          // Handle photo navigation here - you'll need to add state for current photo index
-        }
-      } else if (x0 > cardWidth - rightZoneWidth) {
-        // Right tap - next photo (not a swipe gesture)
-        const currentHotel = hotels[currentIndex];
-        if (currentHotel && currentHotel.photos && currentHotel.photos.length > 1) {
-          IOSHaptics.buttonPress();
-          setIsActivelyGesturing(false); // This is a tap, not a swipe
-          // Handle photo navigation here - you'll need to add state for current photo index
-        }
-      }
+      // Safety timeout to prevent stuck state
+      gestureTimeoutRef.current = setTimeout(() => {
+        console.log('⚠️ Gesture timeout - forcing reset');
+        setIsActivelyGesturing(false);
+        position.setValue({ x: 0, y: 0 });
+        rotate.setValue(0);
+      }, 5000); // 5 second timeout
     },
 
     onPanResponderMove: (_, gesture: any) => {
       const { dx, dy } = gesture;
       
-      // Update card position (CRITICAL for indicator opacity calculations!)
-      position.setValue({ x: dx, y: dy });
+      // Determine primary gesture direction to avoid conflicts
+      const isHorizontalSwipe = Math.abs(dx) > Math.abs(dy);
+      const isVerticalSwipe = Math.abs(dy) > Math.abs(dx);
       
-      // Calculate rotation based on horizontal movement
-      const rotateValue = dx * 0.1;
-      rotate.setValue(rotateValue);
-      
-      // Handle upward swipe - show details preview
-      if (dy < 0) {
-        const progress = Math.min(Math.abs(dy) / SWIPE_THRESHOLD, 1);
-        animationController.updateDetailsPreview(progress);
-        
-        // Set details hotel for preview
-        if (!detailsHotel) {
-          const currentHotel = hotels[currentIndex];
-          if (currentHotel) {
-            setDetailsHotel(currentHotel);
-          }
-        }
+      if (isHorizontalSwipe) {
+        // Handle horizontal swiping (like/dismiss)
+        position.setValue({ x: dx, y: 0 });
+        const rotateValue = dx * 0.1;
+        rotate.setValue(rotateValue);
+      } else if (isVerticalSwipe) {
+        // Handle vertical swiping (superlike)
+        position.setValue({ x: 0, y: dy });
+        rotate.setValue(0);
       } else {
-        // Reset details preview when not swiping up
-        animationController.resetDetailsPreview();
+        // Small movements - update position normally
+        position.setValue({ x: dx, y: dy });
+        const rotateValue = dx * 0.1;
+        rotate.setValue(rotateValue);
       }
       
       // Provide haptic feedback at threshold
@@ -284,66 +210,88 @@ const panResponder = PanResponder.create({
       }
     },
 
-    onPanResponderRelease: (_, gesture: any) => {
+    onPanResponderRelease: (evt, gesture: any) => {
       const { dx, dy, vx, vy } = gesture;
+      
+      // Clear gesture timeout
+      if (gestureTimeoutRef.current) {
+        clearTimeout(gestureTimeoutRef.current);
+        gestureTimeoutRef.current = null;
+      }
       
       // User released - stop showing indicators immediately
       setIsActivelyGesturing(false);
       
-      if (showingDetails) {
-        // Handle details closing
-        if (dy > SCREEN_HEIGHT * 0.3 || vy > 0.5) {
-          animationController.hideDetails();
-        } else {
-          // Snap back to open position
-          Animated.parallel([
-            Animated.spring(detailsTranslateY, {
-              toValue: 0,
-              useNativeDriver: true,
-            }),
-            Animated.spring(detailsOpacity, {
-              toValue: 1,
-              useNativeDriver: true,
-            }),
-          ]).start();
+      // Check if this was just a tap (very small movement) - if so, handle photo navigation
+      const isTap = Math.abs(dx) < 10 && Math.abs(dy) < 10 && Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3;
+      
+      if (isTap) {
+        // This is a tap - check which side of screen was tapped for photo navigation
+        const tapX = evt.nativeEvent.pageX;
+        const screenMidpoint = SCREEN_WIDTH / 2;
+        
+        // Get current hotel to check if it has multiple photos
+        const currentHotel = hotels[currentIndex];
+        const hasMultiplePhotos = currentHotel && currentHotel.photos && currentHotel.photos.length > 1;
+        
+        if (hasMultiplePhotos) {
+          if (tapX < screenMidpoint) {
+            // Left half tapped - previous photo
+            // We can't directly call HotelCard's handler, so we'll use a ref or event
+            // For now, let's just log - the TouchableOpacity should handle this
+            console.log('📸 Left tap detected (should go to previous photo)');
+          } else {
+            // Right half tapped - next photo
+            console.log('📸 Right tap detected (should go to next photo)');
+          }
         }
+        
+        // For taps, don't do any card animation - just return
+        // The TouchableOpacity in HotelCard should handle the photo navigation
         return;
       }
       
-      // Handle card swiping
-      // Determine swipe action based on direction and velocity
+      // Determine primary gesture direction to avoid conflicts
+      const isHorizontalSwipe = Math.abs(dx) > Math.abs(dy);
+      const isVerticalSwipe = Math.abs(dy) > Math.abs(dx);
+      
+      // Handle card swiping based on primary direction
       let action: SwipeAction | null = null;
       let animateDirection = { x: 0, y: 0 };
 
-      if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(vx) > 0.5) {
+      if (isHorizontalSwipe && (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(vx) > 0.5)) {
         if (dx > 0) {
           // Swipe right - Like
           action = 'like';
-          animateDirection = { x: SCREEN_WIDTH + 100, y: dy };
+          animateDirection = { x: SCREEN_WIDTH + 100, y: 0 };
         } else {
           // Swipe left - Dismiss
           action = 'dismiss';
-          animateDirection = { x: -SCREEN_WIDTH - 100, y: dy };
+          animateDirection = { x: -SCREEN_WIDTH - 100, y: 0 };
         }
-      } else if (dy < -SWIPE_THRESHOLD || vy < -0.5) {
-        // Swipe up - Details (complete the rolling animation)
-        const currentHotel = hotels[currentIndex];
-        if (currentHotel) {
-          animationController.showDetails(currentHotel);
-          // Reset card position
-          position.setValue({ x: 0, y: 0 });
-          rotate.setValue(0);
+      } else if (isVerticalSwipe && (Math.abs(dy) > SWIPE_THRESHOLD || Math.abs(vy) > 0.3)) {
+        if (dy < -SWIPE_THRESHOLD || vy < -0.3) {
+          // Swipe up - Navigate to DetailsScreen
+          console.log('⬆️ Swipe up detected! Opening details for:', hotels[currentIndex]?.name);
+          const currentHotel = hotels[currentIndex];
+          if (currentHotel) {
+            // Navigate to DetailsScreen instead of showing overlay
+            navigation.navigate('Details', { hotel: currentHotel });
+            // Reset card position
+            position.setValue({ x: 0, y: 0 });
+            rotate.setValue(0);
+          }
+          return;
+        } else if (dy > SWIPE_THRESHOLD || vy > 0.5) {
+          // Swipe down - Superlike
+          action = 'superlike';
+          animateDirection = { x: 0, y: SCREEN_HEIGHT + 100 };
         }
-        return;
-      } else if (dy > SWIPE_THRESHOLD || vy > 0.5) {
-        // Swipe down - Superlike
-        action = 'superlike';
-        animateDirection = { x: 0, y: SCREEN_HEIGHT + 100 };
       }
 
       if (action) {
         // Animate card out
-        animationController.animateCardOut(animateDirection, action!, () => {
+        animateCardOut(animateDirection, () => {
           // Trigger swipe callback
           const currentHotel = hotels[currentIndex];
           if (currentHotel) {
@@ -361,7 +309,8 @@ const panResponder = PanResponder.create({
         }
       } else {
         // Snap back to center
-        animationController.snapCardBack();
+        console.log('🔄 Snapping back to center');
+        snapCardBack();
       }
     },
   });
@@ -400,8 +349,8 @@ const panResponder = PanResponder.create({
 
   const getDetailsOpacity = () => {
     return position.y.interpolate({
-      inputRange: [-SWIPE_THRESHOLD, 0],
-      outputRange: [1, 0],
+      inputRange: [-SWIPE_THRESHOLD, -20, 0],
+      outputRange: [1, 0.3, 0],
       extrapolate: 'clamp',
     });
   };
@@ -410,6 +359,8 @@ const panResponder = PanResponder.create({
     const isCurrentCard = index === currentIndex;
     const isNextCard = index === currentIndex + 1;
     const isAfterNextCard = index === currentIndex + 2;
+
+    // Removed excessive debug logging to prevent performance issues
 
     if (index < currentIndex) {
       return null; // Don't render past cards
@@ -467,7 +418,8 @@ const panResponder = PanResponder.create({
         <HotelCardComponent 
           hotel={hotel} 
           navigation={navigation} 
-          isDevelopment={__DEV__} 
+          isDevelopment={__DEV__}
+          onPress={undefined} // Explicitly no tap handler - swipe up is the only way to open details
         />
         
         {/* Swipe indicators - only show on current card during active gesture */}
@@ -522,214 +474,15 @@ const panResponder = PanResponder.create({
     );
   };
 
-  const formatPrice = (price?: { amount: string; currency: string }) => {
-    if (!price) return 'Price on request';
-    
-    const amount = parseFloat(price.amount);
-    const currency = price.currency === 'EUR' ? '€' : price.currency;
-    
-    return `from ${currency}${Math.round(amount)}/night`;
-  };
-
-  const handleBookNow = async () => {
-    if (!detailsHotel) return;
-    
-    // Only check if URL exists, don't validate format
-    if (!detailsHotel.bookingUrl || detailsHotel.bookingUrl.trim() === '') {
-      Alert.alert(
-        'Booking',
-        'This hotel is available for booking. In a real app, this would open the booking page.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
-    
-    console.log('🔗 Attempting to open booking URL:', detailsHotel.bookingUrl);
-    
-    try {
-      // Try to open the URL directly first, as Linking.canOpenURL can be unreliable for web URLs
-      await Linking.openURL(detailsHotel.bookingUrl);
-      console.log('✅ Successfully opened booking URL');
-    } catch (error) {
-      console.error('❌ Failed to open booking URL:', error);
-      // Only show fallback if opening actually fails
-      Alert.alert(
-        'Booking',
-        'This hotel is available for booking. In a real app, this would open the booking page.',
-        [{ text: 'OK' }]
-      );
-    }
-  };
-
-  const renderPhotoCarousel = () => {
-    if (!detailsHotel) return null;
-    
-    if (detailsHotel.photos.length <= 1) {
-      return (
-        <Image
-          source={getImageSource(detailsHotel.heroPhoto)}
-          style={styles.singlePhoto}
-          contentFit="cover"
-        />
-      );
-    }
-
-    return (
-      <ScrollView
-        ref={photoScrollViewRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        scrollEventThrottle={16}
-        decelerationRate="fast"
-        bounces={false}
-        directionalLockEnabled={true}
-        alwaysBounceHorizontal={false}
-        nestedScrollEnabled={true}
-        scrollEnabled={true}
-        onMomentumScrollEnd={(event) => {
-          const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH); // Changed from SCREEN_WIDTH - 40
-          setCurrentPhotoIndex(Math.max(0, Math.min(index, detailsHotel.photos.length - 1)));
-        }}
-        style={styles.photoCarousel}
-      >
-        {detailsHotel.photos.map((photo, index) => (
-          <Image
-            key={index}
-            source={getImageSource(photo)}
-            style={styles.carouselPhoto}
-            contentFit="cover"
-          />
-        ))}
-      </ScrollView>
-    );
-  };
-
-  const renderPhotoDots = () => {
-    if (!detailsHotel || detailsHotel.photos.length <= 1) return null;
-
-    return (
-      <View style={styles.dotsContainer}>
-        {detailsHotel.photos.map((_, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.dot,
-              index === currentPhotoIndex && styles.activeDot,
-            ]}
-            onPress={() => {
-              setCurrentPhotoIndex(index);
-              if (photoScrollViewRef.current) {
-                photoScrollViewRef.current.scrollTo({
-                  x: index * (SCREEN_WIDTH - 40),
-                  animated: true,
-                });
-              }
-            }}
-            accessible={true}
-            accessibilityLabel={`Photo ${index + 1} of ${detailsHotel.photos.length}`}
-            accessibilityRole="button"
-          />
-        ))}
-      </View>
-    );
-  };
-
-  const renderDetailsContent = () => {
-    // Always render the container for smooth animations, but only show content when we have a hotel
-    return (
-      <Animated.View
-        style={[
-          styles.detailsContainer,
-          {
-            transform: [{ translateY: detailsTranslateY }],
-            opacity: detailsOpacity,
-          },
-        ]}
-      >
-        {/* Swipe indicator */}
-        <View style={styles.swipeIndicatorContainer}>
-          <View style={styles.swipeIndicatorBar} />
-        </View>
-
-        {/* Header with close button */}
-        <IOSBlurView 
-          blurType="dark" 
-          blurAmount={20} 
-          style={[styles.detailsHeader, { paddingTop: insets.top }] as any}
-        >
-          <View style={styles.headerContent}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={animationController.hideDetails}
-            >
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
-            <Text style={styles.detailsTitle}>Hotel Details</Text>
-            <View style={styles.headerSpacer} />
-          </View>
-        </IOSBlurView>
-
-        <ScrollView 
-          style={styles.detailsContent} 
-          showsVerticalScrollIndicator={showingDetails}
-          bounces={showingDetails}
-          scrollEnabled={showingDetails}
-          contentContainerStyle={[
-            styles.scrollContentContainer,
-            { paddingBottom: insets.bottom + 20 }
-          ]}
-        >
-          {detailsHotel && (
-            <>
-              {/* Photo Carousel */}
-              <View style={styles.photoSection} pointerEvents="box-none">
-                <View style={styles.photoCarouselContainer} pointerEvents="auto">
-                  {renderPhotoCarousel()}
-                </View>
-                {renderPhotoDots()}
-
-              </View>
-
-              {/* Hotel Information */}
-              <View style={styles.infoSection}>
-                <Text style={styles.hotelName}>{detailsHotel.name}</Text>
-                <Text style={styles.location}>{detailsHotel.city}, {detailsHotel.country}</Text>
-                <Text style={styles.price}>{formatPrice(detailsHotel.price)}</Text>
-              </View>
-
-              {/* Book Now Button - moved after price info */}
-              <View style={styles.bookingSection}>
-                <Button 
-                  title="Book Now" 
-                  onPress={handleBookNow}
-                  variant="primary"
-                  fullWidth
-                />
-              </View>
-
-              {/* Map View (if coordinates available) */}
-              {detailsHotel.coords && (
-                <View style={styles.mapContainer}>
-                  <HotelMapView
-                    coords={detailsHotel.coords}
-                    hotelName={detailsHotel.name}
-                    city={detailsHotel.city}
-                    country={detailsHotel.country}
-                  />
-                </View>
-              )}
-            </>
-          )}
-        </ScrollView>
-      </Animated.View>
-    );
-  };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Loading amazing hotels...</Text>
+        <MonogramGlow 
+          letter="G" 
+          size={120} 
+          tone="light"
+        />
       </View>
     );
   }
@@ -748,7 +501,6 @@ const panResponder = PanResponder.create({
       {hotels.slice(currentIndex, currentIndex + 3).map((hotel, index) =>
         renderCard(hotel, currentIndex + index)
       )}
-      {renderDetailsContent()}
     </View>
   );
 };
@@ -778,12 +530,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#000',
-  },
-  loadingText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
+    backgroundColor: '#FAF8F5',
   },
   emptyContainer: {
     flex: 1,
@@ -854,181 +601,6 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.9)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 5,
-  },
-  detailsContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.95)',
-    zIndex: 100,
-  },
-  swipeIndicatorContainer: {
-    position: 'absolute',
-    top: 10,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 201,
-  },
-  swipeIndicatorBar: {
-    width: 40,
-    height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    borderRadius: 2,
-  },
-  detailsHeader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 200,
-    paddingHorizontal: 20,
-    paddingVertical: 8, // Further reduced for more compact header
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  closeButton: {
-    padding: 8, // Reduced for more compact header
-  },
-  closeButtonText: {
-    fontSize: 24,
-    color: '#fff',
-  },
-  detailsTitle: {
-    color: '#fff',
-    fontSize: 24, // Reduced font size to be less prominent
-    fontWeight: '600', // Slightly lighter weight
-    textAlign: 'center',
-  },
-  headerSpacer: {
-    width: 50,
-  },
-  detailsContent: {
-    flex: 1,
-    paddingHorizontal: 0, // Changed from 20 to 0 for full-screen photos
-    paddingTop: 125, // Increased further to ensure complete clearance
-  },
-  scrollContentContainer: {
-    paddingBottom: 10, // Reduced to prevent excessive bottom space
-    flexGrow: 1,
-  },
-  mapContainer: {
-    marginBottom: 12, // Consistent with other sections
-  },
-  photoSection: {
-    height: 300, // Increased from 200 to 300 for more immersive photos
-    marginBottom: 12, // Consistent with other sections
-    position: 'relative',
-    zIndex: 1, // Ensure photos are above background but below header
-  },
-  singlePhoto: {
-    width: SCREEN_WIDTH, // Changed from SCREEN_WIDTH - 40 to full width
-    height: 300, // Increased from 200 to 300
-  },
-  photoCarousel: {
-    width: SCREEN_WIDTH, // Changed from SCREEN_WIDTH - 40 to full width
-    height: 300, // Increased from 200 to 300
-  },
-  photoCarouselContainer: {
-    width: SCREEN_WIDTH, // Changed from SCREEN_WIDTH - 40 to full width
-    height: 300, // Increased from 200 to 300
-    borderRadius: 0, // Removed border radius for true full-screen
-    overflow: 'hidden',
-  },
-  photoCarouselContent: {
-    alignItems: 'center',
-  },
-  carouselPhoto: {
-    width: SCREEN_WIDTH, // Changed from SCREEN_WIDTH - 40 to full width
-    height: 300, // Increased from 200 to 300
-  },
-  dotsContainer: {
-    position: 'absolute',
-    bottom: 12,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    zIndex: 10,
-    pointerEvents: 'box-none', // Allow touches to pass through container
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    marginHorizontal: 4,
-    pointerEvents: 'auto', // Ensure dots are tappable
-  },
-  activeDot: {
-    backgroundColor: '#fff',
-    width: 8,
-    height: 8,
-  },
-  infoSection: {
-    marginBottom: 12, // Standardized margin
-    paddingHorizontal: 20, // Added back horizontal padding for text content
-  },
-  hotelName: {
-    color: '#fff',
-    fontSize: 28, // Reduced font size
-    fontWeight: 'bold',
-    marginBottom: 6, // Slightly increased for better spacing
-  },
-  location: {
-    color: '#999',
-    fontSize: 16, // Reduced font size
-    marginBottom: 6, // Consistent spacing
-  },
-  price: {
-    color: '#FFD700',
-    fontSize: 20, // Reduced font size
-    fontWeight: 'bold',
-  },
-  section: {
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    color: '#fff',
-    fontSize: 20, // Reduced font size
-    fontWeight: 'bold',
-    marginBottom: 6, // Consistent spacing
-  },
-  description: {
-    color: '#ccc',
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  amenitiesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 6, // Consistent with other spacing
-  },
-  amenityTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginRight: 6,
-    marginBottom: 6,
-  },
-  amenityText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-
-  spacer: {
-    height: 80,
-  },
-  bookingSection: {
-    paddingHorizontal: 20, // Added horizontal padding for button
-    paddingTop: 12, // Standardized margin
-    paddingBottom: 12, // Standardized margin
   },
 
 });

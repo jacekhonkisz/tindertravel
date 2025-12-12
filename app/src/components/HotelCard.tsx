@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useMemo, memo } from 'react';
+import React, { useState, useCallback, useMemo, memo, useEffect } from 'react';
+import { Image as RNImage } from 'react-native';
 import {
   View,
   Text,
@@ -18,7 +19,7 @@ import { useTheme } from '../theme';
 import { GradientOverlay, DebugBadge, Chip } from '../ui';
 import { getImageSource } from '../utils/imageUtils';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface HotelCardProps {
   hotel: HotelCardType;
@@ -31,6 +32,9 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
   const theme = useTheme();
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [photoManagerVisible, setPhotoManagerVisible] = useState(false);
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
+  // Store all preloaded dimensions in a Map to prevent duplicate loading
+  const [dimensionsMap, setDimensionsMap] = useState<Map<string, { width: number; height: number }>>(new Map());
   const fadeAnim = new Animated.Value(1);
 
   const photos = useMemo(() => 
@@ -39,6 +43,68 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
   );
   
   const totalPhotos = useMemo(() => photos.length, [photos.length]);
+
+  // Preload ALL photos AND their dimensions ONCE - prevents flicker and duplicate loading
+  useEffect(() => {
+    const preloadAllPhotos = async () => {
+      if (!photos || photos.length === 0) return;
+      
+      // Preload images and dimensions in parallel
+      const preloadPromises = photos.map(async (photo: string) => {
+        if (!photo || photo.length === 0) return { photo, dimensions: null };
+        
+        // Preload image
+        await Image.prefetch(photo).catch(() => {});
+        
+        // Preload dimensions to prevent flicker
+        const dimensions = await new Promise<{ width: number; height: number } | null>((resolve) => {
+          RNImage.getSize(
+            photo,
+            (width, height) => resolve({ width, height }),
+            () => resolve(null)
+          );
+        });
+        
+        return { photo, dimensions };
+      });
+      
+      const results = await Promise.all(preloadPromises);
+      
+      // Store all dimensions in Map for instant lookup
+      const newDimensionsMap = new Map<string, { width: number; height: number }>();
+      results.forEach(({ photo, dimensions }) => {
+        if (dimensions) {
+          newDimensionsMap.set(photo, dimensions);
+        }
+      });
+      
+      setDimensionsMap(newDimensionsMap);
+      
+      // Set dimensions for current photo immediately (prevents flicker)
+      const currentPhoto = photos[currentPhotoIndex];
+      if (currentPhoto && newDimensionsMap.has(currentPhoto)) {
+        setImageDimensions(newDimensionsMap.get(currentPhoto)!);
+      }
+    };
+    
+    preloadAllPhotos();
+  }, [photos]); // Only run when photos change, not on photo index change
+  
+  // Update dimensions when photo index changes - use preloaded Map (no duplicate loading!)
+  useEffect(() => {
+    const currentPhoto = photos[currentPhotoIndex];
+    if (currentPhoto && dimensionsMap.has(currentPhoto)) {
+      // Use preloaded dimensions - instant, no flicker!
+      const dimensions = dimensionsMap.get(currentPhoto)!;
+      setImageDimensions(dimensions);
+    } else if (currentPhoto) {
+      // Fallback: if dimensions not preloaded yet, set to null (will show with default sizing)
+      setImageDimensions(null);
+    } else {
+      setImageDimensions(null);
+    }
+  }, [currentPhotoIndex, photos, dimensionsMap]);
+
 
   const formatPrice = (price?: { amount: string; currency: string }) => {
     if (!price) return null;
@@ -50,29 +116,17 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
   };
 
   const changePhoto = useCallback((direction: 'next' | 'prev') => {
-    // Haptic feedback
+    // Haptic feedback - instant
     IOSHaptics.buttonPress();
 
-    // Fade animation
-    Animated.sequence([
-      Animated.timing(fadeAnim, {
-        toValue: 0.7,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
+    // INSTANT photo change - no animation delay
+    // Photos are preloaded so they appear immediately
     if (direction === 'next') {
       setCurrentPhotoIndex((prev) => (prev + 1) % totalPhotos);
     } else {
       setCurrentPhotoIndex((prev) => (prev - 1 + totalPhotos) % totalPhotos);
     }
-  }, [totalPhotos, fadeAnim]);
+  }, [totalPhotos]);
 
   const handleLeftTap = useCallback(() => {
     if (totalPhotos > 1) {
@@ -157,19 +211,52 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
     }
   };
 
+  // Get image source with fallback
+  const currentPhoto = photos[currentPhotoIndex];
+  const imageSource = currentPhoto ? getImageSource(currentPhoto) : null;
+  const hasValidImage = imageSource && imageSource.uri && imageSource.uri.length > 0;
+
+  // Smart display based on orientation - use single source of truth to prevent conflicts
+  const isHorizontal = imageDimensions ? (imageDimensions.width > imageDimensions.height) : false;
+  
+  // For vertical images: Use full screen height with 'cover' to fill screen (no black bars)
+  // For horizontal images: Use 60% height with 'cover' for better coverage
+  const imageHeight = isHorizontal ? SCREEN_HEIGHT * 0.6 : SCREEN_HEIGHT;
+  const imageWidth = '100%';
+  const contentFit = 'cover'; // Use 'cover' for both to fill screen completely (no black bars)
+
   return (
     <View style={styles.container}>
-      {/* Photo Carousel */}
-      <Animated.View style={[styles.imageContainer, { opacity: fadeAnim }]}>
-        <Image
-          source={getImageSource(photos[currentPhotoIndex])}
-          style={styles.heroImage}
-          contentFit="cover"
-          transition={200}
-          cachePolicy="memory-disk"
-          recyclingKey={hotel.id}
-        />
-      </Animated.View>
+      {/* Photo Carousel - no fade animation for instant response */}
+      <View style={[
+        styles.imageContainer,
+        { backgroundColor: isHorizontal ? '#1a1a1a' : '#000' } // Background for horizontal images
+      ]}>
+        {hasValidImage ? (
+          <Image
+            source={imageSource}
+            style={[
+              {
+                width: imageWidth,
+                height: imageHeight,
+                alignSelf: 'center',
+                marginTop: isHorizontal ? (SCREEN_HEIGHT - imageHeight) / 2 : 0, // Center horizontal images only
+              }
+            ]}
+            contentFit={contentFit}
+            transition={0}
+            cachePolicy="memory-disk"
+            priority="high"
+          />
+        ) : (
+          // Fallback placeholder - consistent layout prevents jumps
+          <View style={[styles.heroImage, { backgroundColor: '#2a2a2a', justifyContent: 'center', alignItems: 'center' }]}>
+            <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center', padding: 20 }}>
+              {hotel.name}
+            </Text>
+          </View>
+        )}
+      </View>
 
       {/* Left tap area for previous photo */}
       {totalPhotos > 1 && (
@@ -250,11 +337,6 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
         <Text style={styles.profileButtonText}>👤</Text>
       </TouchableOpacity>
 
-      {/* Amadeus Attribution */}
-      <View style={styles.attribution}>
-        <Text style={styles.attributionText}>Data © Amadeus</Text>
-      </View>
-
       {/* Development Photo Manager Button */}
       {isDevelopment && (
         <TouchableOpacity
@@ -310,6 +392,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'absolute',
+    backgroundColor: '#000', // Base background
   },
   heroImage: {
     width: '100%',
@@ -321,20 +404,20 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    width: SCREEN_WIDTH * 0.15, // 15% of screen width
-    zIndex: 1,
+    width: SCREEN_WIDTH * 0.5, // 50% of screen width - left half
+    zIndex: 100, // High z-index to ensure it's above other elements
   },
   rightTapArea: {
     position: 'absolute',
     right: 0,
     top: 0,
     bottom: 0,
-    width: SCREEN_WIDTH * 0.15, // 15% of screen width
-    zIndex: 1,
+    width: SCREEN_WIDTH * 0.5, // 50% of screen width - right half
+    zIndex: 100, // High z-index to ensure it's above other elements (same as left)
   },
   photoIndicators: {
     position: 'absolute',
-    top: 50,
+    top: 70,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -361,8 +444,8 @@ const styles = StyleSheet.create({
   },
   photoCounter: {
     position: 'absolute',
-    top: 20,
-    right: 15,
+    top: 28,
+    right: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -442,21 +525,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.01,
   },
-  attribution: {
-    position: 'absolute',
-    bottom: 12,
-    right: 15,
-  },
-  attributionText: {
-    color: 'rgba(255, 255, 255, 0.5)',
-    fontSize: 10,
-    fontWeight: '400',
-    letterSpacing: 0.02,
-  },
   profileButton: {
     position: 'absolute',
-    top: 20,
-    left: 15,
+    top: 28,
+    left: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     paddingHorizontal: 12,
     paddingVertical: 10,

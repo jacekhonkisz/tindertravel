@@ -56,8 +56,9 @@ async function getDeviceNetworkIP(): Promise<string | null> {
  */
 const configs: Record<Environment, Partial<ApiConfig>> = {
   development: {
-    // NOTE: Using network IP for iOS simulator compatibility
-    baseUrl: 'http://192.168.1.105:3001', // Network IP for iOS simulator
+    // Local backend for app services (auth, user data, etc.)
+    // Partners API (Railway) is called directly in client.ts for hotel data
+    baseUrl: 'http://192.168.1.107:3001',
     timeout: 30000,
     retryAttempts: 3,
     retryDelay: 1000,
@@ -177,9 +178,9 @@ export function getFallbackUrls(): string[] {
   if (env === 'development') {
     // Try common development URLs in order of preference
     return [
-      'http://localhost:3001',        // Primary: localhost (works in simulator)
-      'http://127.0.0.1:3001',       // Secondary: loopback
-      'http://192.168.1.105:3001',   // Tertiary: current network IP
+      'http://192.168.1.107:3001',   // Primary: current network IP
+      'http://localhost:3001',        // Secondary: localhost (works in simulator)
+      'http://127.0.0.1:3001',       // Tertiary: loopback
       // Add other common local IPs if needed
     ];
   }

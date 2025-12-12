@@ -232,3 +232,6 @@ secrets.json
 api-keys.json
 api/.env
 api/.env.*
+# Sync results with R2 URLs
+api/sync-results*.json
+api/sync-results-final.json

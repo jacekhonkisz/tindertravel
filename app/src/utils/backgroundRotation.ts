@@ -1,5 +1,4 @@
 import { ImageSourcePropType } from 'react-native';
-import { Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getApiConfig } from '../config/api';
 
@@ -9,14 +8,14 @@ const BG_LAST_CHANGE_KEY = '@glintz_lastBgChange';
 const BG_PHOTOS_CACHE_KEY = '@glintz_bgPhotosCache';
 const BG_PHOTOS_FETCH_TIME_KEY = '@glintz_bgPhotosFetchTime';
 
-// Rotation interval: 12 hours in milliseconds
-const ROTATION_INTERVAL = 12 * 60 * 60 * 1000;
+// Rotation interval: 6 hours in milliseconds (more frequent updates)
+const ROTATION_INTERVAL = 6 * 60 * 60 * 1000;
 
-// Cache photos list for 24 hours (refresh daily)
-const PHOTOS_CACHE_DURATION = 24 * 60 * 60 * 1000;
+// Cache photos list for 12 hours (refresh twice daily to get new photos)
+const PHOTOS_CACHE_DURATION = 12 * 60 * 60 * 1000;
 
-// Number of best quality photos to fetch
-const PHOTO_POOL_SIZE = 30;
+// Number of random photos to fetch (will use all available if more)
+const PHOTO_POOL_SIZE = 50;
 
 // API Configuration - initialized with default, updated asynchronously
 let API_BASE_URL = 'http://localhost:3001'; // Default fallback
@@ -101,6 +100,14 @@ const fetchBestQualityPhotos = async (): Promise<BgPhoto[]> => {
     if (error instanceof Error) {
       console.error(`❌ Error message: ${error.message}`);
     }
+    
+    // If endpoint doesn't exist (404), return empty array instead of throwing
+    // This allows the app to use fallback backgrounds
+    if (error instanceof Error && error.message.includes('404')) {
+      console.warn('⚠️  Onboarding photos endpoint not available, using fallback');
+      return [];
+    }
+    
     throw error;
   }
 };
@@ -118,17 +125,34 @@ const getPhotoPool = async (): Promise<BgPhoto[]> => {
     const cachedTime = cachedTimeStr ? parseInt(cachedTimeStr, 10) : 0;
     const timeSinceFetch = now - cachedTime;
     
-    // Use cache if less than 24 hours old
+    // Use cache if less than 24 hours old AND not empty
     if (cachedPhotosStr && timeSinceFetch < PHOTOS_CACHE_DURATION) {
       const cachedPhotos = JSON.parse(cachedPhotosStr);
-      console.log(`📦 Using cached photos (fetched ${Math.round(timeSinceFetch / 3600000)}h ago)`);
-      return cachedPhotos;
+      // Don't use empty cache - it was from a failed fetch
+      if (cachedPhotos.length > 0) {
+        console.log(`📦 Using cached photos (fetched ${Math.round(timeSinceFetch / 3600000)}h ago)`);
+        return cachedPhotos;
+      } else {
+        console.warn('⚠️  Cached photos is empty, clearing bad cache');
+        await AsyncStorage.removeItem(BG_PHOTOS_CACHE_KEY);
+        await AsyncStorage.removeItem(BG_PHOTOS_FETCH_TIME_KEY);
+      }
     }
     
     // Fetch fresh photos
     const photos = await fetchBestQualityPhotos();
     
-    // Cache them
+    // If no photos returned (endpoint doesn't exist), return empty array
+    // Don't cache empty results - they would cause repeated failures
+    if (photos.length === 0) {
+      console.warn('⚠️  No photos available from API, will use fallback');
+      // Clear any bad cache
+      await AsyncStorage.removeItem(BG_PHOTOS_CACHE_KEY);
+      await AsyncStorage.removeItem(BG_PHOTOS_FETCH_TIME_KEY);
+      return [];
+    }
+    
+    // Only cache if we have actual photos
     await AsyncStorage.setItem(BG_PHOTOS_CACHE_KEY, JSON.stringify(photos));
     await AsyncStorage.setItem(BG_PHOTOS_FETCH_TIME_KEY, now.toString());
     
@@ -141,11 +165,13 @@ const getPhotoPool = async (): Promise<BgPhoto[]> => {
     // Try to use old cache as fallback
     const cachedPhotosStr = await AsyncStorage.getItem(BG_PHOTOS_CACHE_KEY);
     if (cachedPhotosStr) {
-      console.log('⚠️ Using stale cache as fallback');
+      console.log('📦 Using old cached photos as fallback');
       return JSON.parse(cachedPhotosStr);
     }
     
-    throw error;
+    // If no cache and error, return empty array (will trigger fallback in getCurrentBackground)
+    console.warn('⚠️  No photos available, will use fallback background');
+    return [];
   }
 };
 
@@ -160,7 +186,14 @@ export const getCurrentBackground = async (): Promise<BgRotationResult> => {
     const photoPool = await getPhotoPool();
     
     if (photoPool.length === 0) {
-      throw new Error('No photos available');
+      // Return fallback instead of throwing
+      console.warn('⚠️  No photos in pool, using fallback background');
+      return {
+        imageSource: require('../../assets/icon.png'),
+        index: 0,
+        caption: 'Welcome to Glintz',
+        hotelName: 'Glintz',
+      };
     }
     
     const savedIndexStr = await AsyncStorage.getItem(BG_INDEX_KEY);
@@ -172,23 +205,39 @@ export const getCurrentBackground = async (): Promise<BgRotationResult> => {
     
     let currentIndex: number;
     
-    // If we have a saved index and it's been less than 12 hours, reuse it
+    // If we have a saved index and it's been less than rotation interval, reuse it
     if (savedIndexStr !== null && timeSinceLastChange < ROTATION_INTERVAL) {
       currentIndex = parseInt(savedIndexStr, 10);
       // Make sure index is valid for current photo pool
       if (currentIndex >= photoPool.length) {
-        currentIndex = 0;
+        // Pool grew, pick new random index
+        currentIndex = Math.floor(Math.random() * photoPool.length);
+        await AsyncStorage.setItem(BG_INDEX_KEY, currentIndex.toString());
+        await AsyncStorage.setItem(BG_LAST_CHANGE_KEY, now.toString());
+        console.log(`🖼️ Pool grew, new random background: ${currentIndex}`);
+      } else {
+        console.log(`🖼️ Reusing background ${currentIndex} (last changed ${Math.round(timeSinceLastChange / 3600000)}h ago)`);
       }
-      console.log(`🖼️ Reusing background ${currentIndex} (last changed ${Math.round(timeSinceLastChange / 3600000)}h ago)`);
     } else {
-      // Pick a new random index
-      currentIndex = Math.floor(Math.random() * photoPool.length);
+      // Pick a new random index (ensuring it's different from last one if possible)
+      let newIndex = Math.floor(Math.random() * photoPool.length);
+      
+      // If pool is large enough, try to avoid showing the same photo
+      if (photoPool.length > 1 && savedIndexStr !== null) {
+        const lastIndex = parseInt(savedIndexStr, 10);
+        // If we picked the same index, try once more
+        if (newIndex === lastIndex) {
+          newIndex = Math.floor(Math.random() * photoPool.length);
+        }
+      }
+      
+      currentIndex = newIndex;
       
       // Save the new index and timestamp
       await AsyncStorage.setItem(BG_INDEX_KEY, currentIndex.toString());
       await AsyncStorage.setItem(BG_LAST_CHANGE_KEY, now.toString());
       
-      console.log(`🖼️ New background selected: ${currentIndex} (rotation triggered)`);
+      console.log(`🖼️ New random background selected: ${currentIndex} of ${photoPool.length} (rotation triggered)`);
     }
     
     const selectedPhoto = photoPool[currentIndex];
@@ -204,41 +253,58 @@ export const getCurrentBackground = async (): Promise<BgRotationResult> => {
   } catch (error) {
     console.error('Error in background rotation:', error);
     
-    // Return a placeholder or throw
-    throw new Error('Failed to load background image');
+    // Return a fallback background instead of throwing
+    // This allows the app to continue working even if photos can't be loaded
+    console.warn('⚠️  Using fallback background due to error');
+    
+    return {
+      imageSource: require('../../assets/icon.png'), // Fallback to app icon
+      index: 0,
+      caption: 'Welcome to Glintz',
+      hotelName: 'Glintz',
+    };
   }
 };
 
 /**
  * Preload the current background image for smooth display
+ * Returns immediately - expo-image handles caching and progressive loading
  */
 export const preloadBackground = async (): Promise<BgRotationResult> => {
   try {
-    console.log('🖼️  Starting background preload...');
+    console.log('🖼️  Getting background (expo-image will handle caching)...');
     const bgData = await getCurrentBackground();
     
-    // Preload the image for smooth display
-    if (bgData.imageSource && 'uri' in bgData.imageSource && bgData.imageSource.uri) {
-      const imageUri = bgData.imageSource.uri;
-      console.log(`🖼️  Preloading image: ${imageUri.substring(0, 100)}...`);
-      
-      try {
-        await Image.prefetch(imageUri);
-        console.log('✅ Background image preloaded successfully');
-      } catch (prefetchError) {
-        console.warn('⚠️  Image prefetch failed, but will still try to display:', prefetchError);
-        // Don't throw - the image might still load when displayed
-      }
+    // With expo-image, we don't need to prefetch - it handles caching automatically
+    // Just return the data immediately so UI can show
+    const isRemoteImage = bgData.imageSource && 
+      typeof bgData.imageSource === 'object' && 
+      'uri' in bgData.imageSource;
+    
+    if (isRemoteImage) {
+      const imageUri = (bgData.imageSource as { uri: string }).uri;
+      console.log(`🖼️  Background image: ${imageUri.substring(0, 80)}...`);
+      console.log('✅ expo-image will cache and load progressively');
+    } else {
+      console.log('✅ Using local fallback background');
     }
     
+    // Return immediately - expo-image will handle loading/caching
     return bgData;
   } catch (error) {
-    console.error('❌ Failed to preload background:', error);
+    console.error('❌ Failed to get background:', error);
     if (error instanceof Error) {
       console.error('❌ Error details:', error.message);
-      console.error('❌ Error stack:', error.stack);
     }
-    throw new Error('Failed to load background image');
+    
+    // Return fallback instead of throwing
+    console.warn('⚠️  Returning fallback background due to error');
+    return {
+      imageSource: require('../../assets/icon.png'),
+      index: 0,
+      caption: 'Welcome to Glintz',
+      hotelName: 'Glintz',
+    };
   }
 };
 

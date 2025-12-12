@@ -28,31 +28,20 @@ export const getImageUrl = (photo: any): string => {
 export const getImageSource = (photo: any) => {
   const url = getImageUrl(photo);
   
-  if (!url) {
+  if (!url || url.trim() === '') {
+    console.warn('⚠️ getImageSource: Empty URL provided', photo);
     return { uri: '' };
   }
   
-  // Base image source with performance optimizations
-  const baseSource = {
-    uri: url,
-    // Performance optimizations
-    cachePolicy: 'memory-disk',
-    recyclingKey: url,
-  };
-  
-  // For Unsplash URLs, add proper headers
-  if (url.includes('unsplash.com')) {
-    return {
-      ...baseSource,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; ReactNative/1.0)',
-        'Accept': 'image/*',
-      },
-    };
+  // Validate URL format
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    console.warn('⚠️ getImageSource: Invalid URL format', url);
+    return { uri: '' };
   }
   
-  // For other URLs, use optimized format
-  return baseSource;
+  // expo-image expects simple { uri: string } format
+  // Caching is handled by the Image component's cachePolicy prop
+  return { uri: url };
 };
 
 export const getPhotoSource = (photo: any): string => {
