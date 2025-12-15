@@ -508,3 +508,4 @@ class PhotoQualityCleaner {
 // Run the script
 const cleaner = new PhotoQualityCleaner();
 cleaner.run().catch(console.error);
+

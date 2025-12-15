@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinderTravel - Exact App Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .mockup-section {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        .phone-mockup {
+            width: 300px;
+            height: 600px;
+            background: #000;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* EXACT APP STYLING - Replicated from HotelCard.tsx */
+        .app-container {
+            flex: 1;
+            border-radius: 0;
+            overflow: hidden;
+            background-color: #000;
+            position: relative;
+            height: 100%;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .gradient-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 55%;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            z-index: 2;
+        }
+
+        .info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 25px;
+            padding-bottom: 40px;
+            z-index: 3;
+        }
+
+        .main-info {
+            margin-bottom: 15px;
+        }
+
+        .hotel-name {
+            font-size: 30px;
+            font-weight: 600;
+            font-family: Georgia, serif;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: 0.01em;
+            line-height: 38px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+        }
+
+        .location {
+            font-size: 18px;
+            font-weight: 400;
+            color: #fff;
+            opacity: 0.95;
+            margin-bottom: 12px;
+            letter-spacing: 0.01em;
+            line-height: 24px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .price-pill {
+            padding: 8px 16px;
+            border-radius: 32px;
+            align-self: flex-start;
+            background: #FFBE82;
+            box-shadow: 0 2px 10px rgba(255, 190, 130, 0.35);
+        }
+
+        .price-text {
+            font-size: 15px;
+            color: #FFFFFF;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        .photo-indicators {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .indicator {
+            width: 5px;
+            height: 5px;
+            border-radius: 2.5px;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 0 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .active-indicator {
+            background-color: rgba(255, 255, 255, 1.0);
+        }
+
+        .photo-counter {
+            position: absolute;
+            top: 28px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 5px 10px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 2;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .photo-counter-text {
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .profile-button {
+            position: absolute;
+            top: 28px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 10px 12px;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .profile-button-text {
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .attribution {
+            position: absolute;
+            bottom: 20px;
+            right: 25px;
+        }
+
+        .attribution-text {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Swipe indicators */
+        .swipe-indicator {
+            position: absolute;
+            padding: 20px;
+            border-radius: 20px;
+            border: 4px solid;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .like-indicator {
+            top: 45%;
+            right: 30%;
+            border-color: rgba(76, 175, 80, 1);
+            background-color: rgba(76, 175, 80, 0.3);
+            transform: rotate(15deg);
+        }
+
+        .dislike-indicator {
+            top: 45%;
+            left: 30%;
+            border-color: rgba(244, 67, 54, 1);
+            background-color: rgba(244, 67, 54, 0.3);
+            transform: rotate(-15deg);
+        }
+
+        .superlike-indicator {
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-color: rgba(33, 150, 243, 1);
+            background-color: rgba(33, 150, 243, 0.3);
+            padding: 20px 24px;
+        }
+
+        .details-indicator {
+            top: 40%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-color: rgba(255, 152, 0, 1);
+            background-color: rgba(255, 152, 0, 0.3);
+            padding: 20px;
+        }
+
+        .indicator-text {
+            color: #fff;
+            font-weight: 800;
+            font-size: 28px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Features section */
+        .features {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 400px;
+        }
+
+        .features h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .feature h3 {
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .feature p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .cta {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .control-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .mockup-section {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .phone-mockup {
+                width: 250px;
+                height: 500px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏨 TinderTravel</h1>
+            <p>Swipe your way to the perfect hotel</p>
+        </div>
+
+        <div class="mockup-section">
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="app-container" id="appContainer">
+                        <!-- App content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features">
+                <h2>Why Choose TinderTravel?</h2>
+                <div class="feature-grid">
+                    <div class="feature">
+                        <div class="feature-icon">💎</div>
+                        <h3>Luxury Hotels</h3>
+                        <p>Discover 5-star resorts and boutique hotels from around the world</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📱</div>
+                        <h3>Swipe Interface</h3>
+                        <p>Easy-to-use Tinder-style interface for finding your perfect match</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🌍</div>
+                        <h3>Global Coverage</h3>
+                        <p>Hotels from Barcelona to Tenerife, with more destinations coming</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📸</div>
+                        <h3>Real Photos</h3>
+                        <p>High-quality photos from Hotelbeds and Google Places API</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-button" onclick="previousHotel()">← Previous</button>
+            <button class="control-button" onclick="nextHotel()">Next →</button>
+            <button class="control-button" onclick="previousPhoto()">← Photo</button>
+            <button class="control-button" onclick="nextPhoto()">Photo →</button>
+        </div>
+
+        <div class="cta">
+            <a href="#" class="cta-button">Download App</a>
+        </div>
+    </div>
+
+    <script>
+        // Mock hotel data with real Hotelbeds URLs
+        const hotels = [
+            {
+                id: 'luxury-1',
+                name: 'Gran Hotel Bahia del Duque',
+                city: 'Costa Adeje',
+                country: 'Spain',
+                rating: 5,
+                price: { amount: '850', currency: 'USD' },
+                photos: [
+                    'https://photos.hotelbeds.com/giata/xxl/00/000030/000030a_hb_a_001.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000030/000030a_hb_a_002.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000030/000030a_hb_p_001.jpg'
+                ],
+                heroPhoto: 'https://photos.hotelbeds.com/giata/xxl/00/000030/000030a_hb_a_001.jpg'
+            },
+            {
+                id: 'luxury-2',
+                name: 'Hotel Arts Barcelona',
+                city: 'Barcelona',
+                country: 'Spain',
+                rating: 5,
+                price: { amount: '750', currency: 'USD' },
+                photos: [
+                    'https://photos.hotelbeds.com/giata/xxl/00/000025/000025a_hb_a_001.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000025/000025a_hb_a_002.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000025/000025a_hb_ro_001.jpg'
+                ],
+                heroPhoto: 'https://photos.hotelbeds.com/giata/xxl/00/000025/000025a_hb_a_001.jpg'
+            },
+            {
+                id: 'luxury-3',
+                name: 'Hotel Riu Palace Tenerife',
+                city: 'Adeje',
+                country: 'Spain',
+                rating: 5,
+                price: { amount: '650', currency: 'USD' },
+                photos: [
+                    'https://photos.hotelbeds.com/giata/xxl/00/000010/000010a_hb_a_001.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000010/000010a_hb_a_002.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000010/000010a_hb_p_001.jpg'
+                ],
+                heroPhoto: 'https://photos.hotelbeds.com/giata/xxl/00/000010/000010a_hb_a_001.jpg'
+            },
+            {
+                id: 'luxury-4',
+                name: 'Iberostar Selection Playa de Palma',
+                city: 'Palma',
+                country: 'Spain',
+                rating: 4,
+                price: { amount: '550', currency: 'USD' },
+                photos: [
+                    'https://photos.hotelbeds.com/giata/xxl/00/000020/000020a_hb_a_001.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000020/000020a_hb_a_002.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000020/000020a_hb_p_001.jpg'
+                ],
+                heroPhoto: 'https://photos.hotelbeds.com/giata/xxl/00/000020/000020a_hb_a_001.jpg'
+            }
+        ];
+
+        let currentHotelIndex = 0;
+        let currentPhotoIndex = 0;
+
+        // Function to format price
+        function formatPrice(price) {
+            if (!price) return null;
+            
+            const amount = parseFloat(price.amount);
+            const currency = price.currency === 'EUR' ? '€' : price.currency;
+            
+            return `from ${currency}${Math.round(amount)}/night`;
+        }
+
+        // Function to display the current hotel
+        function displayCurrentHotel() {
+            const hotel = hotels[currentHotelIndex];
+            const photos = hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto];
+            const totalPhotos = photos.length;
+
+            document.getElementById('appContainer').innerHTML = `
+                <div class="image-container">
+                    <div class="hero-image" style="background-image: url('${photos[currentPhotoIndex]}')"></div>
+                </div>
+
+                ${totalPhotos > 1 ? `
+                    <div class="photo-indicators">
+                        ${photos.map((_, index) => `
+                            <div class="indicator ${index === currentPhotoIndex ? 'active-indicator' : ''}" onclick="setPhotoIndex(${index})"></div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="gradient-overlay"></div>
+
+                <div class="info-overlay">
+                    <div class="main-info">
+                        <div class="hotel-name">${hotel.name}</div>
+                        <div class="location">${hotel.city}, ${hotel.country}</div>
+                        ${hotel.price ? `
+                            <div class="price-pill">
+                                <div class="price-text">${formatPrice(hotel.price)}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                ${totalPhotos > 1 ? `
+                    <div class="photo-counter">
+                        <div class="photo-counter-text">${currentPhotoIndex + 1}/${totalPhotos}</div>
+                    </div>
+                ` : ''}
+
+                <div class="profile-button">
+                    <div class="profile-button-text">👤</div>
+                </div>
+
+                <div class="attribution">
+                    <div class="attribution-text">Photos © Google Maps</div>
+                </div>
+
+                <!-- Swipe indicators -->
+                <div class="swipe-indicator like-indicator" id="likeIndicator">
+                    <div class="indicator-text">LIKE</div>
+                </div>
+                <div class="swipe-indicator dislike-indicator" id="dislikeIndicator">
+                    <div class="indicator-text">PASS</div>
+                </div>
+                <div class="swipe-indicator superlike-indicator" id="superlikeIndicator">
+                    <div class="indicator-text">SUPER LIKE</div>
+                </div>
+                <div class="swipe-indicator details-indicator" id="detailsIndicator">
+                    <div class="indicator-text">DETAILS</div>
+                </div>
+            `;
+
+            // Add swipe simulation
+            addSwipeSimulation();
+        }
+
+        // Function to add swipe simulation
+        function addSwipeSimulation() {
+            let startX = 0;
+            let startY = 0;
+            let isDragging = false;
+
+            const container = document.getElementById('appContainer');
+            
+            container.addEventListener('mousedown', (e) => {
+                startX = e.clientX;
+                startY = e.clientY;
+                isDragging = true;
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                // Show appropriate indicator based on drag direction
+                if (Math.abs(deltaX) > 50) {
+                    if (deltaX > 0) {
+                        document.getElementById('likeIndicator').style.opacity = '1';
+                    } else {
+                        document.getElementById('dislikeIndicator').style.opacity = '1';
+                    }
+                } else if (deltaY < -50) {
+                    document.getElementById('superlikeIndicator').style.opacity = '1';
+                } else if (deltaY > 50) {
+                    document.getElementById('detailsIndicator').style.opacity = '1';
+                }
+            });
+
+            container.addEventListener('mouseup', (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                // Hide all indicators
+                document.querySelectorAll('.swipe-indicator').forEach(indicator => {
+                    indicator.style.opacity = '0';
+                });
+                
+                // Handle swipe actions
+                if (Math.abs(deltaX) > 100) {
+                    if (deltaX > 0) {
+                        // Swipe right - Like
+                        simulateSwipe('like');
+                    } else {
+                        // Swipe left - Dismiss
+                        simulateSwipe('dismiss');
+                    }
+                } else if (deltaY < -100) {
+                    // Swipe up - Superlike
+                    simulateSwipe('superlike');
+                } else if (deltaY > 100) {
+                    // Swipe down - Details
+                    simulateSwipe('details');
+                }
+            });
+        }
+
+        // Function to simulate swipe action
+        function simulateSwipe(action) {
+            console.log(`🎯 Swipe action: ${action}`);
+
+            // Animate card out
+            const container = document.getElementById('appContainer');
+            container.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            
+            let transform = '';
+            switch (action) {
+                case 'like':
+                    transform = 'translateX(100vw) rotate(15deg)';
+                    break;
+                case 'dismiss':
+                    transform = 'translateX(-100vw) rotate(-15deg)';
+                    break;
+                case 'superlike':
+                    transform = 'translateY(-100vh)';
+                    break;
+                case 'details':
+                    // For details, we'll just show a message
+                    alert(`Details for ${hotels[currentHotelIndex].name}`);
+                    return;
+            }
+
+            container.style.transform = transform;
+            container.style.opacity = '0';
+
+            setTimeout(() => {
+                // Move to next hotel
+                currentHotelIndex = (currentHotelIndex + 1) % hotels.length;
+                currentPhotoIndex = 0;
+                
+                // Reset container
+                container.style.transition = '';
+                container.style.transform = '';
+                container.style.opacity = '';
+                
+                // Display next hotel
+                displayCurrentHotel();
+            }, 300);
+        }
+
+        // Control functions
+        function previousHotel() {
+            currentHotelIndex = (currentHotelIndex - 1 + hotels.length) % hotels.length;
+            currentPhotoIndex = 0;
+            displayCurrentHotel();
+        }
+
+        function nextHotel() {
+            currentHotelIndex = (currentHotelIndex + 1) % hotels.length;
+            currentPhotoIndex = 0;
+            displayCurrentHotel();
+        }
+
+        function previousPhoto() {
+            const hotel = hotels[currentHotelIndex];
+            const photos = hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto];
+            if (photos.length > 1) {
+                currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
+                displayCurrentHotel();
+            }
+        }
+
+        function nextPhoto() {
+            const hotel = hotels[currentHotelIndex];
+            const photos = hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto];
+            if (photos.length > 1) {
+                currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+                displayCurrentHotel();
+            }
+        }
+
+        function setPhotoIndex(index) {
+            currentPhotoIndex = index;
+            displayCurrentHotel();
+        }
+
+        // Load initial hotel when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            displayCurrentHotel();
+        });
+    </script>
+</body>
+</html>
+

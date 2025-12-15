@@ -1,29 +1,29 @@
 export const light = {
-  // Base tones - Editorial warmth
-  bg: '#FAF8F5',
-  surface: '#F4F2EE',
-  surfaceElev: '#EFEAE3',
+  // Base tones - Brandbook colors
+  bg: '#E5DED5', // Sand - main background (from brandbook)
+  surface: '#F4EFE8', // Sand light - card/panel backgrounds
+  surfaceElev: '#EFEAE3', // Elevated surfaces
   overlay: 'rgba(0,0,0,0.55)',
   
-  // Typography colors
-  textPrimary: 'rgba(0,0,0,0.85)',
-  textSecondary: 'rgba(0,0,0,0.55)',
-  textTertiary: 'rgba(0,0,0,0.35)',
+  // Typography colors - using brandbook deep navy
+  textPrimary: '#10233B', // Deep Navy - main text (from brandbook)
+  textSecondary: 'rgba(16, 35, 59, 0.65)', // Deep Navy with opacity
+  textTertiary: 'rgba(16, 35, 59, 0.45)',
   
-  // Warm amber accent - boutique luxury (gradient: 145deg)
-  accent: '#FDBA74',
-  accentGradientStart: '#FBCB8A', // Lighter warm tone (gradient start)
-  accentGradientEnd: '#FDBA74',   // Main accent (gradient end)
-  accentPressed: '#F5A957',
+  // Brandbook accent color - Terracotta
+  accent: '#9D5049', // Terracotta - CTAs, important highlights (from brandbook)
+  accentGradientStart: '#9D5049', // Terracotta (gradient start)
+  accentGradientEnd: '#7C3B35',   // Terracotta dark (gradient end)
+  accentPressed: '#7C3B35', // Terracotta dark - pressed state
   
   // Supporting colors
-  chipBg: '#EADAC8',
-  chipBorder: 'rgba(0,0,0,0.08)',
+  chipBg: '#A1BAC7', // Coastal Blue - secondary sections (from brandbook)
+  chipBorder: 'rgba(16, 35, 59, 0.15)', // Deep Navy with opacity
   success: '#3CCB7F',
   danger: '#FF6B6B',
   
   // Glass panel colors (fake glass - pre-rendered)
-  glassBg: 'rgba(255,255,255,0.65)',
+  glassBg: 'rgba(229, 222, 213, 0.85)', // Sand with opacity
   glassBorder: 'rgba(255,255,255,0.4)',
   
   // Border radius system
@@ -47,10 +47,7 @@ export const light = {
       shadowOffset: { width: 0, height: 4 } 
     },
     button: {
-      shadowColor: 'rgba(255,180,100,0.25)', // Warm glow
-      shadowOpacity: 1,
-      shadowRadius: 12,
-      shadowOffset: { width: 0, height: 6 }
+      // No shadow for premium flat design
     },
     glow: {
       shadowColor: 'rgba(255,180,100,0.35)', // Warm highlight glow
@@ -66,34 +63,45 @@ export const light = {
     }
   },
   
-  // Typography scale
+  // Typography scale - Brandbook fonts with system fallbacks
+  // NOTE: When brandbook fonts are downloaded, they will override system fonts
   typography: {
-    // Display titles - Editorial serif feel
+    // Display titles - Minion Pro (serif headlines from brandbook)
+    // Fallback: Georgia (iOS serif)
     displaySize: 30,
     displayLineHeight: 38,
-    displayFont: 'Georgia', // Serif fallback (iOS: New York, Android: Serif)
+    displayFont: 'Georgia', // Will be 'MinionPro-Regular' when font is loaded
     displayWeight: '600' as any,
     
-    // Section titles - Editorial serif
+    // Section titles - Minion Pro (serif)
     titleSize: 22,
     titleLineHeight: 28,
-    titleFont: 'Georgia',
+    titleFont: 'Georgia', // Will be 'MinionPro-Regular' when font is loaded
     titleWeight: '600' as any,
     
-    // Subtitles - Sans serif
+    // Subtitles - Apparat (sans-serif from brandbook)
+    // Fallback: System (SF Pro on iOS)
     subtitleSize: 18,
     subtitleLineHeight: 24,
+    subtitleFont: 'System', // Will be 'Apparat-Regular' when font is loaded
     subtitleWeight: '500' as any,
     
-    // Body text
+    // Body text - Apparat (sans-serif from brandbook)
     bodySize: 16,
     bodyLineHeight: 24,
+    bodyFont: 'System', // Will be 'Apparat-Regular' when font is loaded
     bodyWeight: '400' as any,
     
-    // Captions
+    // Captions - Apparat (sans-serif from brandbook)
     captionSize: 14,
     captionLineHeight: 20,
+    captionFont: 'System', // Will be 'Apparat-Regular' when font is loaded
     captionWeight: '400' as any,
+    
+    // Script font - Nautica Regular (decorative use only from brandbook)
+    scriptFont: 'Georgia', // Will be 'Nautica-Regular' when font is loaded
+    scriptSize: 18,
+    scriptLineHeight: 24,
     
     letterSpacing: 0.01,
   }
@@ -161,34 +169,42 @@ export const dark = {
     }
   },
   
-  // Typography scale (same as light)
+  // Typography scale - Brandbook fonts with system fallbacks
   typography: {
-    // Display titles - Editorial serif feel
+    // Display titles - Minion Pro (serif headlines from brandbook)
     displaySize: 30,
     displayLineHeight: 38,
-    displayFont: 'Georgia',
+    displayFont: 'Georgia', // Will be 'MinionPro-Regular' when font is loaded
     displayWeight: '600' as any,
     
-    // Section titles - Editorial serif
+    // Section titles - Minion Pro (serif)
     titleSize: 22,
     titleLineHeight: 28,
-    titleFont: 'Georgia',
+    titleFont: 'Georgia', // Will be 'MinionPro-Regular' when font is loaded
     titleWeight: '600' as any,
     
-    // Subtitles - Sans serif
+    // Subtitles - Apparat (sans-serif from brandbook)
     subtitleSize: 18,
     subtitleLineHeight: 24,
+    subtitleFont: 'System', // Will be 'Apparat-Regular' when font is loaded
     subtitleWeight: '500' as any,
     
-    // Body text
+    // Body text - Apparat (sans-serif from brandbook)
     bodySize: 16,
     bodyLineHeight: 24,
+    bodyFont: 'System', // Will be 'Apparat-Regular' when font is loaded
     bodyWeight: '400' as any,
     
-    // Captions
+    // Captions - Apparat (sans-serif from brandbook)
     captionSize: 14,
     captionLineHeight: 20,
+    captionFont: 'System', // Will be 'Apparat-Regular' when font is loaded
     captionWeight: '400' as any,
+    
+    // Script font - Nautica Regular (decorative use only from brandbook)
+    scriptFont: 'Georgia', // Will be 'Nautica-Regular' when font is loaded
+    scriptSize: 18,
+    scriptLineHeight: 24,
     
     letterSpacing: 0.01,
   }

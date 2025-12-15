@@ -261,8 +261,8 @@ const panResponder = PanResponder.create({
 
       if (isHorizontalSwipe && (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(vx) > 0.5)) {
         if (dx > 0) {
-          // Swipe right - Like
-          action = 'like';
+          // Swipe right - Superlike
+          action = 'superlike';
           animateDirection = { x: SCREEN_WIDTH + 100, y: 0 };
         } else {
           // Swipe left - Dismiss
@@ -300,9 +300,7 @@ const panResponder = PanResponder.create({
         });
 
         // Haptic feedback for successful swipe
-        if (action === 'like') {
-          IOSHaptics.likeAction();
-        } else if (action === 'superlike') {
+        if (action === 'superlike') {
           IOSHaptics.superlikeAction();
         } else if (action === 'dismiss') {
           IOSHaptics.dismissAction();

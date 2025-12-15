@@ -1073,10 +1073,7 @@ export class AmadeusClient {
           city: curatedHotel.city,
           country: curatedHotel.country,
           coords: curatedHotel.coords,
-          price: {
-            amount: this.generateRealisticPrice(curatedHotel.priceRange),
-            currency: curatedHotel.priceRange.currency
-          },
+          // Price removed - will display "View Rates" in UI
           description: curatedHotel.description,
           amenityTags: curatedHotel.amenityTags,
           photos: realPhotos.length > 0 ? realPhotos.map(photo => photo.url) : this.getFallbackPhotos(curatedHotel.city),
@@ -1101,10 +1098,7 @@ export class AmadeusClient {
           city: curatedHotel.city,
           country: curatedHotel.country,
           coords: curatedHotel.coords,
-          price: {
-            amount: this.generateRealisticPrice(curatedHotel.priceRange),
-            currency: curatedHotel.priceRange.currency
-          },
+          // Price removed - will display "View Rates" in UI
           description: curatedHotel.description,
           amenityTags: curatedHotel.amenityTags,
           photos: this.getFallbackPhotos(curatedHotel.city),
@@ -1650,8 +1644,8 @@ export class AmadeusClient {
     try {
       const googlePlacesApiKey = process.env.GOOGLE_PLACES_API_KEY || 'AIzaSyBh4W1feHK_zB7uiIx0VIkllOpy8ClnSk8';
       
-      // Search for the hotel using Google Places Text Search
-      const searchQuery = `${hotelName} hotel ${city.name}`;
+      // Search for the hotel using Google Places Text Search with country context
+      const searchQuery = `${hotelName} hotel ${city.name} ${city.countryCode}`;
       const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${googlePlacesApiKey}`;
       
       const response = await this.client.get(searchUrl);

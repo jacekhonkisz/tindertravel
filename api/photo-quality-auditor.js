@@ -460,3 +460,4 @@ class PhotoQualityAuditor {
 // Run the script
 const auditor = new PhotoQualityAuditor();
 auditor.run().catch(console.error);
+

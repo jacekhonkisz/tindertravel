@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Luxury Hotelbeds Photos Gallery</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .photo-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .photo-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .photo-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .photo-info {
+            padding: 25px;
+        }
+        .hotel-name {
+            font-weight: 800;
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .hotel-location {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .hotel-rating {
+            color: #f39c12;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .hotel-price {
+            color: #27ae60;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .room-type {
+            color: #8e44ad;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stats {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        .luxury-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .price-range {
+            font-size: 24px;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏆 Luxury Hotelbeds Photos Gallery</h1>
+        <p>5-Star Hotels • XXL Quality • Professional Photography</p>
+        <p>Scraped on 10/14/2025, 12:22:05 PM</p>
+    </div>
+    
+    <div class="stats">
+        <h2>💰 Luxury Statistics</h2>
+        <p><strong>Total Photos:</strong> 2</p>
+        <p><strong>Luxury Hotels:</strong> 2</p>
+        <p><strong>Hotels:</strong> Gran Hotel Bahia del Duque, Hotel Riu Palace Tenerife</p>
+        <div class="price-range">$500 - $1200 USD/night</div>
+        <div class="luxury-badge">XXL (2048px) • 5-Star Luxury Hotels</div>
+    </div>
+    
+    <div class="gallery">
+        
+            <div class="photo-card">
+                <img src="gran-hotel-bahia-del-duque-luxury-general-1.jpg" alt="Gran Hotel Bahia del Duque" loading="lazy">
+                <div class="photo-info">
+                    <div class="hotel-name">Gran Hotel Bahia del Duque</div>
+                    <div class="hotel-location">Costa Adeje, Spain</div>
+                    <div class="hotel-rating">⭐ 5/5 Stars</div>
+                    <div class="hotel-price">$700 - $1200/night</div>
+                    <div class="room-type">Luxury Hotel Exterior</div>
+                </div>
+            </div>
+        
+            <div class="photo-card">
+                <img src="hotel-riu-palace-tenerife-luxury-pool.jpg" alt="Hotel Riu Palace Tenerife" loading="lazy">
+                <div class="photo-info">
+                    <div class="hotel-name">Hotel Riu Palace Tenerife</div>
+                    <div class="hotel-location">Adeje, Spain</div>
+                    <div class="hotel-rating">⭐ 5/5 Stars</div>
+                    <div class="hotel-price">$500 - $800/night</div>
+                    <div class="room-type">Luxury Pool Area</div>
+                </div>
+            </div>
+        
+    </div>
+</body>
+</html>

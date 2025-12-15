@@ -58,7 +58,7 @@ const configs: Record<Environment, Partial<ApiConfig>> = {
   development: {
     // Local backend for app services (auth, user data, etc.)
     // Partners API (Railway) is called directly in client.ts for hotel data
-    baseUrl: 'http://192.168.1.107:3001',
+    baseUrl: 'http://192.168.1.102:3001',
     timeout: 30000,
     retryAttempts: 3,
     retryDelay: 1000,
@@ -178,7 +178,7 @@ export function getFallbackUrls(): string[] {
   if (env === 'development') {
     // Try common development URLs in order of preference
     return [
-      'http://192.168.1.107:3001',   // Primary: current network IP
+      'http://192.168.1.102:3001',   // Primary: current network IP
       'http://localhost:3001',        // Secondary: localhost (works in simulator)
       'http://127.0.0.1:3001',       // Tertiary: loopback
       // Add other common local IPs if needed

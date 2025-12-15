@@ -10,10 +10,11 @@
     "splash": {
       "image": "./app/assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#E5DED5"
     },
     "assetBundlePatterns": [
-      "**/*"
+      "**/*",
+      "app/assets/fonts/**"
     ],
     "ios": {
       "supportsTablet": false,
@@ -35,27 +36,8 @@
       "usesAppleSignIn": false,
       "config": {
         "usesNonExemptEncryption": false,
-        "googleMapsApiKey": "AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU"
+        "googleMapsApiKey": "YOUR_GOOGLE_MAPS_API_KEY_HERE"
       }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./app/assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
-      },
-      "statusBar": {
-        "barStyle": "light-content",
-        "backgroundColor": "#000000",
-        "translucent": true
-      },
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU"
-        }
-      }
-    },
-    "web": {
-      "favicon": "./app/assets/favicon.png"
     },
     "plugins": [
       [
@@ -66,7 +48,17 @@
       ]
     ],
     "scheme": "glintz",
-    "platforms": ["ios", "android"],
-    "primaryColor": "#000000"
+    "platforms": ["ios", "web"],
+    "primaryColor": "#9D5049",
+    "web": {
+      "favicon": "./app/assets/favicon.png",
+      "bundler": "metro",
+      "output": "single",
+      "build": {
+        "babel": {
+          "include": ["@react-navigation"]
+        }
+      }
+    }
   }
 } 

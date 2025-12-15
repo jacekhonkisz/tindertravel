@@ -21,13 +21,14 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Initialize Amadeus client
-let amadeusClient: AmadeusClient;
+// Initialize Amadeus client (optional - not required for OTP/auth endpoints)
+let amadeusClient: AmadeusClient | null = null;
 try {
   amadeusClient = new AmadeusClient();
+  console.log('✅ Amadeus client initialized');
 } catch (error) {
-  console.error('Failed to initialize Amadeus client:', error);
-  process.exit(1);
+  console.warn('⚠️  Amadeus client not available (optional):', error instanceof Error ? error.message : error);
+  console.warn('   Server will continue without Amadeus. OTP and auth endpoints will work.');
 }
 
 // Initialize Database service
@@ -68,12 +69,17 @@ let landingPageAPI: any = null;
 //   console.error('Failed to initialize Landing Page API:', error);
 // }
 
-// Initialize Hotel Discovery Controller
+// Initialize Hotel Discovery Controller (optional - requires Amadeus)
+let discoveryController: HotelDiscoveryController | null = null;
+try {
+  discoveryController = new HotelDiscoveryController();
+  console.log('✅ Hotel Discovery Controller initialized');
+} catch (error) {
+  console.warn('⚠️  Hotel Discovery Controller not available (optional):', error instanceof Error ? error.message : error);
+}
 
 // Initialize Photo Quality Auditor
 const photoAuditor = new PhotoQualityAuditor();
-
-const discoveryController = new HotelDiscoveryController();
 
 // CORS configuration - Allow all origins for development
 app.use(cors({
@@ -149,6 +155,13 @@ app.post('/api/seed', seedLimiter, async (req, res) => {
     if (supabaseService) {
       await supabaseService.clearHotels();
       console.log('✅ Cleared existing hotels');
+    }
+    
+    if (!amadeusClient) {
+      return res.status(503).json({
+        success: false,
+        error: 'Amadeus client not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+      });
     }
     
     const hotels = await amadeusClient.seedHotelsFromCities();
@@ -1296,6 +1309,13 @@ app.get('/api/hotels/glintz', async (req, res) => {
     let rawHotels: RawHotel[] = [];
 
     if (cityCode) {
+      if (!amadeusClient) {
+        return res.status(503).json({
+          success: false,
+          error: 'Amadeus client not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+        });
+      }
+      
       // Fetch from specific city
       const cityHotels = await amadeusClient.getHotelsByCity(cityCode as string, limitNum * 2);
       
@@ -2559,13 +2579,27 @@ app.use((error: Error, req: express.Request, res: express.Response, next: expres
 
 // ==================== HOTEL DISCOVERY ENDPOINTS ====================
 
+// Helper to check if discovery controller is available
+function requireDiscoveryController(res: any) {
+  if (!discoveryController) {
+    res.status(503).json({
+      success: false,
+      error: 'Hotel Discovery Controller not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+    });
+    return false;
+  }
+  return true;
+}
+
 // Start global hotel discovery
 app.post('/api/discovery/start', async (req, res) => {
   try {
+    if (!requireDiscoveryController(res)) return;
+    
     const config = req.body;
     
     // Validate configuration
-    const validation = discoveryController.validateConfig(config);
+    const validation = discoveryController!.validateConfig(config);
     if (!validation.valid) {
       return res.status(400).json({
         error: 'Invalid configuration',
@@ -2573,7 +2607,7 @@ app.post('/api/discovery/start', async (req, res) => {
       });
     }
 
-    const sessionId = await discoveryController.startDiscovery(config);
+    const sessionId = await discoveryController!.startDiscovery(config);
     
     res.json({
       success: true,
@@ -2593,7 +2627,8 @@ app.post('/api/discovery/start', async (req, res) => {
 // Stop current discovery session
 app.post('/api/discovery/stop', async (req, res) => {
   try {
-    const stopped = await discoveryController.stopDiscovery();
+    if (!requireDiscoveryController(res)) return;
+    const stopped = await discoveryController!.stopDiscovery();
     
     if (stopped) {
       res.json({
@@ -2617,9 +2652,10 @@ app.post('/api/discovery/stop', async (req, res) => {
 // Get current discovery status
 app.get('/api/discovery/status', async (req, res) => {
   try {
-    const currentSession = discoveryController.getCurrentSession();
-    const liveProgress = discoveryController.getLiveProgress();
-    const stats = await discoveryController.getDiscoveryStats();
+    if (!requireDiscoveryController(res)) return;
+    const currentSession = discoveryController!.getCurrentSession();
+    const liveProgress = discoveryController!.getLiveProgress();
+    const stats = await discoveryController!.getDiscoveryStats();
     
     res.json({
       currentSession,
@@ -2639,7 +2675,8 @@ app.get('/api/discovery/status', async (req, res) => {
 // Get all discovery sessions
 app.get('/api/discovery/sessions', async (req, res) => {
   try {
-    const sessions = discoveryController.getAllSessions();
+    if (!requireDiscoveryController(res)) return;
+    const sessions = discoveryController!.getAllSessions();
     
     res.json({
       sessions,
@@ -2658,8 +2695,9 @@ app.get('/api/discovery/sessions', async (req, res) => {
 // Get specific session details
 app.get('/api/discovery/sessions/:sessionId', async (req, res) => {
   try {
+    if (!requireDiscoveryController(res)) return;
     const { sessionId } = req.params;
-    const session = discoveryController.getSession(sessionId);
+    const session = discoveryController!.getSession(sessionId);
     
     if (!session) {
       return res.status(404).json({
@@ -2684,7 +2722,8 @@ app.get('/api/discovery/sessions/:sessionId', async (req, res) => {
 // Get recommended configuration
 app.get('/api/discovery/config/recommended', async (req, res) => {
   try {
-    const config = await discoveryController.getRecommendedConfig();
+    if (!requireDiscoveryController(res)) return;
+    const config = await discoveryController!.getRecommendedConfig();
     
     res.json({
       config,
@@ -2702,8 +2741,9 @@ app.get('/api/discovery/config/recommended', async (req, res) => {
 // Validate configuration
 app.post('/api/discovery/config/validate', async (req, res) => {
   try {
+    if (!requireDiscoveryController(res)) return;
     const config = req.body;
-    const validation = discoveryController.validateConfig(config);
+    const validation = discoveryController!.validateConfig(config);
     
     res.json({
       valid: validation.valid,
@@ -2866,7 +2906,8 @@ app.delete('/api/photos/remove/:hotelId/:photoIndex', async (req, res) => {
 app.get('/api/discovery/sessions/:sessionId/export', async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const results = await discoveryController.exportResults(sessionId);
+    if (!requireDiscoveryController(res)) return;
+    const results = await discoveryController!.exportResults(sessionId);
     
     res.json(results);
   } catch (error) {
@@ -2914,12 +2955,25 @@ export default app;
 
 import { EnhancedGlobalHotelDiscovery } from './enhanced-global-hotel-discovery';
 
-// Initialize Enhanced Discovery
-const enhancedDiscovery = new EnhancedGlobalHotelDiscovery();
+// Initialize Enhanced Discovery (optional - requires Amadeus)
+let enhancedDiscovery: EnhancedGlobalHotelDiscovery | null = null;
+try {
+  enhancedDiscovery = new EnhancedGlobalHotelDiscovery();
+  console.log('✅ Enhanced Global Hotel Discovery initialized');
+} catch (error) {
+  console.warn('⚠️  Enhanced Global Hotel Discovery not available (optional):', error instanceof Error ? error.message : error);
+}
 
 // Start enhanced global hotel discovery
 app.post('/api/discovery/enhanced', async (req, res) => {
   try {
+    if (!enhancedDiscovery) {
+      return res.status(503).json({
+        success: false,
+        error: 'Enhanced Global Hotel Discovery not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+      });
+    }
+    
     const { targetCount = 1000 } = req.body;
     
     console.log(`🌍 Starting Enhanced Global Hotel Discovery for ${targetCount} hotels...`);
@@ -2958,12 +3012,25 @@ app.post('/api/discovery/enhanced', async (req, res) => {
 
 import { TargetedLuxuryDiscovery } from './targeted-luxury-discovery';
 
-// Initialize Targeted Discovery
-const targetedDiscovery = new TargetedLuxuryDiscovery();
+// Initialize Targeted Discovery (optional - requires Amadeus)
+let targetedDiscovery: TargetedLuxuryDiscovery | null = null;
+try {
+  targetedDiscovery = new TargetedLuxuryDiscovery();
+  console.log('✅ Targeted Luxury Discovery initialized');
+} catch (error) {
+  console.warn('⚠️  Targeted Luxury Discovery not available (optional):', error instanceof Error ? error.message : error);
+}
 
 // Start targeted luxury hotel discovery for under-represented destinations
 app.post('/api/discovery/targeted-luxury', async (req, res) => {
   try {
+    if (!targetedDiscovery) {
+      return res.status(503).json({
+        success: false,
+        error: 'Targeted Luxury Discovery not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+      });
+    }
+    
     console.log('🎯 Starting Targeted Luxury Discovery for under-represented destinations...');
     
     // Start the discovery process (non-blocking)

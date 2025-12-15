@@ -67,6 +67,7 @@ var database_1 = require("./database");
 var google_places_1 = require("./google-places");
 var supabase_1 = require("./supabase");
 var curation_1 = require("./curation");
+var hotel_pipeline_1 = require("./hotel-pipeline");
 // Load environment variables
 dotenv_1.default.config();
 var app = (0, express_1.default)();
@@ -106,6 +107,16 @@ try {
 }
 catch (error) {
     console.error('Failed to initialize Supabase service:', error);
+}
+
+// Initialize Hotel Data Pipeline
+var hotelPipeline;
+try {
+    hotelPipeline = new hotel_pipeline_1.HotelDataPipeline(amadeusClient, googlePlacesClient, supabaseService);
+    console.log('✅ Hotel Data Pipeline initialized');
+}
+catch (error) {
+    console.error('Failed to initialize Hotel Data Pipeline:', error);
 }
 // CORS configuration - Allow all origins for development
 app.use((0, cors_1.default)({
@@ -1195,6 +1206,208 @@ function calculatePersonalizationScore(hotel, personalization) {
         0.2 * seenPenalty;
     return Math.max(0, Math.min(1, score)); // Clamp between 0 and 1
 }
+
+// 🏨 COMPREHENSIVE HOTEL DATA PIPELINE ENDPOINTS
+
+// Get pipeline status
+app.get('/api/pipeline/status', function (req, res) {
+    try {
+        if (!hotelPipeline) {
+            return res.status(503).json({
+                error: 'Pipeline not available',
+                message: 'Hotel Data Pipeline not initialized'
+            });
+        }
+
+        res.json({
+            status: hotelPipeline.isRunning ? 'running' : 'idle',
+            stats: hotelPipeline.stats,
+            initialized: true
+        });
+    }
+    catch (error) {
+        console.error('Failed to get pipeline status:', error);
+        res.status(500).json({
+            error: 'Failed to get pipeline status',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+
+// Run comprehensive hotel data pipeline
+app.post('/api/pipeline/run', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var options, results, error_12;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                if (!hotelPipeline) {
+                    return [2 /*return*/, res.status(503).json({
+                            error: 'Pipeline not available',
+                            message: 'Hotel Data Pipeline not initialized'
+                        })];
+                }
+                options = __assign({ cities: ['Paris', 'London', 'New York'], maxHotelsPerCity: 25, enableScraping: true, enableAmadeusEnrichment: true, enableGooglePhotos: true, batchSize: 5 }, req.body);
+                console.log('🚀 Starting pipeline run with options:', options);
+                return [4 /*yield*/, hotelPipeline.runComprehensivePipeline(options)];
+            case 1:
+                results = _a.sent();
+                res.json({
+                    success: true,
+                    message: "Pipeline completed successfully",
+                    results: results
+                });
+                return [3 /*break*/, 3];
+            case 2:
+                error_12 = _a.sent();
+                console.error('Pipeline run failed:', error_12);
+                res.status(500).json({
+                    error: 'Pipeline run failed',
+                    message: error_12 instanceof Error ? error_12.message : 'Unknown error'
+                });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
+
+// Run pipeline for a specific city
+app.post('/api/pipeline/city/:cityName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var cityName, options, results, error_13;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                if (!hotelPipeline) {
+                    return [2 /*return*/, res.status(503).json({
+                            error: 'Pipeline not available',
+                            message: 'Hotel Data Pipeline not initialized'
+                        })];
+                }
+                cityName = req.params.cityName;
+                options = __assign({ maxHotels: 25, enableScraping: true, enableAmadeusEnrichment: true, enableGooglePhotos: true, batchSize: 5 }, req.body);
+                console.log("🚀 Running pipeline for city: ".concat(cityName));
+                return [4 /*yield*/, hotelPipeline.executeFullPipeline({
+                        cities: [cityName],
+                        maxHotelsPerCity: options.maxHotels,
+                        enableScraping: options.enableScraping,
+                        enableAmadeusEnrichment: options.enableAmadeusEnrichment,
+                        enableGooglePhotos: options.enableGooglePhotos,
+                        batchSize: options.batchSize
+                    })];
+            case 1:
+                results = _a.sent();
+                res.json({
+                    success: true,
+                    message: "Pipeline completed for ".concat(cityName),
+                    results: results
+                });
+                return [3 /*break*/, 3];
+            case 2:
+                error_13 = _a.sent();
+                console.error("Pipeline run failed for ".concat(cityName, ":"), error_13);
+                res.status(500).json({
+                    error: 'Pipeline run failed',
+                    message: error_13 instanceof Error ? error_13.message : 'Unknown error'
+                });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
+
+// Test pipeline with sample data
+app.post('/api/pipeline/test', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var testOptions, results, error_14;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                if (!hotelPipeline) {
+                    return [2 /*return*/, res.status(503).json({
+                            error: 'Pipeline not available',
+                            message: 'Hotel Data Pipeline not initialized'
+                        })];
+                }
+                testOptions = {
+                    cities: ['Paris'],
+                    maxHotelsPerCity: 5,
+                    enableScraping: true,
+                    enableAmadeusEnrichment: true,
+                    enableGooglePhotos: true,
+                    batchSize: 2
+                };
+                console.log('🧪 Running pipeline test...');
+                return [4 /*yield*/, hotelPipeline.runComprehensivePipeline(testOptions)];
+            case 1:
+                results = _a.sent();
+                res.json({
+                    success: true,
+                    message: 'Pipeline test completed',
+                    results: results
+                });
+                return [3 /*break*/, 3];
+            case 2:
+                error_14 = _a.sent();
+                console.error('Pipeline test failed:', error_14);
+                res.status(500).json({
+                    error: 'Pipeline test failed',
+                    message: error_14 instanceof Error ? error_14.message : 'Unknown error'
+                });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
+
+// Reset pipeline stats
+app.post('/api/pipeline/reset', function (req, res) {
+    try {
+        if (!hotelPipeline) {
+            return res.status(503).json({
+                error: 'Pipeline not available',
+                message: 'Hotel Data Pipeline not initialized'
+            });
+        }
+
+        // Reset stats
+        hotelPipeline.stats = {
+            total: 0,
+            successful: 0,
+            failed: 0,
+            sources: {
+                booking: 0,
+                tripadvisor: 0,
+                expedia: 0,
+                hotels: 0
+            },
+            enriched: 0,
+            withPhotos: 0,
+            duplicates: 0,
+            errors: {
+                scraping: 0,
+                amadeus: 0,
+                googlePlaces: 0,
+                database: 0
+            }
+        };
+
+        // Clear cache
+        hotelPipeline.hotelCache.clear();
+
+        res.json({
+            success: true,
+            message: 'Pipeline stats and cache reset successfully'
+        });
+    }
+    catch (error) {
+        console.error('Failed to reset pipeline:', error);
+        res.status(500).json({
+            error: 'Failed to reset pipeline',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
 // Error handling middleware
 app.use(function (error, req, res, next) {
     console.error('Unhandled error:', error);

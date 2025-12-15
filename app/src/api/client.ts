@@ -4,30 +4,46 @@ import { getApiConfig, logApiConfig, printApiInstructions } from '../config/api'
 
 // Get API configuration based on environment (async)
 let apiConfig: any = null;
-let API_BASE_URL = 'http://localhost:3001'; // Default fallback
+let API_BASE_URL = 'http://192.168.1.102:3001'; // Default to current network IP
 let API_TIMEOUT = 30000; // Default timeout
+let configInitialized = false;
+let configInitPromise: Promise<void> | null = null;
 
 // Initialize API configuration
-(async () => {
-  try {
-    apiConfig = await getApiConfig();
-    API_BASE_URL = apiConfig.baseUrl;
-    API_TIMEOUT = apiConfig.timeout;
-
-    // Update the API client instance
-    apiClient.updateConfig(API_BASE_URL, API_TIMEOUT);
-
-    // Log configuration on startup
-    console.log('\n' + '='.repeat(60));
-    console.log('🌐 API CLIENT - CONFIGURATION');
-    console.log('='.repeat(60));
-    logApiConfig(apiConfig);
-    console.log('='.repeat(60));
-    console.log('');
-  } catch (error) {
-    console.error('Failed to initialize API config:', error);
+const initializeConfig = async () => {
+  if (configInitPromise) {
+    return configInitPromise;
   }
-})();
+  
+  configInitPromise = (async () => {
+    try {
+      console.log('🔧 Initializing API configuration...');
+      apiConfig = await getApiConfig();
+      API_BASE_URL = apiConfig.baseUrl;
+      API_TIMEOUT = apiConfig.timeout;
+
+      // Update the API client instance
+      apiClient.updateConfig(API_BASE_URL, API_TIMEOUT);
+      configInitialized = true;
+
+      // Log configuration on startup
+      console.log('\n' + '='.repeat(60));
+      console.log('🌐 API CLIENT - CONFIGURATION');
+      console.log('='.repeat(60));
+      logApiConfig(apiConfig);
+      console.log('='.repeat(60));
+      console.log('');
+    } catch (error) {
+      console.error('❌ Failed to initialize API config:', error);
+      // Keep default URL if config fails
+    }
+  })();
+  
+  return configInitPromise;
+};
+
+// Start initialization immediately
+initializeConfig();
 
 // If connection fails, show instructions
 let hasShownInstructions = false;
@@ -57,9 +73,16 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+    // Ensure config is initialized before making requests
+    if (!configInitialized) {
+      console.log('⏳ Waiting for API config to initialize...');
+      await initializeConfig();
+    }
+    
     const url = `${this.baseUrl}${endpoint}`;
     
     console.log(`🌐 API Request: ${url}`);
+    console.log(`🌐 Base URL: ${this.baseUrl}`);
     
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

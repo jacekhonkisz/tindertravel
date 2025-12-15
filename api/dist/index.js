@@ -49,18 +49,21 @@ const hotel_discovery_controller_1 = require("./hotel-discovery-controller");
 const photo_quality_auditor_1 = require("./photo-quality-auditor");
 const photo_curation_1 = require("./photo-curation");
 const network_utils_1 = require("./network-utils");
+// // import { LandingPageAPI } from './landing-page-api';
+const partnersApi_1 = require("./services/partnersApi");
 // Load environment variables
 dotenv.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3001;
-// Initialize Amadeus client
-let amadeusClient;
+// Initialize Amadeus client (optional - not required for OTP/auth endpoints)
+let amadeusClient = null;
 try {
     amadeusClient = new amadeus_1.AmadeusClient();
+    console.log('✅ Amadeus client initialized');
 }
 catch (error) {
-    console.error('Failed to initialize Amadeus client:', error);
-    process.exit(1);
+    console.warn('⚠️  Amadeus client not available (optional):', error instanceof Error ? error.message : error);
+    console.warn('   Server will continue without Amadeus. OTP and auth endpoints will work.');
 }
 // Initialize Database service
 let database;
@@ -90,10 +93,26 @@ catch (error) {
     console.error('Failed to initialize Supabase service:', error);
     process.exit(1);
 }
-// Initialize Hotel Discovery Controller
+// Initialize Landing Page API
+// let landingPageAPI: LandingPageAPI;
+let landingPageAPI = null;
+// try {
+//   landingPageAPI = new LandingPageAPI();
+//   console.log('✅ Landing Page API initialized');
+// } catch (error) {
+//   console.error('Failed to initialize Landing Page API:', error);
+// }
+// Initialize Hotel Discovery Controller (optional - requires Amadeus)
+let discoveryController = null;
+try {
+    discoveryController = new hotel_discovery_controller_1.HotelDiscoveryController();
+    console.log('✅ Hotel Discovery Controller initialized');
+}
+catch (error) {
+    console.warn('⚠️  Hotel Discovery Controller not available (optional):', error instanceof Error ? error.message : error);
+}
 // Initialize Photo Quality Auditor
 const photoAuditor = new photo_quality_auditor_1.PhotoQualityAuditor();
-const discoveryController = new hotel_discovery_controller_1.HotelDiscoveryController();
 // CORS configuration - Allow all origins for development
 app.use((0, cors_1.default)({
     origin: true, // Allow all origins for development
@@ -110,6 +129,11 @@ const limiter = (0, express_rate_limit_1.default)({
     legacyHeaders: false,
 });
 app.use(limiter);
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+    console.log('🔍 REQUEST:', req.method, req.path, req.body);
+    next();
+});
 // Stricter rate limiting for seeding endpoint
 const seedLimiter = (0, express_rate_limit_1.default)({
     windowMs: 60 * 60 * 1000, // 1 hour
@@ -156,6 +180,12 @@ app.post('/api/seed', seedLimiter, async (req, res) => {
             await supabaseService.clearHotels();
             console.log('✅ Cleared existing hotels');
         }
+        if (!amadeusClient) {
+            return res.status(503).json({
+                success: false,
+                error: 'Amadeus client not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+            });
+        }
         const hotels = await amadeusClient.seedHotelsFromCities();
         // Store hotels in Supabase
         await database.storeHotels(hotels);
@@ -198,9 +228,36 @@ app.delete('/api/hotels', async (req, res) => {
         });
     }
 });
-// SIMPLE DEV AUTHENTICATION ENDPOINTS
-// Simple passwordless auth - always accepts test@glintz.io with OTP 123456
-app.post('/api/auth/request-otp', async (req, res) => {
+// ==================== PRODUCTION AUTHENTICATION ENDPOINTS ====================
+const otp_service_1 = require("./services/otp-service");
+const email_service_1 = require("./services/email-service");
+const auth_service_1 = require("./services/auth-service");
+// Rate limiter for OTP requests (temporarily disabled for testing)
+// const otpLimiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 1000, // Max 1000 OTP requests per 15 minutes (increased for testing)
+//   keyGenerator: (req) => {
+//     // Use email + IP as key for more granular rate limiting
+//     const email = req.body?.email || 'unknown';
+//     const ip = req.ip || req.connection.remoteAddress || 'unknown';
+//     return `${email}:${ip}`;
+//   },
+//   message: {
+//     success: false,
+//     error: 'Too many OTP requests. Please try again later.'
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
+// Temporary: no rate limiting for testing
+const otpLimiter = (req, res, next) => next();
+/**
+ * Request OTP code for email authentication
+ * POST /api/auth/request-otp
+ * Body: { email: string }
+ */
+app.post('/api/auth/request-otp', otpLimiter, async (req, res) => {
+    console.log('🚨 OTP ENDPOINT CALLED');
     try {
         const { email } = req.body;
         if (!email) {
@@ -209,97 +266,394 @@ app.post('/api/auth/request-otp', async (req, res) => {
                 error: 'Email is required',
             });
         }
-        // In dev mode, only accept test@glintz.io
-        if (email.toLowerCase() !== 'test@glintz.io') {
-            return res.status(400).json({
+        console.log('📧 Processing OTP request for:', email);
+        // Generate and store OTP
+        const otpResult = await otp_service_1.otpService.createOTP(email);
+        if (!otpResult.success) {
+            console.error('❌ Failed to create OTP:', otpResult.error);
+            // Rate limiting should return 400, not 500
+            const isRateLimit = otpResult.error?.includes('Too many OTP requests');
+            return res.status(isRateLimit ? 400 : 500).json({
                 success: false,
-                error: 'Only test@glintz.io is allowed in dev mode',
+                error: otpResult.error || 'Failed to create OTP',
             });
         }
+        if (!otpResult.code) {
+            console.error('❌ OTP code not returned from service');
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to generate OTP code',
+            });
+        }
+        // Send OTP email
+        console.log('📨 Sending OTP email to:', email);
+        const emailResult = await email_service_1.emailService.sendOTPEmail(email, otpResult.code);
+        if (!emailResult.success) {
+            console.error('❌ Failed to send OTP email:', emailResult.error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to send verification email. Please try again.',
+            });
+        }
+        console.log('✅ OTP request completed successfully');
+        console.log('🔐 ============================================');
+        console.log('🔐 OTP CODE FOR TESTING:');
+        console.log('🔐 Email:', email);
+        console.log('🔐 Code:', otpResult.code);
+        console.log('🔐 Use this code in the app!');
+        console.log('🔐 ============================================');
         res.json({
             success: true,
-            message: 'OTP sent successfully (dev mode: use 123456)',
+            message: 'Verification code sent to your email',
+            // Always include debug code for development/testing
+            debugCode: otpResult.code,
+            debugMessage: 'Use this code in the app for testing'
         });
     }
     catch (error) {
-        console.error('Request OTP error:', error);
+        console.error('🚨 OTP ENDPOINT ERROR:', error);
+        console.error('🚨 Error stack:', error instanceof Error ? error.stack : 'No stack trace');
         res.status(500).json({
             success: false,
             error: 'Internal server error',
         });
     }
 });
-// Verify OTP code - always accepts 123456 for test@glintz.io
+/**
+ * Get OTP code for testing (development only)
+ * GET /api/auth/debug-otp?email=test@example.com
+ */
+app.get('/api/auth/debug-otp', async (req, res) => {
+    try {
+        const { email } = req.query;
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                error: 'Email parameter required'
+            });
+        }
+        // Get the most recent OTP for this email
+        const { data: otpRecords, error } = await supabase_1.supabase
+            .from('otp_codes')
+            .select('*')
+            .eq('email', email.toString().toLowerCase())
+            .gt('expires_at', new Date().toISOString())
+            .order('created_at', { ascending: false })
+            .limit(1);
+        if (error) {
+            console.error('Error fetching OTP:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to fetch OTP'
+            });
+        }
+        if (!otpRecords || otpRecords.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'No valid OTP found. Please request a new code first.'
+            });
+        }
+        const otpRecord = otpRecords[0];
+        res.json({
+            success: true,
+            email: email,
+            code: otpRecord.code,
+            expiresAt: otpRecord.expires_at,
+            attempts: otpRecord.attempts,
+            message: 'Use this code in the app for testing'
+        });
+    }
+    catch (error) {
+        console.error('Debug OTP error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error'
+        });
+    }
+});
+/**
+ * Verify OTP code and authenticate user
+ * POST /api/auth/verify-otp
+ * Body: { email: string, code: string }
+ */
 app.post('/api/auth/verify-otp', async (req, res) => {
     try {
         const { email, code } = req.body;
+        console.log('🔍 ============================================');
+        console.log('🔍 OTP VERIFICATION received');
+        console.log('🔍 Email:', email);
+        console.log('🔍 Code length:', code?.length);
+        console.log('🔍 Timestamp:', new Date().toISOString());
+        console.log('🔍 ============================================');
+        // Validate input
         if (!email || !code) {
+            console.warn('⚠️  Missing email or code in request');
             return res.status(400).json({
                 success: false,
                 error: 'Email and code are required',
             });
         }
-        // In dev mode, only accept test@glintz.io with OTP 123456
-        if (email.toLowerCase() !== 'test@glintz.io' || code !== '123456') {
+        // Verify OTP
+        const verifyResult = await otp_service_1.otpService.verifyOTP(email, code);
+        if (!verifyResult.success) {
+            console.warn('⚠️  OTP verification failed:', verifyResult.error);
             return res.status(400).json({
                 success: false,
-                error: 'Invalid email or OTP code',
+                error: verifyResult.error,
+                attemptsRemaining: verifyResult.attemptsRemaining,
             });
         }
-        // Create a simple user object and token
-        const user = {
-            id: 'test-user-id',
-            email: 'test@glintz.io',
-            name: 'Test User',
-        };
-        const token = 'dev-token-' + Date.now();
+        // OTP verified! Now authenticate the user
+        const authResult = await auth_service_1.authService.authenticateUser(email);
+        if (!authResult.success || !authResult.user || !authResult.token) {
+            console.error('❌ Failed to authenticate user');
+            return res.status(500).json({
+                success: false,
+                error: 'Authentication failed',
+            });
+        }
+        // Send welcome email for new users (async, don't wait)
+        if (authResult.user.created_at === authResult.user.last_login_at) {
+            email_service_1.emailService.sendWelcomeEmail(email, authResult.user.name).catch(err => {
+                console.error('Failed to send welcome email:', err);
+            });
+        }
+        console.log('✅ ============================================');
+        console.log('✅ OTP VERIFICATION completed successfully');
+        console.log('✅ User ID:', authResult.user.id);
+        console.log('✅ Email:', authResult.user.email);
+        console.log('✅ ============================================');
         res.json({
             success: true,
-            user,
-            token,
+            user: {
+                id: authResult.user.id,
+                email: authResult.user.email,
+                name: authResult.user.name,
+                created_at: authResult.user.created_at,
+                last_login_at: authResult.user.last_login_at,
+            },
+            token: authResult.token,
             message: 'Authentication successful',
         });
     }
     catch (error) {
-        console.error('Verify OTP error:', error);
+        console.error('❌ ============================================');
+        console.error('❌ OTP VERIFICATION failed with error:', error);
+        console.error('❌ ============================================');
         res.status(500).json({
             success: false,
             error: 'Internal server error',
         });
     }
 });
-// Verify token - always valid for dev tokens
+/**
+ * Verify JWT token
+ * GET /api/auth/verify-token
+ * Headers: Authorization: Bearer <token>
+ */
 app.get('/api/auth/verify-token', async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
+        console.log('🔐 ============================================');
+        console.log('🔐 TOKEN VERIFICATION received');
+        console.log('🔐 Timestamp:', new Date().toISOString());
+        console.log('🔐 ============================================');
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            console.warn('⚠️  No authorization header or invalid format');
             return res.status(401).json({
                 valid: false,
                 error: 'No token provided',
             });
         }
         const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-        // In dev mode, accept any token that starts with 'dev-token-'
-        if (!token.startsWith('dev-token-')) {
+        // Verify token
+        const verifyResult = auth_service_1.authService.verifyToken(token);
+        if (!verifyResult.valid || !verifyResult.payload) {
+            console.warn('⚠️  Invalid token:', verifyResult.error);
             return res.status(401).json({
                 valid: false,
-                error: 'Invalid token',
+                error: verifyResult.error,
             });
         }
+        // Get user data
+        const user = await auth_service_1.authService.getUserById(verifyResult.payload.userId);
+        if (!user) {
+            console.warn('⚠️  User not found for token');
+            return res.status(401).json({
+                valid: false,
+                error: 'User not found',
+            });
+        }
+        console.log('✅ ============================================');
+        console.log('✅ TOKEN VERIFICATION successful');
+        console.log('✅ User ID:', user.id);
+        console.log('✅ ============================================');
         res.json({
             valid: true,
             user: {
-                id: 'test-user-id',
-                email: 'test@glintz.io',
-                name: 'Test User',
+                id: user.id,
+                email: user.email,
+                name: user.name,
             },
         });
     }
     catch (error) {
-        console.error('Verify token error:', error);
+        console.error('❌ ============================================');
+        console.error('❌ TOKEN VERIFICATION failed with error:', error);
+        console.error('❌ ============================================');
         res.status(500).json({
             valid: false,
             error: 'Internal server error',
+        });
+    }
+});
+/**
+ * Get OTP statistics (admin/monitoring endpoint)
+ * GET /api/auth/otp-stats
+ */
+app.get('/api/auth/otp-stats', async (req, res) => {
+    try {
+        const stats = await otp_service_1.otpService.getOTPStats();
+        res.json({
+            success: true,
+            stats,
+            timestamp: new Date().toISOString(),
+        });
+    }
+    catch (error) {
+        console.error('Failed to get OTP stats:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get OTP statistics',
+        });
+    }
+});
+/**
+ * Test email configuration (admin endpoint)
+ * POST /api/auth/test-email
+ */
+app.post('/api/auth/test-email', async (req, res) => {
+    try {
+        const result = await email_service_1.emailService.testConfiguration();
+        res.json(result);
+    }
+    catch (error) {
+        console.error('Failed to test email:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to test email configuration',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+});
+// Get personalized hotel recommendations based on user preferences
+app.post('/api/hotels/recommendations', async (req, res) => {
+    try {
+        if (!supabaseService) {
+            return res.status(503).json({
+                error: 'Supabase service not available',
+                message: 'Database service not initialized'
+            });
+        }
+        const { userId, limit = 20, offset = 0, countryAffinity = {}, amenityAffinity = {}, seenHotels = [], likedHotels = [], superlikedHotels = [] } = req.body;
+        if (!userId) {
+            return res.status(400).json({
+                error: 'User ID is required',
+                message: 'Please provide a valid userId'
+            });
+        }
+        const limitNum = parseInt(limit);
+        const offsetNum = parseInt(offset);
+        console.log(`🎯 Personalized recommendations request for user ${userId}`);
+        console.log(`   Limit: ${limitNum}, Offset: ${offsetNum}`);
+        console.log(`   Seen: ${seenHotels.length}, Liked: ${likedHotels.length}, Superliked: ${superlikedHotels.length}`);
+        // Get hotels from Supabase
+        const supabaseHotels = await supabaseService.getHotels(limitNum * 2, offsetNum); // Get extra for filtering
+        // Convert Supabase format to HotelCard format
+        const hotels = supabaseHotels.map(hotel => {
+            // Generate a proper booking URL if none exists
+            let bookingUrl = hotel.booking_url;
+            if (!bookingUrl || bookingUrl.trim() === '') {
+                // Generate a fallback booking.com search URL
+                const searchQuery = encodeURIComponent(`${hotel.name} ${hotel.city}`);
+                bookingUrl = `https://www.booking.com/searchresults.html?ss=${searchQuery}`;
+            }
+            // Parse photos into clean URL strings
+            const parsedPhotos = parsePhotoUrls(hotel.photos);
+            const parsedHeroPhoto = hotel.hero_photo
+                ? (typeof hotel.hero_photo === 'string' && hotel.hero_photo.startsWith('{')
+                    ? parsePhotoUrls([hotel.hero_photo])[0]
+                    : hotel.hero_photo)
+                : (parsedPhotos[0] || '');
+            return {
+                id: hotel.id,
+                name: hotel.name,
+                city: hotel.city,
+                country: hotel.country,
+                coords: hotel.coords,
+                price: hotel.price,
+                description: hotel.description || '',
+                amenityTags: hotel.amenity_tags || [],
+                photos: parsedPhotos, // Clean URL strings with metadata!
+                heroPhoto: parsedHeroPhoto, // Clean URL string with metadata!
+                bookingUrl,
+                rating: hotel.rating
+            };
+        });
+        // Enhanced personalization data including likes and superlikes
+        const enhancedPersonalization = {
+            countryAffinity,
+            amenityAffinity,
+            seenHotels: new Set(seenHotels),
+            likedHotels,
+            superlikedHotels
+        };
+        // Apply enhanced personalization scoring
+        const scoredHotels = hotels.map(hotel => ({
+            ...hotel,
+            score: calculateEnhancedPersonalizationScore(hotel, enhancedPersonalization)
+        }));
+        // Sort by score (highest first)
+        scoredHotels.sort((a, b) => b.score - a.score);
+        const responseHotels = scoredHotels.map(({ score, ...hotel }) => hotel);
+        // Get total available hotels count
+        const totalAvailable = await supabaseService.getHotelCount();
+        // Add recommendation metadata
+        const recommendationMetadata = {
+            totalAvailable,
+            filteredBy: {
+                seenHotels: seenHotels.length,
+                likedHotels: likedHotels.length,
+                superlikedHotels: superlikedHotels.length
+            },
+            personalization: {
+                topCountries: Object.entries(countryAffinity)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 3)
+                    .map(([country, score]) => ({ country, score })),
+                topAmenities: Object.entries(amenityAffinity)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 5)
+                    .map(([amenity, score]) => ({ amenity, score }))
+            },
+            algorithm: {
+                version: '2.0',
+                factors: ['rating', 'country_affinity', 'amenity_affinity', 'interaction_history', 'recency_bias'],
+                weights: { rating: 0.4, country: 0.25, amenity: 0.2, interactions: 0.1, recency: 0.05 }
+            }
+        };
+        res.json({
+            hotels: responseHotels,
+            metadata: recommendationMetadata,
+            total: responseHotels.length,
+            hasMore: offsetNum + limitNum < totalAvailable
+        });
+    }
+    catch (error) {
+        console.error('Failed to get personalized recommendations:', error);
+        res.status(500).json({
+            error: 'Failed to get recommendations',
+            message: error instanceof Error ? error.message : 'Unknown error'
         });
     }
 });
@@ -780,6 +1134,12 @@ app.get('/api/hotels/glintz', async (req, res) => {
         // Get raw hotel data from Amadeus
         let rawHotels = [];
         if (cityCode) {
+            if (!amadeusClient) {
+                return res.status(503).json({
+                    success: false,
+                    error: 'Amadeus client not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+                });
+            }
             // Fetch from specific city
             const cityHotels = await amadeusClient.getHotelsByCity(cityCode, limitNum * 2);
             for (const hotel of cityHotels) {
@@ -893,6 +1253,195 @@ const parsePhotoUrls = (photos) => {
         return '';
     }).filter(url => url && url.length > 0); // Remove empty strings
 };
+// Get random R2 photos from partners for background rotation
+app.get('/api/onboarding/photos', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 30;
+        console.log(`📸 Fetching ${limit} random R2 photos for background rotation...`);
+        // Import R2 photo mapping
+        const { getPartnerR2Photos } = require('./services/r2PhotoMapping');
+        // Fetch all active partners
+        const partnersResponse = await partnersApi_1.partnersApi.listPartners({
+            page: 1,
+            per_page: 100, // Get all partners
+            status: 'active'
+        });
+        // Collect all R2 photos from all partners
+        const allPhotos = [];
+        partnersResponse.partners.forEach((partner) => {
+            const r2Photos = getPartnerR2Photos(partner.id);
+            r2Photos.forEach((photoUrl) => {
+                const location = partner.location_label ||
+                    (partner.city && partner.country_code
+                        ? `${partner.city}, ${partner.country_code}`
+                        : partner.country_code || 'Unknown');
+                const locationParts = location.split(',').map((s) => s.trim());
+                const city = partner.city || locationParts[0] || '';
+                const country = partner.country_code || locationParts[1] || location || '';
+                // Optimize image URL for faster loading
+                // For background images, we can use a smaller size
+                // R2 doesn't support transformations, but we can note the optimization
+                // In the future, we could add Cloudflare Images or similar for resizing
+                const optimizedUrl = photoUrl; // Keep original for now, but ready for optimization
+                allPhotos.push({
+                    url: optimizedUrl,
+                    width: 1920, // Optimized width for backgrounds (1080p is sufficient)
+                    hotelName: partner.hotel_name,
+                    city,
+                    country,
+                    caption: `${partner.hotel_name}, ${location}`
+                });
+            });
+        });
+        console.log(`✅ Collected ${allPhotos.length} R2 photos from ${partnersResponse.partners.length} partners`);
+        if (allPhotos.length === 0) {
+            return res.json({
+                photos: [],
+                total: 0,
+                message: 'No R2 photos available'
+            });
+        }
+        // Randomize and take up to limit
+        const shuffled = allPhotos.sort(() => Math.random() - 0.5);
+        const selectedPhotos = shuffled.slice(0, Math.min(limit, allPhotos.length));
+        console.log(`✅ Returning ${selectedPhotos.length} random R2 photos for backgrounds`);
+        res.json({
+            photos: selectedPhotos,
+            total: allPhotos.length,
+            message: `Random selection of ${selectedPhotos.length} photos from ${allPhotos.length} available`
+        });
+    }
+    catch (error) {
+        console.error('Failed to fetch R2 photos for backgrounds:', error);
+        res.status(500).json({
+            error: 'Failed to fetch photos',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Legacy endpoint (kept for compatibility)
+app.get('/api/onboarding/photos-legacy', async (req, res) => {
+    try {
+        if (!supabaseService) {
+            return res.status(503).json({
+                error: 'Supabase service not available',
+                message: 'Database service not initialized'
+            });
+        }
+        const limit = parseInt(req.query.limit) || 30;
+        console.log(`📸 Fetching top ${limit} best quality hotel photos for onboarding...`);
+        // Fetch hotels with photos - get a large pool to select from
+        const hotels = await supabaseService.getHotels(200, 0);
+        const hotelsWithPhotos = hotels.filter((h) => h.photos && h.photos.length > 0);
+        console.log(`✅ Fetched ${hotelsWithPhotos.length} hotels with photos`);
+        // Collect all photos with metadata
+        const allPhotos = [];
+        hotelsWithPhotos.forEach((hotel) => {
+            if (hotel.photos && Array.isArray(hotel.photos)) {
+                hotel.photos.forEach((photo, index) => {
+                    try {
+                        let photoUrl = photo;
+                        let photoWidth = 0;
+                        // Parse if it's a JSON string
+                        if (typeof photo === 'string' && photo.startsWith('{')) {
+                            const photoObj = JSON.parse(photo);
+                            photoUrl = photoObj.url || photo;
+                            photoWidth = photoObj.width || 0;
+                        }
+                        // Extract width from Google Places URL if available
+                        if (typeof photoUrl === 'string' && photoUrl.includes('maxwidth=')) {
+                            const match = photoUrl.match(/maxwidth=(\d+)/);
+                            if (match) {
+                                photoWidth = parseInt(match[1], 10);
+                            }
+                        }
+                        allPhotos.push({
+                            url: photoUrl,
+                            width: photoWidth,
+                            hotelName: hotel.name,
+                            city: hotel.city,
+                            country: hotel.country,
+                            isHero: index === 0, // First photo is usually best
+                            caption: `Photo: ${hotel.name}, ${hotel.city}`,
+                        });
+                    }
+                    catch (error) {
+                        console.log('Error parsing photo:', photo);
+                    }
+                });
+            }
+        });
+        console.log(`📊 Total photos collected: ${allPhotos.length}`);
+        // Sort by quality:
+        // 1. Higher width = better quality
+        // 2. Hero photos first
+        // 3. Filter out low quality photos
+        const qualityPhotos = allPhotos
+            .filter(photo => {
+            // Only keep high quality photos (typically Google Places ultra = 2048)
+            // Or at least 1200px wide
+            return photo.width >= 1200 || photo.url.includes('maxwidth=2048');
+        })
+            .sort((a, b) => {
+            // Sort by: isHero first, then by width
+            if (a.isHero && !b.isHero)
+                return -1;
+            if (!a.isHero && b.isHero)
+                return 1;
+            return b.width - a.width;
+        })
+            .slice(0, limit); // Take top N photos
+        console.log(`✅ Selected ${qualityPhotos.length} best quality photos`);
+        if (qualityPhotos.length > 0) {
+            const avgWidth = Math.round(qualityPhotos.reduce((sum, p) => sum + p.width, 0) / qualityPhotos.length);
+            console.log(`📏 Average width: ${avgWidth}px`);
+        }
+        res.json({
+            photos: qualityPhotos,
+            total: qualityPhotos.length,
+            message: `Top ${qualityPhotos.length} best quality hotel photos`,
+        });
+    }
+    catch (error) {
+        console.error('Failed to fetch onboarding photos:', error);
+        res.status(500).json({
+            error: 'Failed to fetch photos',
+            message: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+});
+// Get best photos for landing page mockup
+app.get('/api/landing/photos', async (req, res) => {
+    try {
+        if (!landingPageAPI) {
+            return res.status(503).json({
+                error: 'Landing Page API not available',
+                message: 'Landing Page API not initialized'
+            });
+        }
+        const limit = parseInt(req.query.limit) || 12;
+        console.log(`🎨 Fetching ${limit} best photos for landing page mockup...`);
+        const photos = await landingPageAPI.getLandingPagePhotos(limit);
+        console.log(`✅ Returning ${photos.length} photos for landing page mockup`);
+        res.json({
+            photos,
+            total: photos.length,
+            message: `Best ${photos.length} photos for landing page showcase`,
+            sources: {
+                hotelbeds: photos.filter((p) => p.source === 'hotelbeds').length,
+                google_places: photos.filter((p) => p.source === 'google_places').length,
+                curated: photos.filter((p) => p.source === 'unsplash').length
+            }
+        });
+    }
+    catch (error) {
+        console.error('Failed to fetch landing page photos:', error);
+        res.status(500).json({
+            error: 'Failed to fetch landing page photos',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
 app.get('/api/hotels', async (req, res) => {
     try {
         if (!supabaseService) {
@@ -971,6 +1520,107 @@ app.get('/api/hotels', async (req, res) => {
         console.error('Failed to fetch hotels:', error);
         res.status(500).json({
             error: 'Failed to fetch hotels',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Partners cache for super-fast responses
+let partnersCache = null;
+let partnersCacheTime = 0;
+const PARTNERS_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+// Get hotels from Partners API (with R2 photos) - OPTIMIZED
+app.get('/api/hotels/partners', async (req, res) => {
+    try {
+        const { page = 1, per_page = 20, status = 'active', country_code, include_photos = 'true' } = req.query;
+        const pageNum = parseInt(page);
+        const perPageNum = parseInt(per_page);
+        const includePhotos = include_photos === 'true';
+        const now = Date.now();
+        // Use cached partners if fresh (massive speed improvement)
+        let partnersResponse;
+        if (partnersCache && (now - partnersCacheTime) < PARTNERS_CACHE_DURATION) {
+            console.log('⚡ Using cached partners data');
+            partnersResponse = partnersCache;
+        }
+        else {
+            console.log('🔄 Fetching fresh partners data...');
+            partnersResponse = await partnersApi_1.partnersApi.listPartners({
+                page: 1,
+                per_page: 100, // Get all partners at once for caching
+                status: 'active'
+            });
+            partnersCache = partnersResponse;
+            partnersCacheTime = now;
+            console.log(`✅ Cached ${partnersResponse.partners.length} partners`);
+        }
+        // Apply pagination from cache
+        const startIdx = (pageNum - 1) * perPageNum;
+        const paginatedPartners = {
+            ...partnersResponse,
+            partners: partnersResponse.partners.slice(startIdx, startIdx + perPageNum)
+        };
+        // Convert partners to hotel cards and fetch photos
+        const hotels = [];
+        // Import R2 photo mapping service (cached in memory)
+        const { getPartnerR2Photos } = require('./services/r2PhotoMapping');
+        // PERFORMANCE: Process partners synchronously (R2 mapping is cached, no async needed)
+        // Images are now compressed (~150KB each), so we can show ALL photos!
+        // No limit needed - even 50 photos = 7.5MB (totally reasonable)
+        const hotelPromises = paginatedPartners.partners.map((partner) => {
+            let photos = [];
+            if (includePhotos) {
+                // R2 photos only (no Dropbox fallback - too slow)
+                const r2Photos = getPartnerR2Photos(partner.id);
+                if (r2Photos.length > 0) {
+                    // Show ALL photos - no limit! Images are optimized (~150KB each)
+                    photos = r2Photos;
+                }
+            }
+            // Use location_label or construct from city/country
+            const location = partner.location_label ||
+                (partner.city && partner.country_code
+                    ? `${partner.city}, ${partner.country_code}`
+                    : partner.country_code || 'Unknown');
+            // Split location into city and country
+            const locationParts = location.split(',').map((s) => s.trim());
+            const city = partner.city || locationParts[0] || '';
+            const country = partner.country_code || locationParts[1] || location || '';
+            // Use website as booking URL
+            const bookingUrl = partner.website ||
+                `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(partner.hotel_name)}`;
+            // Use tags as amenity tags
+            const amenityTags = partner.tags || [];
+            // Set hero photo (first photo or empty)
+            const heroPhoto = photos.length > 0 ? photos[0] : '';
+            return {
+                id: partner.id,
+                name: partner.hotel_name,
+                city,
+                country,
+                address: location,
+                coords: partner.lat && partner.lng ? {
+                    lat: partner.lat,
+                    lng: partner.lng
+                } : undefined,
+                description: partner.notes || `${partner.hotel_name} - ${location}`,
+                amenityTags,
+                photos,
+                heroPhoto,
+                bookingUrl,
+                rating: undefined
+            };
+        });
+        const hotelCards = await Promise.all(hotelPromises);
+        res.json({
+            hotels: hotelCards,
+            total: partnersResponse.total,
+            hasMore: partnersResponse.page < partnersResponse.total_pages
+        });
+    }
+    catch (error) {
+        console.error('Failed to fetch partners hotels:', error);
+        res.status(500).json({
+            error: 'Failed to fetch partners hotels',
             message: error instanceof Error ? error.message : 'Unknown error'
         });
     }
@@ -1142,6 +1792,356 @@ app.post('/api/personalization', (req, res) => {
         });
     }
 });
+// ==================== USER METRICS & PREFERENCES ENDPOINTS ====================
+// Save user preferences to database
+app.post('/api/user/preferences', async (req, res) => {
+    try {
+        if (!supabaseService) {
+            return res.status(503).json({
+                success: false,
+                error: 'Supabase service not available'
+            });
+        }
+        const { userId, countryAffinity, amenityAffinity, seenHotels } = req.body;
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                error: 'userId is required'
+            });
+        }
+        console.log(`💾 Saving preferences for user ${userId}`);
+        // Upsert user preferences
+        const { error } = await supabase_1.supabase
+            .from('user_preferences')
+            .upsert({
+            user_id: userId,
+            country_affinity: countryAffinity || {},
+            amenity_affinity: amenityAffinity || {},
+            seen_hotels: seenHotels || [],
+            updated_at: new Date().toISOString()
+        }, {
+            onConflict: 'user_id'
+        });
+        if (error) {
+            console.error('Failed to save preferences:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to save preferences',
+                message: error.message
+            });
+        }
+        res.json({
+            success: true,
+            message: 'Preferences saved successfully'
+        });
+    }
+    catch (error) {
+        console.error('Failed to save user preferences:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to save preferences',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Load user preferences from database
+app.get('/api/user/preferences', async (req, res) => {
+    try {
+        if (!supabaseService) {
+            return res.status(503).json({
+                success: false,
+                error: 'Supabase service not available'
+            });
+        }
+        const { userId } = req.query;
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                error: 'userId is required'
+            });
+        }
+        console.log(`📥 Loading preferences for user ${userId}`);
+        const { data, error } = await supabase_1.supabase
+            .from('user_preferences')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+        if (error) {
+            if (error.code === 'PGRST116') {
+                // No preferences found yet
+                return res.json({
+                    success: true,
+                    preferences: null,
+                    message: 'No preferences found for this user'
+                });
+            }
+            console.error('Failed to load preferences:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to load preferences',
+                message: error.message
+            });
+        }
+        res.json({
+            success: true,
+            preferences: {
+                countryAffinity: data.country_affinity || {},
+                amenityAffinity: data.amenity_affinity || {},
+                seenHotels: data.seen_hotels || [],
+                lastUpdated: data.updated_at
+            }
+        });
+    }
+    catch (error) {
+        console.error('Failed to load user preferences:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to load preferences',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Save user interaction (swipe action)
+app.post('/api/user/interactions', async (req, res) => {
+    try {
+        if (!supabaseService) {
+            return res.status(503).json({
+                success: false,
+                error: 'Supabase service not available'
+            });
+        }
+        const { userId, hotelId, actionType, sessionId } = req.body;
+        if (!userId || !hotelId || !actionType) {
+            return res.status(400).json({
+                success: false,
+                error: 'userId, hotelId, and actionType are required'
+            });
+        }
+        console.log(`👆 Saving interaction: ${userId} ${actionType} ${hotelId}`);
+        // Insert interaction
+        const { error } = await supabase_1.supabase
+            .from('user_interactions')
+            .insert({
+            user_id: userId,
+            hotel_id: hotelId,
+            action_type: actionType,
+            session_id: sessionId || null,
+            created_at: new Date().toISOString()
+        });
+        if (error) {
+            console.error('Failed to save interaction:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to save interaction',
+                message: error.message
+            });
+        }
+        res.json({
+            success: true,
+            message: 'Interaction saved successfully'
+        });
+    }
+    catch (error) {
+        console.error('Failed to save user interaction:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to save interaction',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Save hotel to user's saved list
+app.post('/api/user/saved-hotels', async (req, res) => {
+    try {
+        if (!supabaseService) {
+            return res.status(503).json({
+                success: false,
+                error: 'Supabase service not available'
+            });
+        }
+        const { userId, hotelId, saveType, hotelData } = req.body;
+        if (!userId || !hotelId || !saveType || !hotelData) {
+            return res.status(400).json({
+                success: false,
+                error: 'userId, hotelId, saveType, and hotelData are required'
+            });
+        }
+        console.log(`💝 Saving hotel: ${userId} ${saveType} ${hotelId}`);
+        // Upsert saved hotel
+        const { error } = await supabase_1.supabase
+            .from('user_saved_hotels')
+            .upsert({
+            user_id: userId,
+            hotel_id: hotelId,
+            save_type: saveType,
+            hotel_data: hotelData,
+            created_at: new Date().toISOString()
+        }, {
+            onConflict: 'user_id,hotel_id'
+        });
+        if (error) {
+            console.error('Failed to save hotel:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to save hotel',
+                message: error.message
+            });
+        }
+        res.json({
+            success: true,
+            message: 'Hotel saved successfully'
+        });
+    }
+    catch (error) {
+        console.error('Failed to save hotel:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to save hotel',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Load user's saved hotels
+app.get('/api/user/saved-hotels', async (req, res) => {
+    try {
+        if (!supabaseService) {
+            return res.status(503).json({
+                success: false,
+                error: 'Supabase service not available'
+            });
+        }
+        const { userId, type } = req.query;
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                error: 'userId is required'
+            });
+        }
+        console.log(`📚 Loading saved hotels for user ${userId}, type: ${type || 'all'}`);
+        let query = supabase_1.supabase
+            .from('user_saved_hotels')
+            .select('*')
+            .eq('user_id', userId);
+        if (type) {
+            query = query.eq('save_type', type);
+        }
+        const { data, error } = await query.order('created_at', { ascending: false });
+        if (error) {
+            console.error('Failed to load saved hotels:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to load saved hotels',
+                message: error.message
+            });
+        }
+        res.json({
+            success: true,
+            hotels: (data || []).map((item) => item.hotel_data)
+        });
+    }
+    catch (error) {
+        console.error('Failed to load saved hotels:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to load saved hotels',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Remove hotel from saved list
+app.delete('/api/user/saved-hotels/:userId/:hotelId', async (req, res) => {
+    try {
+        if (!supabaseService) {
+            return res.status(503).json({
+                success: false,
+                error: 'Supabase service not available'
+            });
+        }
+        const { userId, hotelId } = req.params;
+        console.log(`🗑️  Removing saved hotel: ${userId} - ${hotelId}`);
+        const { error } = await supabase_1.supabase
+            .from('user_saved_hotels')
+            .delete()
+            .eq('user_id', userId)
+            .eq('hotel_id', hotelId);
+        if (error) {
+            console.error('Failed to remove saved hotel:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to remove saved hotel',
+                message: error.message
+            });
+        }
+        res.json({
+            success: true,
+            message: 'Hotel removed successfully'
+        });
+    }
+    catch (error) {
+        console.error('Failed to remove saved hotel:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to remove saved hotel',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Get user stats
+app.get('/api/user/stats', async (req, res) => {
+    try {
+        if (!supabaseService) {
+            return res.status(503).json({
+                success: false,
+                error: 'Supabase service not available'
+            });
+        }
+        const { userId } = req.query;
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                error: 'userId is required'
+            });
+        }
+        console.log(`📊 Loading stats for user ${userId}`);
+        // Get interaction counts
+        const { data: interactions, error: interactionsError } = await supabase_1.supabase
+            .from('user_interactions')
+            .select('action_type')
+            .eq('user_id', userId);
+        if (interactionsError) {
+            console.error('Failed to load interactions:', interactionsError);
+        }
+        // Get saved hotel counts
+        const { data: savedHotels, error: savedError } = await supabase_1.supabase
+            .from('user_saved_hotels')
+            .select('save_type')
+            .eq('user_id', userId);
+        if (savedError) {
+            console.error('Failed to load saved hotels:', savedError);
+        }
+        // Calculate stats
+        const stats = {
+            totalInteractions: interactions?.length || 0,
+            likes: interactions?.filter((i) => i.action_type === 'like').length || 0,
+            superlikes: interactions?.filter((i) => i.action_type === 'superlike').length || 0,
+            dismisses: interactions?.filter((i) => i.action_type === 'dismiss').length || 0,
+            savedLikes: savedHotels?.filter((h) => h.save_type === 'like').length || 0,
+            savedSuperlikes: savedHotels?.filter((h) => h.save_type === 'superlike').length || 0
+        };
+        res.json({
+            success: true,
+            stats
+        });
+    }
+    catch (error) {
+        console.error('Failed to load user stats:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to load user stats',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
 // Calculate personalization score for a hotel
 function calculatePersonalizationScore(hotel, personalization) {
     // Base score from rating (if available) or default
@@ -1162,6 +2162,47 @@ function calculatePersonalizationScore(hotel, personalization) {
         0.2 * seenPenalty;
     return Math.max(0, Math.min(1, score)); // Clamp between 0 and 1
 }
+// Enhanced personalization score calculation with interaction history
+function calculateEnhancedPersonalizationScore(hotel, personalization) {
+    // Base score from rating (if available) or default
+    const baseScore = hotel.rating ? hotel.rating / 5 : 0.7;
+    // Country affinity score
+    const countryScore = personalization.countryAffinity[hotel.country] || 0;
+    // Amenity affinity score
+    const amenityTags = hotel.amenityTags || [];
+    const amenityScore = amenityTags.reduce((sum, tag) => {
+        return sum + (personalization.amenityAffinity[tag] || 0);
+    }, 0) / Math.max(amenityTags.length, 1);
+    // Interaction history scoring
+    let interactionScore = 0;
+    // Superliked hotels get highest boost (direct matches)
+    if (personalization.superlikedHotels.includes(hotel.id)) {
+        interactionScore += 0.8;
+    }
+    // Liked hotels get moderate boost (direct matches)
+    else if (personalization.likedHotels.includes(hotel.id)) {
+        interactionScore += 0.5;
+    }
+    // Hotels in same country as liked hotels get small boost
+    else {
+        const countryLikedCount = personalization.likedHotels.length > 0 ?
+            personalization.likedHotels.filter(id => {
+                // This would need access to other hotels data to check country matches
+                // For now, we'll use a simplified approach
+                return false; // Placeholder - would need hotel lookup
+            }).length / personalization.likedHotels.length : 0;
+        interactionScore += countryLikedCount * 0.2;
+    }
+    // Seen penalty (should be 0 since we filter out seen hotels, but keeping for completeness)
+    const seenPenalty = personalization.seenHotels.has(hotel.id) ? 0.3 : 0;
+    // Enhanced weighted score calculation
+    const score = 0.4 * baseScore +
+        0.25 * Math.min(countryScore, 1) +
+        0.15 * Math.min(amenityScore, 1) +
+        0.15 * Math.min(interactionScore, 1) -
+        0.3 * seenPenalty;
+    return Math.max(0, Math.min(1, score)); // Clamp between 0 and 1
+}
 // Error handling middleware
 app.use((error, req, res, next) => {
     console.error('Unhandled error:', error);
@@ -1171,9 +2212,22 @@ app.use((error, req, res, next) => {
     });
 });
 // ==================== HOTEL DISCOVERY ENDPOINTS ====================
+// Helper to check if discovery controller is available
+function requireDiscoveryController(res) {
+    if (!discoveryController) {
+        res.status(503).json({
+            success: false,
+            error: 'Hotel Discovery Controller not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+        });
+        return false;
+    }
+    return true;
+}
 // Start global hotel discovery
 app.post('/api/discovery/start', async (req, res) => {
     try {
+        if (!requireDiscoveryController(res))
+            return;
         const config = req.body;
         // Validate configuration
         const validation = discoveryController.validateConfig(config);
@@ -1202,6 +2256,8 @@ app.post('/api/discovery/start', async (req, res) => {
 // Stop current discovery session
 app.post('/api/discovery/stop', async (req, res) => {
     try {
+        if (!requireDiscoveryController(res))
+            return;
         const stopped = await discoveryController.stopDiscovery();
         if (stopped) {
             res.json({
@@ -1226,6 +2282,8 @@ app.post('/api/discovery/stop', async (req, res) => {
 // Get current discovery status
 app.get('/api/discovery/status', async (req, res) => {
     try {
+        if (!requireDiscoveryController(res))
+            return;
         const currentSession = discoveryController.getCurrentSession();
         const liveProgress = discoveryController.getLiveProgress();
         const stats = await discoveryController.getDiscoveryStats();
@@ -1247,6 +2305,8 @@ app.get('/api/discovery/status', async (req, res) => {
 // Get all discovery sessions
 app.get('/api/discovery/sessions', async (req, res) => {
     try {
+        if (!requireDiscoveryController(res))
+            return;
         const sessions = discoveryController.getAllSessions();
         res.json({
             sessions,
@@ -1265,6 +2325,8 @@ app.get('/api/discovery/sessions', async (req, res) => {
 // Get specific session details
 app.get('/api/discovery/sessions/:sessionId', async (req, res) => {
     try {
+        if (!requireDiscoveryController(res))
+            return;
         const { sessionId } = req.params;
         const session = discoveryController.getSession(sessionId);
         if (!session) {
@@ -1289,6 +2351,8 @@ app.get('/api/discovery/sessions/:sessionId', async (req, res) => {
 // Get recommended configuration
 app.get('/api/discovery/config/recommended', async (req, res) => {
     try {
+        if (!requireDiscoveryController(res))
+            return;
         const config = await discoveryController.getRecommendedConfig();
         res.json({
             config,
@@ -1306,6 +2370,8 @@ app.get('/api/discovery/config/recommended', async (req, res) => {
 // Validate configuration
 app.post('/api/discovery/config/validate', async (req, res) => {
     try {
+        if (!requireDiscoveryController(res))
+            return;
         const config = req.body;
         const validation = discoveryController.validateConfig(config);
         res.json({
@@ -1455,6 +2521,8 @@ app.delete('/api/photos/remove/:hotelId/:photoIndex', async (req, res) => {
 app.get('/api/discovery/sessions/:sessionId/export', async (req, res) => {
     try {
         const { sessionId } = req.params;
+        if (!requireDiscoveryController(res))
+            return;
         const results = await discoveryController.exportResults(sessionId);
         res.json(results);
     }
@@ -1496,11 +2564,24 @@ app.listen(port, () => {
 exports.default = app;
 // ==================== ENHANCED GLOBAL HOTEL DISCOVERY ====================
 const enhanced_global_hotel_discovery_1 = require("./enhanced-global-hotel-discovery");
-// Initialize Enhanced Discovery
-const enhancedDiscovery = new enhanced_global_hotel_discovery_1.EnhancedGlobalHotelDiscovery();
+// Initialize Enhanced Discovery (optional - requires Amadeus)
+let enhancedDiscovery = null;
+try {
+    enhancedDiscovery = new enhanced_global_hotel_discovery_1.EnhancedGlobalHotelDiscovery();
+    console.log('✅ Enhanced Global Hotel Discovery initialized');
+}
+catch (error) {
+    console.warn('⚠️  Enhanced Global Hotel Discovery not available (optional):', error instanceof Error ? error.message : error);
+}
 // Start enhanced global hotel discovery
 app.post('/api/discovery/enhanced', async (req, res) => {
     try {
+        if (!enhancedDiscovery) {
+            return res.status(503).json({
+                success: false,
+                error: 'Enhanced Global Hotel Discovery not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+            });
+        }
         const { targetCount = 1000 } = req.body;
         console.log(`🌍 Starting Enhanced Global Hotel Discovery for ${targetCount} hotels...`);
         // Start the discovery process (non-blocking)
@@ -1532,11 +2613,24 @@ app.post('/api/discovery/enhanced', async (req, res) => {
 });
 // ==================== TARGETED LUXURY DISCOVERY ====================
 const targeted_luxury_discovery_1 = require("./targeted-luxury-discovery");
-// Initialize Targeted Discovery
-const targetedDiscovery = new targeted_luxury_discovery_1.TargetedLuxuryDiscovery();
+// Initialize Targeted Discovery (optional - requires Amadeus)
+let targetedDiscovery = null;
+try {
+    targetedDiscovery = new targeted_luxury_discovery_1.TargetedLuxuryDiscovery();
+    console.log('✅ Targeted Luxury Discovery initialized');
+}
+catch (error) {
+    console.warn('⚠️  Targeted Luxury Discovery not available (optional):', error instanceof Error ? error.message : error);
+}
 // Start targeted luxury hotel discovery for under-represented destinations
 app.post('/api/discovery/targeted-luxury', async (req, res) => {
     try {
+        if (!targetedDiscovery) {
+            return res.status(503).json({
+                success: false,
+                error: 'Targeted Luxury Discovery not available. Please configure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env'
+            });
+        }
         console.log('🎯 Starting Targeted Luxury Discovery for under-represented destinations...');
         // Start the discovery process (non-blocking)
         targetedDiscovery.discoverTargetedLuxuryHotels().catch(error => {

@@ -22,11 +22,6 @@ import GlassCard from '../components/GlassCard';
 import MonogramGlow from '../components/MonogramGlow';
 import { preloadBackground, BgRotationResult } from '../utils/backgroundRotation';
 import {
-  COLOR_TEXT,
-  COLOR_TEXT_MID,
-  COLOR_INPUT,
-  COLOR_ACCENT,
-  RADIUS_M,
   DUR_FAST,
   DUR_MED,
   EASING_SMOOTH,
@@ -35,10 +30,12 @@ import {
   SPACING,
   SHADOW_BUTTON,
 } from '../ui/tokens';
+import { useTheme } from '../theme';
 
 type Step = 'email' | 'otp';
 
 const AuthScreen: React.FC = () => {
+  const theme = useTheme();
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -289,6 +286,119 @@ const AuthScreen: React.FC = () => {
   // Background will fade in when ready via expo-image
   const backgroundSource = bgData?.imageSource || require('../../assets/icon.png');
   
+  // Create dynamic styles with theme access
+  const dynamicStyles = StyleSheet.create({
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.bg, // Sand #E5DED5 from brandbook
+    },
+    loadingText: {
+      fontSize: 16,
+      color: theme.textSecondary, // Deep Navy with opacity from brandbook
+    },
+    resendLinkDisabled: {
+      color: theme.textSecondary, // Deep Navy with opacity from brandbook
+      opacity: 0.6,
+    },
+    title: {
+      fontSize: FONT_SIZES.title,
+      fontWeight: FONT_WEIGHTS.semibold,
+      fontFamily: theme.typography.displayFont, // Minion Pro for headlines (from brandbook)
+      color: '#FFFFFF',
+      marginBottom: SPACING.s,
+      letterSpacing: -0.3,
+      textAlign: 'center',
+      textShadowColor: 'rgba(0,0,0,0.3)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
+    },
+    subtitle: {
+      fontSize: FONT_SIZES.subtitle,
+      fontWeight: FONT_WEIGHTS.regular,
+      fontFamily: theme.typography.bodyFont, // Apparat for body text (from brandbook)
+      color: 'rgba(255,255,255,0.85)',
+      textAlign: 'center',
+      letterSpacing: 0,
+      textShadowColor: 'rgba(0,0,0,0.3)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
+    },
+    label: {
+      fontSize: FONT_SIZES.label,
+      fontWeight: FONT_WEIGHTS.medium,
+      fontFamily: theme.typography.bodyFont,
+      color: '#10233B', // Deep Navy - HARDCODED
+      marginBottom: SPACING.s,
+      letterSpacing: 0,
+    },
+    input: {
+      backgroundColor: 'rgba(255,255,255,0.95)',
+      borderRadius: 16, // Brandbook input radius
+      padding: 14,
+      fontSize: FONT_SIZES.input,
+      fontFamily: theme.typography.bodyFont,
+      color: '#10233B', // Deep Navy - HARDCODED
+      marginBottom: SPACING.l,
+      borderWidth: 1,
+      borderColor: 'rgba(0,0,0,0.1)',
+    },
+    primaryButton: {
+      backgroundColor: '#10233B', // Deep Navy - HARDCODED to ensure it shows
+      borderRadius: 22, // Brandbook button radius
+      paddingVertical: 14,
+      alignItems: 'center' as const,
+    },
+    buttonText: {
+      color: '#FFFFFF',
+      fontSize: FONT_SIZES.button,
+      fontFamily: theme.typography.bodyFont,
+      fontWeight: FONT_WEIGHTS.semibold,
+      letterSpacing: 0.01,
+    },
+    resendLinkText: {
+      fontSize: FONT_SIZES.link,
+      fontFamily: theme.typography.bodyFont,
+      color: '#9D5049', // Terracotta - HARDCODED
+      fontWeight: FONT_WEIGHTS.medium,
+      letterSpacing: 0,
+    },
+    backLinkText: {
+      fontSize: FONT_SIZES.link,
+      fontFamily: theme.typography.bodyFont,
+      color: '#9D5049', // Terracotta - HARDCODED
+      fontWeight: FONT_WEIGHTS.regular,
+      letterSpacing: 0,
+    },
+    legalText: {
+      fontSize: 12,
+      fontFamily: theme.typography.bodyFont, // Apparat for legal text (from brandbook)
+      color: 'rgba(255,255,255,0.75)',
+      textAlign: 'center',
+      lineHeight: 18,
+      textShadowColor: 'rgba(0,0,0,0.3)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
+    },
+    legalLink: {
+      fontFamily: theme.typography.bodyFont,
+      color: '#E5DED5', // Sand color from brandbook (api/design.tsx)
+      fontWeight: '600' as any,
+      textDecorationLine: 'underline' as const,
+    },
+    photoCredit: {
+      fontSize: FONT_SIZES.caption,
+      fontFamily: theme.typography.bodyFont, // Apparat for captions (from brandbook)
+      color: 'rgba(255,255,255,0.7)',
+      letterSpacing: 0.4,
+      textAlign: 'center',
+      textShadowColor: 'rgba(0,0,0,0.3)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
+    },
+  });
+  
   // Removed loading blocker - UI shows instantly, image loads progressively
   
   return (
@@ -302,8 +412,8 @@ const AuthScreen: React.FC = () => {
         >
           {/* Title & Subtitle */}
           <View style={styles.header}>
-            <Text style={styles.title}>Welcome to Glintz</Text>
-            <Text style={styles.subtitle}>
+            <Text style={dynamicStyles.title}>Welcome to Glintz</Text>
+            <Text style={dynamicStyles.subtitle}>
               {step === 'email' ? 'Discover your next stay' : 'Enter the code we just sent you'}
             </Text>
           </View>
@@ -323,9 +433,9 @@ const AuthScreen: React.FC = () => {
                 {step === 'email' ? (
                   // Email Step
                   <View>
-                    <Text style={styles.label}>Email Address</Text>
+                    <Text style={dynamicStyles.label}>Email Address</Text>
                     <TextInput
-                      style={styles.input}
+                      style={dynamicStyles.input}
                       value={email}
                       onChangeText={setEmail}
                       placeholder="your@email.com"
@@ -338,22 +448,22 @@ const AuthScreen: React.FC = () => {
 
                     <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
                       <TouchableOpacity
-                        style={styles.primaryButton}
+                        style={dynamicStyles.primaryButton}
                         onPress={handleContinue}
                         onPressIn={handleButtonPressIn}
                         onPressOut={handleButtonPressOut}
                         activeOpacity={0.9}
                       >
-                        <Text style={styles.buttonText}>Continue</Text>
+                        <Text style={dynamicStyles.buttonText}>Continue</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   </View>
                 ) : (
                   // OTP Step
                   <View>
-                    <Text style={styles.label}>Verification Code</Text>
+                    <Text style={dynamicStyles.label}>Verification Code</Text>
                     <TextInput
-                      style={styles.input}
+                      style={dynamicStyles.input}
                       value={otp}
                       onChangeText={handleOTPChange}
                       placeholder="Enter 6-digit code"
@@ -365,13 +475,13 @@ const AuthScreen: React.FC = () => {
 
                     <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
                       <TouchableOpacity
-                        style={styles.primaryButton}
+                        style={dynamicStyles.primaryButton}
                         onPress={handleLogin}
                         onPressIn={handleButtonPressIn}
                         onPressOut={handleButtonPressOut}
                         activeOpacity={0.9}
                       >
-                        <Text style={styles.buttonText}>Login</Text>
+                        <Text style={dynamicStyles.buttonText}>Login</Text>
                       </TouchableOpacity>
                     </Animated.View>
 
@@ -382,7 +492,7 @@ const AuthScreen: React.FC = () => {
                       activeOpacity={0.7}
                       disabled={isResending}
                     >
-                      <Text style={[styles.resendLinkText, isResending && styles.resendLinkDisabled]}>
+                      <Text style={[dynamicStyles.resendLinkText, isResending && dynamicStyles.resendLinkDisabled]}>
                         {isResending ? 'Sending...' : "Didn't get the code? Resend"}
                       </Text>
                     </TouchableOpacity>
@@ -393,7 +503,7 @@ const AuthScreen: React.FC = () => {
                       onPress={handleBackToEmail}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.backLinkText}>← Back to Email</Text>
+                      <Text style={dynamicStyles.backLinkText}>← Back to Email</Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -403,17 +513,17 @@ const AuthScreen: React.FC = () => {
 
           {/* Legal Links */}
           <View style={styles.legalContainer}>
-            <Text style={styles.legalText}>
+            <Text style={dynamicStyles.legalText}>
               By continuing, you agree to our{' '}
               <Text
-                style={styles.legalLink}
+                style={dynamicStyles.legalLink}
                 onPress={() => Linking.openURL('https://jacekhonkisz.github.io/glintz-legal/terms.html')}
               >
                 Terms
               </Text>
               {' & '}
               <Text
-                style={styles.legalLink}
+                style={dynamicStyles.legalLink}
                 onPress={() => Linking.openURL('https://jacekhonkisz.github.io/glintz-legal/privacy.html')}
               >
                 Privacy Policy
@@ -424,7 +534,7 @@ const AuthScreen: React.FC = () => {
           {/* Photo Credit */}
           {bgData && (
             <View style={styles.footer}>
-              <Text style={styles.photoCredit}>{bgData.caption || `Photo: ${bgData.hotelName}`}</Text>
+              <Text style={dynamicStyles.photoCredit}>{bgData.caption || `Photo: ${bgData.hotelName}`}</Text>
             </View>
           )}
         </KeyboardAvoidingView>
@@ -434,16 +544,6 @@ const AuthScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FAF8F5',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: COLOR_TEXT_MID,
-  },
   container: {
     flex: 1,
   },
@@ -456,104 +556,23 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xxxl,
     alignItems: 'center',
   },
-  title: {
-    fontSize: FONT_SIZES.title,
-    fontWeight: FONT_WEIGHTS.semibold,
-    color: '#FFFFFF', // White text for contrast against dark background
-    marginBottom: SPACING.s,
-    letterSpacing: -0.3,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.3)', // Subtle shadow for better readability
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  subtitle: {
-    fontSize: FONT_SIZES.subtitle,
-    fontWeight: FONT_WEIGHTS.regular,
-    color: 'rgba(255,255,255,0.85)', // Semi-transparent white for contrast
-    textAlign: 'center',
-    letterSpacing: 0,
-    textShadowColor: 'rgba(0,0,0,0.3)', // Subtle shadow for better readability
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
   cardContainer: {
     width: '100%',
-  },
-  label: {
-    fontSize: FONT_SIZES.label,
-    fontWeight: FONT_WEIGHTS.medium,
-    color: '#8e775a', // Warm brown color
-    marginBottom: SPACING.s,
-    letterSpacing: 0,
-  },
-  input: {
-    backgroundColor: 'rgba(255,255,255,0.95)', // Slightly more opaque white
-    borderRadius: RADIUS_M,
-    padding: 14,
-    fontSize: FONT_SIZES.input,
-    color: '#8e775a', // Warm brown text
-    marginBottom: SPACING.l,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.1)',
-  },
-  primaryButton: {
-    backgroundColor: '#8e775a', // Warm brown button
-    borderRadius: RADIUS_M,
-    paddingVertical: 14,
-    alignItems: 'center',
-    ...SHADOW_BUTTON,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: FONT_SIZES.button,
-    fontWeight: FONT_WEIGHTS.semibold,
-    letterSpacing: 0.2,
   },
   resendLink: {
     marginTop: SPACING.m,
     alignItems: 'center',
     paddingVertical: SPACING.s,
   },
-  resendLinkText: {
-    fontSize: FONT_SIZES.link,
-    color: '#8e775a', // Warm brown to match other text
-    fontWeight: FONT_WEIGHTS.medium,
-    letterSpacing: 0,
-  },
-  resendLinkDisabled: {
-    color: COLOR_TEXT_MID,
-    opacity: 0.6,
-  },
   backLink: {
     marginTop: SPACING.l,
     alignItems: 'center',
     paddingVertical: SPACING.m,
   },
-  backLinkText: {
-    fontSize: FONT_SIZES.link,
-    color: '#8e775a', // Warm brown to match other text
-    fontWeight: FONT_WEIGHTS.regular,
-    letterSpacing: 0,
-  },
   legalContainer: {
     marginTop: SPACING.xxl,
     paddingHorizontal: SPACING.xl,
     alignItems: 'center',
-  },
-  legalText: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    textAlign: 'center',
-    lineHeight: 18,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  legalLink: {
-    color: '#8e775a', // Warm brown to match other elements
-    fontWeight: '600',
-    textDecorationLine: 'underline',
   },
   footer: {
     position: 'absolute',
@@ -561,15 +580,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-  },
-  photoCredit: {
-    fontSize: FONT_SIZES.caption,
-    color: 'rgba(255,255,255,0.7)', // White text for contrast against dark background
-    letterSpacing: 0.4,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.3)', // Subtle shadow for better readability
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
 });
 

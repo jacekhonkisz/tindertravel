@@ -56,3 +56,4 @@ echo "========================================"
 echo "To view full log: tail -f google-places-fetch-log.txt"
 echo "To check again: bash check-fetch-progress.sh"
 echo "========================================"
+

@@ -152,3 +152,4 @@ async function analyzePhotoResolutions() {
 }
 
 analyzePhotoResolutions().catch(console.error);
+

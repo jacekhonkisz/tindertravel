@@ -445,3 +445,4 @@ class PhotoResolutionPrioritizer {
 // Run the script
 const prioritizer = new PhotoResolutionPrioritizer();
 prioritizer.run().catch(console.error);
+

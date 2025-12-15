@@ -7,7 +7,7 @@ const PORT = 3001;
 
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://qlpxseihykemsblusojx.supabase.co';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFscHhzZWloeWtlbXNibHVzb2p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODIzMjQsImV4cCI6MjA3Mzg1ODMyNH0.yuTwUGivtnorQX1WIgvzalscVPqTh3iVNY6yqId1xMs';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY_HERE';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Hotelbeds 4-5 star hotels with priority photos

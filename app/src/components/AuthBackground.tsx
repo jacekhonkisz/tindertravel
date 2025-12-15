@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#1a1a1a', // Dark background as placeholder
+    backgroundColor: '#E5DED5', // Sand color from brandbook (api/design.tsx)
   },
   imageContainer: {
     position: 'absolute',

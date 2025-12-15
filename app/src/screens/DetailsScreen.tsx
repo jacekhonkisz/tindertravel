@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,6 @@ import {
   Platform,
   StatusBar,
   PanResponder,
-  Image as RNImage,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -25,6 +24,7 @@ import HotelMapView from '../components/HotelMapView';
 import { useTheme } from '../theme';
 import { Button, Card, Chip } from '../ui';
 import { getImageSource } from '../utils/imageUtils';
+import { dimensionCache } from '../utils/dimensionCache';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -57,8 +57,7 @@ const DetailsScreen: React.FC = () => {
   
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
-  // Store all preloaded dimensions in a Map to prevent duplicate loading and flicker
-  const [dimensionsMap, setDimensionsMap] = useState<Map<string, { width: number; height: number }>>(new Map());
+  const [dimensionsReady, setDimensionsReady] = useState(false);
   const photoScrollViewRef = React.useRef<ScrollView>(null);
   const { saveHotel, savedHotels } = useAppStore();
   
@@ -71,20 +70,28 @@ const DetailsScreen: React.FC = () => {
     
     IOSHaptics.buttonPress();
     
-    setCurrentPhotoIndex((prev) => {
-      const newIndex = direction === 'next' 
-        ? (prev + 1) % totalPhotos
-        : (prev - 1 + totalPhotos) % totalPhotos;
-      
-      // Scroll to new photo
-      photoScrollViewRef.current?.scrollTo({
-        x: newIndex * SCREEN_WIDTH,
-        animated: true,
-      });
-      
-      return newIndex;
+    // Calculate new index first
+    const newIndex = direction === 'next' 
+      ? (currentPhotoIndex + 1) % totalPhotos
+      : (currentPhotoIndex - 1 + totalPhotos) % totalPhotos;
+    
+    // Get dimensions for new photo from cache BEFORE updating state
+    const nextPhoto = photos[newIndex];
+    if (nextPhoto) {
+      const dimensions = dimensionCache.get(nextPhoto);
+      // Update dimensions first to prevent jump
+      setImageDimensions(dimensions || null);
+    }
+    
+    // Then update photo index
+    setCurrentPhotoIndex(newIndex);
+    
+    // Scroll to new photo
+    photoScrollViewRef.current?.scrollTo({
+      x: newIndex * SCREEN_WIDTH,
+      animated: true,
     });
-  }, [totalPhotos]);
+  }, [totalPhotos, currentPhotoIndex, photos]);
   
   const handleLeftTap = useCallback(() => {
     if (totalPhotos > 1) {
@@ -98,68 +105,80 @@ const DetailsScreen: React.FC = () => {
     }
   }, [totalPhotos, changePhoto]);
 
-  // Preload ALL photo dimensions ONCE when screen loads - prevents flicker
+  // Preload photo dimensions progressively - OPTIMIZED to show photos immediately
   useEffect(() => {
     const photos = hotel.photos || [];
     if (photos.length === 0 && hotel.heroPhoto) {
       photos.push(hotel.heroPhoto);
     }
     
-    if (photos.length === 0) return;
+    if (photos.length === 0) {
+      setDimensionsReady(true);
+      return;
+    }
     
+    // ✅ PERFORMANCE FIX: Show first photo immediately (no black screen!)
+    setDimensionsReady(true);
+    
+    // Set dimensions for first photo if already cached
+    const firstPhoto = photos[0];
+    if (firstPhoto && dimensionCache.has(firstPhoto)) {
+      setImageDimensions(dimensionCache.get(firstPhoto));
+    }
+    
+    // Preload dimensions and images in background (non-blocking)
     const preloadDimensions = async () => {
-      const preloadPromises = photos.map(async (photo: string) => {
-        if (!photo || photo.length === 0) return { photo, dimensions: null };
-        
-        // Preload image
-        await Image.prefetch(photo).catch(() => {});
-        
-        // Preload dimensions
-        const dimensions = await new Promise<{ width: number; height: number } | null>((resolve) => {
-          RNImage.getSize(
-            photo,
-            (width, height) => resolve({ width, height }),
-            () => resolve(null)
-          );
-        });
-        
-        return { photo, dimensions };
-      });
+      // Load dimensions for all photos (fast - just HTTP headers)
+      await dimensionCache.preload(photos);
       
-      const results = await Promise.all(preloadPromises);
-      const newDimensionsMap = new Map<string, { width: number; height: number }>();
+      // Update dimensions for current photo
+      const currentPhoto = photos[currentPhotoIndex] || photos[0];
+      if (currentPhoto) {
+        const dimensions = dimensionCache.get(currentPhoto);
+        setImageDimensions(dimensions || null);
+      }
       
-      results.forEach(({ photo, dimensions }) => {
-        if (dimensions) {
-          newDimensionsMap.set(photo, dimensions);
+      // Prefetch first 3 photos for smooth swiping (rest load on-demand)
+      const priorityPhotos = photos.slice(0, 3);
+      priorityPhotos.forEach((photo: string) => {
+        if (photo && photo.length > 0) {
+          Image.prefetch(photo).catch(() => {});
         }
       });
       
-      setDimensionsMap(newDimensionsMap);
-      
-      // Set dimensions for current photo immediately
-      const currentPhoto = photos[currentPhotoIndex] || photos[0];
-      if (currentPhoto && newDimensionsMap.has(currentPhoto)) {
-        setImageDimensions(newDimensionsMap.get(currentPhoto)!);
-      }
+      // Lazy load remaining photos after a short delay
+      setTimeout(() => {
+        const remainingPhotos = photos.slice(3);
+        remainingPhotos.forEach((photo: string) => {
+          if (photo && photo.length > 0) {
+            Image.prefetch(photo).catch(() => {});
+          }
+        });
+      }, 1000);
     };
     
-    preloadDimensions();
+    preloadDimensions(); // Run in background - don't block UI
   }, [hotel.photos, hotel.heroPhoto]); // Only run when hotel changes
   
-  // Update dimensions when photo index changes - use preloaded Map (no flicker!)
-  useEffect(() => {
+  // Use useLayoutEffect to update dimensions BEFORE browser paint (prevents flicker)
+  // This runs synchronously after DOM updates but before paint
+  useLayoutEffect(() => {
     const photos = hotel.photos || [];
     const currentPhoto = photos.length > 0 ? photos[currentPhotoIndex] : (hotel.heroPhoto || '');
     
-    if (currentPhoto && dimensionsMap.has(currentPhoto)) {
-      // Use preloaded dimensions - instant, no flicker!
-      setImageDimensions(dimensionsMap.get(currentPhoto)!);
+    if (currentPhoto) {
+      const dimensions = dimensionCache.get(currentPhoto);
+      const currentDimsStr = JSON.stringify(imageDimensions);
+      const newDimsStr = JSON.stringify(dimensions);
+      if (currentDimsStr !== newDimsStr) {
+        setImageDimensions(dimensions || null);
+      }
     } else {
-      // Fallback: if dimensions not preloaded yet
-      setImageDimensions(null);
+      if (imageDimensions !== null) {
+        setImageDimensions(null);
+      }
     }
-  }, [currentPhotoIndex, hotel.photos, hotel.heroPhoto, dimensionsMap]);
+  }, [currentPhotoIndex, hotel.photos, hotel.heroPhoto]);
 
   const isLiked = savedHotels.liked.some(h => h.id === hotel.id);
   const isSuperliked = savedHotels.superliked.some(h => h.id === hotel.id);
@@ -240,7 +259,7 @@ const DetailsScreen: React.FC = () => {
     saveHotel(hotel, type);
     Alert.alert(
       'Saved!',
-      `Hotel ${type === 'superlike' ? 'super liked' : 'liked'} and saved to your favorites.`,
+      `Hotel ${type === 'superlike' ? 'super liked' : 'saved'} and added to your favorites.`,
       [{ text: 'OK' }]
     );
   };
@@ -269,15 +288,40 @@ const DetailsScreen: React.FC = () => {
 
     const imageSource = getImageSource(displayPhoto);
 
-    // Smart display based on orientation
-    // - Vertical images: Calculate proper size to show full image without cropping
-    // - Horizontal images: 60% of FULL SCREEN height with "cover" (good coverage, not too big)
-    const isHorizontal = imageDimensions && imageDimensions.width > imageDimensions.height;
+    // Simple two-category system: horizontal (wide) vs vertical/square
+    const getPhotoDisplaySize = (dims: { width: number; height: number } | null) => {
+      if (!dims) return { height: dimensions.photoHeight, isHorizontal: false, shouldCenter: false };
+      
+      const aspectRatio = dims.width / dims.height;
+      
+      // Horizontal (landscape) photos: wider than 1.15:1 ratio
+      if (aspectRatio > 1.15) {
+        return { 
+          height: SCREEN_HEIGHT * 0.6, 
+          isHorizontal: true,
+          shouldCenter: true  // Center horizontally-oriented photos
+        };
+      }
+      
+      // Vertical/Square photos: 1.15:1 ratio or less
+      return { 
+        height: dimensions.photoHeight, 
+        isHorizontal: false,
+        shouldCenter: false  // Fill screen for vertical photos
+      };
+    };
     
-    // For vertical images: Use full container height with 'cover' to fill screen (no black bars)
-    // For horizontal images: Use 60% height with 'cover' for better coverage
-    const photoHeight = isHorizontal ? SCREEN_HEIGHT * 0.6 : dimensions.photoHeight;
+    const displaySize = getPhotoDisplaySize(imageDimensions);
+    const photoHeight = displaySize.height;
+    const isHorizontal = displaySize.isHorizontal;
+    const shouldCenter = displaySize.shouldCenter;
     const contentFit = 'cover'; // Use 'cover' for both to fill screen completely (no black bars)
+
+    // Use placeholder height that matches final image height to prevent layout shift
+    const placeholderHeight = photoHeight;
+    
+    // Calculate marginTop for centering horizontal photos
+    const photoMarginTop = shouldCenter ? (SCREEN_HEIGHT - photoHeight) / 2 : 0;
 
     // If single photo or no carousel needed
     if (photos.length <= 1) {
@@ -290,28 +334,45 @@ const DetailsScreen: React.FC = () => {
             backgroundColor: isHorizontal ? '#1a1a1a' : 'transparent' // Single background layer
           }
         ]}>
-          <Image
-            source={imageSource}
-            style={[
-              styles.singlePhoto, 
-              { 
-                height: photoHeight,
+          {dimensionsReady ? (
+            <Image
+              source={imageSource}
+              style={[
+                styles.singlePhoto, 
+                { 
+                  height: photoHeight,
+                  width: '100%',
+                  alignSelf: 'center',
+                  marginTop: photoMarginTop  // Center horizontal photos
+                }
+              ]}
+              contentFit={contentFit}
+              cachePolicy="memory-disk"
+              transition={200}
+              onLoad={() => {
+                // Dimensions are already preloaded - no need to load again (prevents flicker)
+                // Logging removed for performance
+              }}
+              onError={(error) => {
+                console.error('❌ Photo load error:', error);
+                console.error('❌ Failed URL:', imageSource.uri);
+              }}
+            />
+          ) : (
+            <View style={[
+              styles.singlePhoto,
+              {
+                height: placeholderHeight,
                 width: '100%',
-                alignSelf: 'center'
+                marginTop: photoMarginTop,  // Match image centering
+                backgroundColor: '#2a2a2a', // Softer gray instead of pure black
+                justifyContent: 'center',
+                alignItems: 'center'
               }
-            ]}
-            contentFit={contentFit}
-            cachePolicy="memory-disk"
-            transition={200}
-            onLoad={() => {
-              console.log('✅ Photo loaded successfully');
-              // Dimensions are already preloaded - no need to load again (prevents flicker)
-            }}
-            onError={(error) => {
-              console.error('❌ Photo load error:', error);
-              console.error('❌ Failed URL:', imageSource.uri);
-            }}
-          />
+            ]}>
+              {/* Removed text to show clean loading state */}
+            </View>
+          )}
         </View>
       );
     }
@@ -339,13 +400,24 @@ const DetailsScreen: React.FC = () => {
         >
           {photos.map((photo, index) => {
             const photoSource = getImageSource(photo);
-            // Detect orientation for this photo
-            const isPhotoHorizontal = imageDimensions && imageDimensions.width > imageDimensions.height;
+            // Get dimensions for THIS specific photo from cache (not current photo's dimensions!)
+            const photoDims = dimensionCache.get(photo);
             
-            // For vertical images: Use full container height with 'cover' to fill screen (no black bars)
-            // For horizontal images: Use 60% height with 'cover' for better coverage
-            const photoHeight = isPhotoHorizontal ? SCREEN_HEIGHT * 0.6 : dimensions.photoHeight;
+            // Use same simple two-category logic for carousel photos
+            const photoDisplaySize = photoDims ? (() => {
+              const aspectRatio = photoDims.width / photoDims.height;
+              if (aspectRatio > 1.15) {
+                return { height: SCREEN_HEIGHT * 0.6, isHorizontal: true, shouldCenter: true };
+              }
+              return { height: dimensions.photoHeight, isHorizontal: false, shouldCenter: false };
+            })() : { height: dimensions.photoHeight, isHorizontal: false, shouldCenter: false };
+            
+            const photoHeight = photoDisplaySize.height;
+            const isPhotoHorizontal = photoDisplaySize.isHorizontal;
+            const photoShouldCenter = photoDisplaySize.shouldCenter;
             const photoContentFit = 'cover'; // Use 'cover' for both to fill screen completely (no black bars)
+            const photoPlaceholderHeight = photoHeight;
+            const photoMarginTop = photoShouldCenter ? (SCREEN_HEIGHT - photoHeight) / 2 : 0;
             
             return (
               <View 
@@ -360,25 +432,42 @@ const DetailsScreen: React.FC = () => {
                   }
                 ]}
               >
-                <Image
-                  source={photoSource}
-                  style={[styles.carouselPhoto, { 
-                    height: photoHeight,
-                    width: SCREEN_WIDTH,
-                    alignSelf: 'center'
-                  }]}
-                  contentFit={photoContentFit}
-                  cachePolicy="memory-disk"
-                  transition={200}
-                  onLoad={() => {
-                    console.log(`✅ Photo ${index} loaded`);
-                    // Dimensions are already preloaded - no need to load again (prevents flicker)
-                  }}
-                  onError={(error) => {
-                    console.error(`❌ Photo ${index} load error:`, error);
-                    console.error('❌ Failed URL:', photoSource.uri);
-                  }}
-                />
+                {dimensionsReady && photoDims ? (
+                  <Image
+                    source={photoSource}
+                    style={[styles.carouselPhoto, { 
+                      height: photoHeight,
+                      width: SCREEN_WIDTH,
+                      alignSelf: 'center',
+                      marginTop: photoMarginTop  // Center horizontal photos in carousel
+                    }]}
+                    contentFit={photoContentFit}
+                    cachePolicy="memory-disk"
+                    transition={200}
+                    onLoad={() => {
+                      // Dimensions are already preloaded - no need to load again (prevents flicker)
+                      // Logging removed for performance
+                    }}
+                    onError={(error) => {
+                      console.error(`❌ Photo ${index} load error:`, error);
+                      console.error('❌ Failed URL:', photoSource.uri);
+                    }}
+                  />
+                ) : (
+                  <View style={[
+                    styles.carouselPhoto,
+                    {
+                      height: photoPlaceholderHeight,
+                      width: SCREEN_WIDTH,
+                      marginTop: photoMarginTop,  // Match image centering in carousel
+                      backgroundColor: '#2a2a2a', // Softer gray instead of pure black
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }
+                  ]}>
+                    {/* Clean loading state without text */}
+                  </View>
+                )}
               </View>
             );
           })}
@@ -550,11 +639,13 @@ const DetailsScreen: React.FC = () => {
     hotelName: {
       fontSize: 28,
       fontWeight: '600',
+      fontFamily: theme.typography.displayFont, // Minion Pro for headlines (from brandbook)
       color: theme.textPrimary,
       marginBottom: theme.spacing.s,
     },
     location: {
       fontSize: 17,
+      fontFamily: theme.typography.bodyFont, // Apparat for body text (from brandbook)
       color: '#000000', // Changed to black instead of theme.textSecondary
       marginBottom: theme.spacing.s,
     },
@@ -671,7 +762,7 @@ const DetailsScreen: React.FC = () => {
           <View style={styles.statusContainer}>
             {isLiked && (
               <View style={styles.statusBadge}>
-                <Text style={styles.statusText}>♡ Liked</Text>
+                <Text style={styles.statusText}>♡ Saved</Text>
               </View>
             )}
             {isSuperliked && (

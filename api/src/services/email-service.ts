@@ -31,7 +31,7 @@ export class EmailService {
 
   constructor() {
     this.apiKey = process.env.MAILERSEND_API_KEY || '';
-    this.fromEmail = process.env.FROM_EMAIL || 'noreply@glintz.com';
+    this.fromEmail = process.env.FROM_EMAIL || 'noreply@jhvideoedits.com'; // Use verified domain
     this.fromName = process.env.FROM_NAME || 'Glintz Travel';
 
     if (!this.apiKey) {
@@ -105,8 +105,10 @@ export class EmailService {
   /**
    * Send OTP verification code email
    */
-  async sendOTPEmail(email: string, code: string): Promise<{ success: boolean; error?: string }> {
+  async sendOTPEmail(email: string, code: string): Promise<{ success: boolean; error?: string; messageId?: string }> {
     console.log('📨 Preparing OTP email for:', email);
+    console.log('📨 API Key available:', this.apiKey ? 'YES' : 'NO');
+    console.log('📨 From email:', this.fromEmail);
 
     // Admin emails that can receive emails on trial account
     const adminEmails = [
@@ -118,14 +120,31 @@ export class EmailService {
       email.toLowerCase() === admin.toLowerCase()
     );
 
-    // If no API key or in dev mode, always use console logging (unless it's admin email)
-    if (!this.apiKey && !isAdminEmail) {
-      console.log('📧 [DEV MODE] OTP Code for', email, ':', code);
-      console.log('   Use this code in the app:', code);
-      return {
-        success: true,
-        messageId: 'dev-mode-' + Date.now()
-      };
+    // Always log OTP codes for development/testing
+    console.log('🔐 ============================================');
+    console.log('🔐 OTP CODE GENERATED');
+    console.log('🔐 Email:', email);
+    console.log('🔐 Code:', code);
+    console.log('🔐 Use this code in the app!');
+    console.log('🔐 ============================================');
+
+    // If no API key, use console logging (unless it's admin email)
+    if (!this.apiKey) {
+      if (isAdminEmail) {
+        console.log('📧 [ADMIN EMAIL] OTP Code for', email, ':', code);
+        console.log('   Use this code in the app:', code);
+        return {
+          success: true,
+          messageId: 'admin-dev-mode-' + Date.now()
+        };
+      } else {
+        console.log('📧 [DEV MODE] OTP Code for', email, ':', code);
+        console.log('   Use this code in the app:', code);
+        return {
+          success: true,
+          messageId: 'dev-mode-' + Date.now()
+        };
+      }
     }
 
     const subject = 'Your Glintz Verification Code';

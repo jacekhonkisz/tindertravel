@@ -1,6 +1,13 @@
 const { getDefaultConfig } = require('expo/metro-config');
+const path = require('path');
 
-const config = getDefaultConfig(__dirname);
+// Force project root to be the app directory, not parent
+const projectRoot = __dirname;
+const config = getDefaultConfig(projectRoot);
+
+// Set project root explicitly
+config.projectRoot = projectRoot;
+config.watchFolders = [projectRoot];
 
 // iOS-specific optimizations
 config.transformer = {
@@ -16,36 +23,24 @@ config.transformer = {
   },
 };
 
-// Optimize resolver for iOS-only
+// Optimize resolver for iOS and web
 config.resolver = {
   ...config.resolver,
-  platforms: ['ios'], // Only resolve iOS platform
-  // Resolve native modules efficiently
-  resolveRequest: (context, moduleName, platform) => {
-    // Skip web-specific modules for main app
-    if (moduleName.includes('react-native-web') || moduleName.includes('react-dom')) {
-      return {
-        type: 'empty',
-      };
-    }
-    return context.resolveRequest(context, moduleName, platform);
-  },
+  platforms: ['ios', 'web'], // Support both iOS and web platforms
 };
 
-// More selective web blocking - allow DevTools but block main app web serving
+// Allow web serving for PWA
 config.server = {
   ...config.server,
-  // Enhanced URL rewriting for better control
-  rewriteRequestUrl: (url) => {
-    // Allow web requests for DevTools interface (but not main app)
-    if (url.includes('platform=web') && !url.includes('dev=true')) {
-      // This is likely a main app web request - block it
-      console.log('🚫 Blocking main app web bundle request:', url);
-      return null; // Block the request
-    }
-    // Allow DevTools web requests to pass through
-    return url;
-  },
 };
+
+// Disable static rendering for React Navigation apps
+config.transformer = {
+  ...config.transformer,
+  enableStaticRendering: false,
+};
+
+// Force disable static rendering
+process.env.EXPO_NO_STATIC_RENDERING = 'true';
 
 module.exports = config;

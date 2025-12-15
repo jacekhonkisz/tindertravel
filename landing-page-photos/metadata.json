@@ -1,0 +1,34 @@
+{
+  "scrapedAt": "2025-10-14T10:16:37.353Z",
+  "totalPhotos": 2,
+  "hotels": [
+    "Iberostar Selection Playa de Palma",
+    "Gran Hotel Bahia del Duque"
+  ],
+  "photoQuality": "XXL (2048px)",
+  "source": "Hotelbeds",
+  "photos": [
+    {
+      "filename": "iberostar-selection-playa-de-palma-general-1.jpg",
+      "hotelName": "Iberostar Selection Playa de Palma",
+      "city": "Palma",
+      "country": "Spain",
+      "rating": 4,
+      "roomType": "General View",
+      "roomTypeName": "Hotel Exterior",
+      "originalUrl": "https://photos.hotelbeds.com/giata/xxl/00/000020/000020a_hb_a_001.jpg",
+      "localPath": "/Users/ala/tindertravel/landing-page-photos/iberostar-selection-playa-de-palma-general-1.jpg"
+    },
+    {
+      "filename": "gran-hotel-bahia-del-duque-general-1.jpg",
+      "hotelName": "Gran Hotel Bahia del Duque",
+      "city": "Costa Adeje",
+      "country": "Spain",
+      "rating": 5,
+      "roomType": "General View",
+      "roomTypeName": "Hotel Exterior",
+      "originalUrl": "https://photos.hotelbeds.com/giata/xxl/00/000030/000030a_hb_a_001.jpg",
+      "localPath": "/Users/ala/tindertravel/landing-page-photos/gran-hotel-bahia-del-duque-general-1.jpg"
+    }
+  ]
+}

@@ -566,3 +566,4 @@ class LiteAPIPhotoFetcher {
 const fetcher = new LiteAPIPhotoFetcher();
 fetcher.run().catch(console.error);
 
+

@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotelbeds XXL Photos Gallery</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .photo-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .photo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+        }
+        .photo-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        .photo-info {
+            padding: 20px;
+        }
+        .hotel-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .hotel-location {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .hotel-rating {
+            color: #f39c12;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .room-type {
+            color: #27ae60;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stats {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .quality-badge {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏨 Hotelbeds XXL Photos Gallery</h1>
+        <p>Professional hotel photos at 2048px resolution</p>
+        <p>Scraped on 10/14/2025, 12:16:37 PM</p>
+    </div>
+    
+    <div class="stats">
+        <h2>📊 Statistics</h2>
+        <p><strong>Total Photos:</strong> 2</p>
+        <p><strong>Hotels:</strong> 2</p>
+        <p><strong>Hotels:</strong> Iberostar Selection Playa de Palma, Gran Hotel Bahia del Duque</p>
+        <div class="quality-badge">XXL (2048px)</div>
+    </div>
+    
+    <div class="gallery">
+        
+            <div class="photo-card">
+                <img src="iberostar-selection-playa-de-palma-general-1.jpg" alt="Iberostar Selection Playa de Palma" loading="lazy">
+                <div class="photo-info">
+                    <div class="hotel-name">Iberostar Selection Playa de Palma</div>
+                    <div class="hotel-location">Palma, Spain</div>
+                    <div class="hotel-rating">⭐ 4/5</div>
+                    <div class="room-type">Hotel Exterior</div>
+                </div>
+            </div>
+        
+            <div class="photo-card">
+                <img src="gran-hotel-bahia-del-duque-general-1.jpg" alt="Gran Hotel Bahia del Duque" loading="lazy">
+                <div class="photo-info">
+                    <div class="hotel-name">Gran Hotel Bahia del Duque</div>
+                    <div class="hotel-location">Costa Adeje, Spain</div>
+                    <div class="hotel-rating">⭐ 5/5</div>
+                    <div class="room-type">Hotel Exterior</div>
+                </div>
+            </div>
+        
+    </div>
+</body>
+</html>

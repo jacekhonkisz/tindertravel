@@ -121,7 +121,7 @@ app.get('/health', async (req, res) => {
 
 // Seed hotels from Amadeus API
 app.post('/api/seed', seedLimiter, async (req, res) => {
-  try {
+  try {`
     console.log('Starting luxury hotel seeding process...');
     
     // Clear existing hotels first

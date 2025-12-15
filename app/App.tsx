@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet, StatusBar, Platform, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, StatusBar, Platform, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import GlintzLogo from './src/components/GlintzLogo';
 
 // IMMEDIATE LOG TO VERIFY CODE IS LOADING
 console.log('🚨🚨🚨 APP.TSX FILE IS LOADING - NEW CODE VERSION 4.0 🚨🚨🚨');
@@ -13,7 +14,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import DetailsScreen from './src/screens/DetailsScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import HotelCollectionScreen from './src/screens/HotelCollectionScreen';
-import SimpleDevAuthScreen from './src/screens/SimpleDevAuthScreen';
+import AuthScreen from './src/screens/AuthScreen';
 
 // Types
 import { RootStackParamList } from './src/types';
@@ -23,7 +24,7 @@ import { useAppStore } from './src/store';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-const AuthStack = () => <SimpleDevAuthScreen />;
+const AuthStack = () => <AuthScreen />;
 
 const MainStack = () => (
   <Stack.Navigator
@@ -124,7 +125,7 @@ const MainStack = () => (
 
 const LoadingScreen = () => (
   <View style={styles.loadingContainer}>
-    <ActivityIndicator size="large" color="#667eea" />
+    <GlintzLogo width={200} height={115} />
   </View>
 );
 
@@ -192,6 +193,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000',
+    backgroundColor: '#E5DED5', // Sand color from brandbook (api/design.tsx)
   },
 });

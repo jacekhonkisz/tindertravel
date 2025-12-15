@@ -178,6 +178,11 @@ export class OTPService {
         .eq('id', otpRecord.id);
 
       // Verify the code
+      console.log('🔍 Comparing codes:');
+      console.log('   Stored code:', otpRecord.code);
+      console.log('   Provided code:', code);
+      console.log('   Codes match:', otpRecord.code === code);
+      
       if (otpRecord.code !== code) {
         console.warn('⚠️  Invalid OTP code provided for email:', email);
         const attemptsRemaining = this.MAX_ATTEMPTS - newAttempts;

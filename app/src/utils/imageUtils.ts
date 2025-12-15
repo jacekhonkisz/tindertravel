@@ -1,3 +1,6 @@
+// Cache for image source objects to prevent unnecessary re-renders
+const imageSourceCache = new Map<string, { uri: string }>();
+
 export const getImageUrl = (photo: any): string => {
   // If it's a JSON string, try to parse it and extract URL
   if (typeof photo === 'string' && photo.startsWith('{')) {
@@ -39,9 +42,18 @@ export const getImageSource = (photo: any) => {
     return { uri: '' };
   }
   
+  // Return cached source object if available (prevents unnecessary re-renders)
+  if (imageSourceCache.has(url)) {
+    return imageSourceCache.get(url)!;
+  }
+  
+  // Create new source object and cache it
+  const source = { uri: url };
+  imageSourceCache.set(url, source);
+  
   // expo-image expects simple { uri: string } format
   // Caching is handled by the Image component's cachePolicy prop
-  return { uri: url };
+  return source;
 };
 
 export const getPhotoSource = (photo: any): string => {

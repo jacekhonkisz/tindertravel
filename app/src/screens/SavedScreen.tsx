@@ -44,7 +44,7 @@ const SavedScreen: React.FC = () => {
   };
 
   const handleSeeAll = (type: 'like' | 'superlike') => {
-    const categoryName = type === 'superlike' ? 'Super Liked' : 'Liked';
+    const categoryName = type === 'superlike' ? 'Super Liked' : 'Saved';
     
     navigation.navigate('HotelCollection', {
       type,
@@ -105,11 +105,7 @@ const SavedScreen: React.FC = () => {
           <Text style={styles.hotelLocation} numberOfLines={1}>
             {hotel.city}, {hotel.country}
           </Text>
-          {hotel.price && (
-            <Text style={styles.hotelPrice}>
-              from {formatPrice(hotel.price)}/night
-            </Text>
-          )}
+          {/* Price removed - View rates on hotel website */}
         </View>
 
         {/* Type indicator */}
@@ -151,11 +147,7 @@ const SavedScreen: React.FC = () => {
         <Text style={styles.compactHotelLocation} numberOfLines={1}>
           {hotel.city}, {hotel.country}
         </Text>
-        {hotel.price && (
-          <Text style={styles.compactHotelPrice}>
-            from {formatPrice(hotel.price)}/night
-          </Text>
-        )}
+        {/* Price removed - View rates on hotel website */}
       </View>
     </TouchableOpacity>
   );
@@ -167,7 +159,7 @@ const SavedScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>{title}</Text>
           <View style={styles.emptySection}>
             <Text style={styles.emptyText}>
-              No {type === 'superlike' ? 'super liked' : 'liked'} hotels yet
+              No {type === 'superlike' ? 'super liked' : 'saved'} hotels yet
             </Text>
             <Text style={styles.emptySubtext}>
               {type === 'superlike' 
@@ -208,7 +200,7 @@ const SavedScreen: React.FC = () => {
       width: 44,
       height: 44,
       borderRadius: 22,
-      backgroundColor: theme.chipBg,
+      backgroundColor: 'transparent', // Transparent background
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -241,7 +233,7 @@ const SavedScreen: React.FC = () => {
     logoutButton: {
       paddingHorizontal: theme.spacing.m,
       paddingVertical: theme.spacing.xs,
-      backgroundColor: theme.chipBg,
+      backgroundColor: 'transparent', // Transparent background
       borderRadius: theme.spacing.xs,
     },
     logoutText: {
@@ -559,7 +551,7 @@ const SavedScreen: React.FC = () => {
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
           <Text style={styles.statNumber}>{savedHotels.liked.length}</Text>
-          <Text style={styles.statLabel}>Liked</Text>
+          <Text style={styles.statLabel}>Saved</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
@@ -625,7 +617,7 @@ const SavedScreen: React.FC = () => {
           {/* Liked Row */}
           <View style={styles.categorySection}>
             <View style={styles.categoryHeader}>
-              <Text style={styles.categoryTitle}>Liked ({savedHotels.liked.length})</Text>
+              <Text style={styles.categoryTitle}>Saved ({savedHotels.liked.length})</Text>
               {savedHotels.liked.length > 3 && (
                 <TouchableOpacity 
                   style={styles.seeAllButton}

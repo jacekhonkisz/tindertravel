@@ -1,5 +1,4 @@
-import React, { useState, useCallback, useMemo, memo, useEffect } from 'react';
-import { Image as RNImage } from 'react-native';
+import React, { useState, useCallback, useMemo, memo, useEffect, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -18,6 +17,8 @@ import { apiClient } from '../api/client';
 import { useTheme } from '../theme';
 import { GradientOverlay, DebugBadge, Chip } from '../ui';
 import { getImageSource } from '../utils/imageUtils';
+import { useAppStore } from '../store';
+import { dimensionCache } from '../utils/dimensionCache';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -30,12 +31,16 @@ interface HotelCardProps {
 
 const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, isDevelopment = false }) => {
   const theme = useTheme();
+  const { saveHotel, savedHotels } = useAppStore();
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [photoManagerVisible, setPhotoManagerVisible] = useState(false);
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
-  // Store all preloaded dimensions in a Map to prevent duplicate loading
-  const [dimensionsMap, setDimensionsMap] = useState<Map<string, { width: number; height: number }>>(new Map());
+  const [dimensionsReady, setDimensionsReady] = useState(false);
   const fadeAnim = new Animated.Value(1);
+  
+  // Check if hotel is already saved
+  const isSaved = savedHotels.liked.some(h => h.id === hotel.id);
+  const isSuperliked = savedHotels.superliked.some(h => h.id === hotel.id);
 
   const photos = useMemo(() => 
     hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto], 
@@ -44,66 +49,58 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
   
   const totalPhotos = useMemo(() => photos.length, [photos.length]);
 
-  // Preload ALL photos AND their dimensions ONCE - prevents flicker and duplicate loading
+  // Preload ALL photos AND their dimensions ONCE using global cache - prevents flicker and duplicate loading
   useEffect(() => {
     const preloadAllPhotos = async () => {
-      if (!photos || photos.length === 0) return;
+      if (!photos || photos.length === 0) {
+        setDimensionsReady(true);
+        return;
+      }
       
-      // Preload images and dimensions in parallel
-      const preloadPromises = photos.map(async (photo: string) => {
-        if (!photo || photo.length === 0) return { photo, dimensions: null };
-        
-        // Preload image
-        await Image.prefetch(photo).catch(() => {});
-        
-        // Preload dimensions to prevent flicker
-        const dimensions = await new Promise<{ width: number; height: number } | null>((resolve) => {
-          RNImage.getSize(
-            photo,
-            (width, height) => resolve({ width, height }),
-            () => resolve(null)
-          );
-        });
-        
-        return { photo, dimensions };
-      });
+      setDimensionsReady(false);
       
-      const results = await Promise.all(preloadPromises);
+      // Preload images in parallel
+      const imagePrefetchPromises = photos.map((photo: string) => 
+        photo && photo.length > 0 ? Image.prefetch(photo).catch(() => {}) : Promise.resolve()
+      );
       
-      // Store all dimensions in Map for instant lookup
-      const newDimensionsMap = new Map<string, { width: number; height: number }>();
-      results.forEach(({ photo, dimensions }) => {
-        if (dimensions) {
-          newDimensionsMap.set(photo, dimensions);
-        }
-      });
+      // Preload dimensions using global cache (prevents duplicate calls)
+      const dimensionsMap = await dimensionCache.preload(photos);
       
-      setDimensionsMap(newDimensionsMap);
+      // Wait for image prefetch to complete
+      await Promise.all(imagePrefetchPromises);
       
       // Set dimensions for current photo immediately (prevents flicker)
       const currentPhoto = photos[currentPhotoIndex];
-      if (currentPhoto && newDimensionsMap.has(currentPhoto)) {
-        setImageDimensions(newDimensionsMap.get(currentPhoto)!);
+      if (currentPhoto) {
+        const dimensions = dimensionCache.get(currentPhoto);
+        setImageDimensions(dimensions || null);
       }
+      
+      setDimensionsReady(true);
     };
     
     preloadAllPhotos();
   }, [photos]); // Only run when photos change, not on photo index change
   
-  // Update dimensions when photo index changes - use preloaded Map (no duplicate loading!)
-  useEffect(() => {
+  // Use useLayoutEffect to update dimensions BEFORE browser paint (prevents flicker)
+  // This runs synchronously after DOM updates but before paint
+  useLayoutEffect(() => {
     const currentPhoto = photos[currentPhotoIndex];
-    if (currentPhoto && dimensionsMap.has(currentPhoto)) {
-      // Use preloaded dimensions - instant, no flicker!
-      const dimensions = dimensionsMap.get(currentPhoto)!;
-      setImageDimensions(dimensions);
-    } else if (currentPhoto) {
-      // Fallback: if dimensions not preloaded yet, set to null (will show with default sizing)
-      setImageDimensions(null);
+    if (currentPhoto) {
+      const dimensions = dimensionCache.get(currentPhoto);
+      // Only update if dimensions are different (prevents unnecessary re-renders)
+      const currentDimsStr = JSON.stringify(imageDimensions);
+      const newDimsStr = JSON.stringify(dimensions);
+      if (currentDimsStr !== newDimsStr) {
+        setImageDimensions(dimensions || null);
+      }
     } else {
-      setImageDimensions(null);
+      if (imageDimensions !== null) {
+        setImageDimensions(null);
+      }
     }
-  }, [currentPhotoIndex, photos, dimensionsMap]);
+  }, [currentPhotoIndex, photos]); // imageDimensions deliberately excluded from deps
 
 
   const formatPrice = (price?: { amount: string; currency: string }) => {
@@ -119,14 +116,22 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
     // Haptic feedback - instant
     IOSHaptics.buttonPress();
 
-    // INSTANT photo change - no animation delay
-    // Photos are preloaded so they appear immediately
-    if (direction === 'next') {
-      setCurrentPhotoIndex((prev) => (prev + 1) % totalPhotos);
-    } else {
-      setCurrentPhotoIndex((prev) => (prev - 1 + totalPhotos) % totalPhotos);
+    // Calculate new index
+    const newIndex = direction === 'next' 
+      ? (currentPhotoIndex + 1) % totalPhotos
+      : (currentPhotoIndex - 1 + totalPhotos) % totalPhotos;
+    
+    // Get dimensions for new photo from cache BEFORE updating state
+    const nextPhoto = photos[newIndex];
+    if (nextPhoto) {
+      const dimensions = dimensionCache.get(nextPhoto);
+      // Update dimensions first to prevent jump
+      setImageDimensions(dimensions || null);
     }
-  }, [totalPhotos]);
+    
+    // Then update photo index - this prevents intermediate render with wrong dimensions
+    setCurrentPhotoIndex(newIndex);
+  }, [totalPhotos, currentPhotoIndex, photos]);
 
   const handleLeftTap = useCallback(() => {
     if (totalPhotos > 1) {
@@ -211,19 +216,82 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
     }
   };
 
+  const handleSave = useCallback(() => {
+    IOSHaptics.likeAction();
+    saveHotel(hotel, 'like');
+  }, [hotel, saveHotel]);
+
   // Get image source with fallback
   const currentPhoto = photos[currentPhotoIndex];
   const imageSource = currentPhoto ? getImageSource(currentPhoto) : null;
   const hasValidImage = imageSource && imageSource.uri && imageSource.uri.length > 0;
 
-  // Smart display based on orientation - use single source of truth to prevent conflicts
-  const isHorizontal = imageDimensions ? (imageDimensions.width > imageDimensions.height) : false;
+  // Simple two-category system: horizontal (wide) vs vertical/square
+  const getPhotoDisplaySize = useCallback((dimensions: { width: number; height: number } | null) => {
+    if (!dimensions) return { height: SCREEN_HEIGHT, isHorizontal: false, shouldCenter: false };
+    
+    const aspectRatio = dimensions.width / dimensions.height;
+    
+    // Horizontal (landscape) photos: wider than 1.15:1 ratio
+    // Examples: 1920x1080 (1.78), 1600x1200 (1.33), 1200x1000 (1.2)
+    if (aspectRatio > 1.15) {
+      return { 
+        height: SCREEN_HEIGHT * 0.6, 
+        isHorizontal: true,
+        shouldCenter: true  // Center horizontally-oriented photos
+      };
+    }
+    
+    // Vertical/Square photos: 1.15:1 ratio or less
+    // Examples: 1080x1920 (0.56), 1000x1200 (0.83), 1080x1080 (1.0)
+    return { 
+      height: SCREEN_HEIGHT, 
+      isHorizontal: false,
+      shouldCenter: false  // Fill screen for vertical photos
+    };
+  }, []);
   
-  // For vertical images: Use full screen height with 'cover' to fill screen (no black bars)
-  // For horizontal images: Use 60% height with 'cover' for better coverage
-  const imageHeight = isHorizontal ? SCREEN_HEIGHT * 0.6 : SCREEN_HEIGHT;
+  const displaySize = getPhotoDisplaySize(imageDimensions);
+  const imageHeight = displaySize.height;
+  const isHorizontal = displaySize.isHorizontal;
+  const shouldCenter = displaySize.shouldCenter;
   const imageWidth = '100%';
   const contentFit = 'cover'; // Use 'cover' for both to fill screen completely (no black bars)
+  
+  // Use placeholder height that matches final image height to prevent layout shift
+  const placeholderHeight = imageHeight;
+  
+  // Calculate marginTop for centering horizontal photos
+  const imageMarginTop = shouldCenter ? (SCREEN_HEIGHT - imageHeight) / 2 : 0;
+
+  // Create styles with theme access
+  const dynamicStyles = StyleSheet.create({
+    hotelName: {
+      fontSize: 30,
+      fontWeight: '600',
+      fontFamily: theme.typography.displayFont, // Minion Pro for headlines (from brandbook)
+      color: '#fff',
+      marginBottom: 8,
+      letterSpacing: 0.01,
+      lineHeight: 38,
+      textShadowColor: 'rgba(0, 0, 0, 0.35)',
+      textShadowOffset: { width: 0, height: 2 },
+      textShadowRadius: 8,
+    },
+    location: {
+      fontSize: 18,
+      fontWeight: '400',
+      fontFamily: theme.typography.bodyFont, // Apparat for body text (from brandbook)
+      color: '#fff',
+      opacity: 0.95,
+      marginBottom: 12,
+      letterSpacing: 0.01,
+      lineHeight: 24,
+      textShadowColor: 'rgba(0, 0, 0, 0.3)',
+      textShadowOffset: { width: 0, height: 2 },
+      textShadowRadius: 6,
+    },
+  });
 
   return (
     <View style={styles.container}>
@@ -232,7 +300,7 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
         styles.imageContainer,
         { backgroundColor: isHorizontal ? '#1a1a1a' : '#000' } // Background for horizontal images
       ]}>
-        {hasValidImage ? (
+        {hasValidImage && dimensionsReady ? (
           <Image
             source={imageSource}
             style={[
@@ -240,17 +308,26 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
                 width: imageWidth,
                 height: imageHeight,
                 alignSelf: 'center',
-                marginTop: isHorizontal ? (SCREEN_HEIGHT - imageHeight) / 2 : 0, // Center horizontal images only
+                marginTop: imageMarginTop, // Center horizontal images, fill screen for vertical
               }
             ]}
             contentFit={contentFit}
-            transition={0}
+            transition={200}
             cachePolicy="memory-disk"
             priority="high"
           />
         ) : (
-          // Fallback placeholder - consistent layout prevents jumps
-          <View style={[styles.heroImage, { backgroundColor: '#2a2a2a', justifyContent: 'center', alignItems: 'center' }]}>
+          // Placeholder with correct height to prevent layout shift
+          <View style={[
+            styles.heroImage, 
+            { 
+              backgroundColor: isHorizontal ? '#1a1a1a' : '#000',
+              height: placeholderHeight,
+              marginTop: imageMarginTop,  // Match image centering
+              justifyContent: 'center', 
+              alignItems: 'center' 
+            }
+          ]}>
             <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center', padding: 20 }}>
               {hotel.name}
             </Text>
@@ -297,10 +374,10 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
       {/* Hotel Information Overlay */}
       <View style={styles.infoOverlay}>
         <View style={styles.mainInfo}>
-          <Text style={styles.hotelName} numberOfLines={2}>
+          <Text style={dynamicStyles.hotelName} numberOfLines={2}>
             {hotel.name}
           </Text>
-          <Text style={styles.location} numberOfLines={2}>
+          <Text style={dynamicStyles.location} numberOfLines={2}>
             {hotel.address || `${hotel.city}, ${hotel.country}`}
           </Text>
           {hotel.price && (
@@ -314,14 +391,20 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
 
       </View>
 
-      {/* Photo counter */}
-      {totalPhotos > 1 && (
-        <View style={styles.photoCounter}>
-          <Text style={styles.photoCounterText}>
-            {currentPhotoIndex + 1}/{totalPhotos}
-          </Text>
-        </View>
-      )}
+      {/* Save button - Top right */}
+      <TouchableOpacity
+        style={styles.saveButton}
+        onPress={handleSave}
+        accessible={true}
+        accessibilityLabel={isSaved ? "Hotel already saved" : "Save hotel"}
+        accessibilityRole="button"
+      >
+        <Ionicons 
+          name={isSaved ? "bookmark" : "bookmark-outline"} 
+          size={20} 
+          color={isSaved ? theme.accent : "#fff"} 
+        />
+      </TouchableOpacity>
 
       {/* Profile button */}
       <TouchableOpacity
@@ -336,6 +419,15 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, onPress, navigation, 
       >
         <Text style={styles.profileButtonText}>👤</Text>
       </TouchableOpacity>
+
+      {/* Photo counter - Bottom right */}
+      {totalPhotos > 1 && (
+        <View style={styles.photoCounter}>
+          <Text style={styles.photoCounterText}>
+            {currentPhotoIndex + 1}/{totalPhotos}
+          </Text>
+        </View>
+      )}
 
       {/* Development Photo Manager Button */}
       {isDevelopment && (
@@ -444,7 +536,7 @@ const styles = StyleSheet.create({
   },
   photoCounter: {
     position: 'absolute',
-    top: 28,
+    bottom: 73, // Aligned with location text height
     right: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     paddingHorizontal: 10,
@@ -456,6 +548,22 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  saveButton: {
+    position: 'absolute',
+    top: 28,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    zIndex: 101,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
   },
   photoCounterText: {
@@ -476,30 +584,6 @@ const styles = StyleSheet.create({
   },
   mainInfo: {
     marginBottom: 15,
-  },
-  hotelName: {
-    fontSize: 30, // Editorial display size
-    fontWeight: '600',
-    fontFamily: 'Georgia', // Serif for editorial feel (iOS: New York, Android: Serif)
-    color: '#fff',
-    marginBottom: 8,
-    letterSpacing: 0.01,
-    lineHeight: 38,
-    textShadowColor: 'rgba(0, 0, 0, 0.35)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
-  },
-  location: {
-    fontSize: 18, // Refined body size
-    fontWeight: '400',
-    color: '#fff',
-    opacity: 0.95,
-    marginBottom: 12,
-    letterSpacing: 0.01,
-    lineHeight: 24,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
   },
   price: {
     fontSize: 18, // Larger font for fullscreen
@@ -535,7 +619,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
-    zIndex: 3,
+    zIndex: 101, // Higher than tap areas (zIndex: 100) to ensure it's clickable
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 8,

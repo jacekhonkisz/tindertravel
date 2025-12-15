@@ -2,12 +2,11 @@ import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { 
-  COLOR_CARD, 
-  RADIUS_L, 
   SHADOW_CARD, 
   BLUR_GLASS, 
   SPACING 
 } from '../ui/tokens';
+import { useTheme } from '../theme';
 
 interface GlassCardProps {
   children: React.ReactNode;
@@ -17,33 +16,36 @@ interface GlassCardProps {
 /**
  * Reusable glass card container with blur effect
  * Used for forms and content overlays on AuthBackground
+ * Uses brandbook colors and radius from theme
  */
 const GlassCard: React.FC<GlassCardProps> = ({ children, style }) => {
+  const theme = useTheme();
+  
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      width: '100%',
+      borderRadius: 24, // 24px from brandbook
+      backgroundColor: '#E5DED5', // Sand color from brandbook (solid, not transparent)
+      overflow: 'hidden',
+      ...SHADOW_CARD,
+    },
+    content: {
+      padding: SPACING.xl,
+    },
+  });
+  
   return (
     <BlurView
       intensity={BLUR_GLASS}
       tint="extraLight"
-      style={[styles.container, style]}
+      style={[dynamicStyles.container, style]}
     >
-      <View style={styles.content}>
+      <View style={dynamicStyles.content}>
         {children}
       </View>
     </BlurView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    borderRadius: RADIUS_L,
-    backgroundColor: COLOR_CARD,
-    overflow: 'hidden',
-    ...SHADOW_CARD,
-  },
-  content: {
-    padding: SPACING.xl,
-  },
-});
 
 export default GlassCard;
 

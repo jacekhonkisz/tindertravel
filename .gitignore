@@ -235,3 +235,12 @@ api/.env.*
 # Sync results with R2 URLs
 api/sync-results*.json
 api/sync-results-final.json
+
+# Brandbook PDF (large file)
+api/glintz.pdf
+
+# Test files with potential sensitive data
+api/test-*.js
+api/*test*.js
+!api/src/**/*.test.ts
+!api/src/**/*.test.js

@@ -600,3 +600,4 @@ class GooglePlacesPhotoFetcherOptimized {
 const fetcher = new GooglePlacesPhotoFetcherOptimized();
 fetcher.run().catch(console.error);
 
+

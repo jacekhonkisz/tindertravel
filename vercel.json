@@ -1,0 +1,72 @@
+{
+  "version": 2,
+  "name": "glintz-travel",
+  "builds": [
+    {
+      "src": "api/dist/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/dist/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "app/web-build/$1"
+    }
+  ],
+  "outputDirectory": "app/web-build",
+  "framework": null,
+  "installCommand": "npm install && cd app && npm install && cd ../api && npm install",
+  "buildCommand": "cd api && npm run build && cd ../app && npx expo export:web",
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
+}
+
+
+

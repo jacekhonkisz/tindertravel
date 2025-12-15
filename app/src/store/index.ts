@@ -173,24 +173,27 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
     }
 
-    // Save hotel if liked or superliked
-    if (action === 'like') {
-      get().saveHotel(hotel, 'like');
-    } else if (action === 'superlike') {
+    // Save hotel if superliked (swipe right)
+    if (action === 'superlike') {
       get().saveHotel(hotel, 'superlike');
     }
 
     // Update current index and seen hotels
+    // In dev mode, loop back to the beginning when all hotels are swiped
+    const nextIndex = state.currentIndex + 1;
+    const shouldLoop = __DEV__ && nextIndex >= state.hotels.length;
+    const newCurrentIndex = shouldLoop ? 0 : nextIndex;
+    
     set({
-      currentIndex: state.currentIndex + 1,
+      currentIndex: newCurrentIndex,
       personalization: {
         ...state.personalization,
         seenHotels: newSeenHotels,
       },
     });
 
-    // Load more hotels if running low
-    if (state.currentIndex + 5 >= state.hotels.length && state.hasMore) {
+    // Load more hotels if running low (only if not looping in dev mode)
+    if (!shouldLoop && state.currentIndex + 5 >= state.hotels.length && state.hasMore) {
       get().loadHotels();
     }
 

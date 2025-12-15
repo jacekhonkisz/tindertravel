@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinderTravel - Perfect 1:1 App Sneak Peek</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .mockup-section {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        .phone-mockup {
+            width: 310px;
+            height: 650px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* iPhone 17 Pro Dynamic Island - Real proportions */
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: #000;
+            border-radius: 18.5px;
+            z-index: 1000;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+        }
+
+        /* iPhone 17 Pro specific styling */
+        .phone-mockup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 50%, #1a1a1a 100%);
+            z-index: -1;
+        }
+
+        .phone-mockup::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border-radius: 38px;
+            background: linear-gradient(135deg, #333 0%, #000 50%, #333 100%);
+            z-index: -1;
+        }
+
+        /* EXACT APP STYLING - 1:1 from HotelCard.tsx and SwipeDeck.tsx */
+        .app-container {
+            flex: 1;
+            border-radius: 0;
+            overflow: hidden;
+            background-color: #000;
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Left and Right Tap Areas - EXACT from SwipeDeck.tsx */
+        .left-tap-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 15%; /* SCREEN_WIDTH * 0.15 */
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .right-tap-area {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 15%; /* SCREEN_WIDTH * 0.15 */
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .gradient-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 55%;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            z-index: 2;
+        }
+
+        .info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 25px;
+            padding-bottom: 40px;
+            z-index: 3;
+        }
+
+        .main-info {
+            margin-bottom: 15px;
+        }
+
+        .hotel-name {
+            font-size: 30px;
+            font-weight: 600;
+            font-family: Georgia, serif;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: 0.01em;
+            line-height: 38px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+        }
+
+        .location {
+            font-size: 18px;
+            font-weight: 400;
+            color: #fff;
+            opacity: 0.95;
+            margin-bottom: 12px;
+            letter-spacing: 0.01em;
+            line-height: 24px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        /* Photo Indicators - EXACT from HotelCard.tsx */
+        .photo-indicators {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .indicator {
+            width: 5px;
+            height: 5px;
+            border-radius: 2.5px;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 0 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .active-indicator {
+            background-color: rgba(255, 255, 255, 1.0);
+        }
+
+        .photo-counter {
+            position: absolute;
+            top: 28px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 5px 10px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 2;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .photo-counter-text {
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .profile-button {
+            position: absolute;
+            top: 28px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 10px 12px;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .profile-button-text {
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .attribution {
+            position: absolute;
+            bottom: 20px;
+            right: 25px;
+        }
+
+        .attribution-text {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* DETAILS VIEW - EXACT from SwipeDeck.tsx */
+        .details-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow: hidden;
+            will-change: transform;
+            height: 100%;
+            width: 100%;
+        }
+
+        .details-container.show {
+            transform: translateY(0);
+        }
+
+        /* Swipe Indicator Bar - EXACT from SwipeDeck.tsx */
+        .swipe-indicator-container {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            z-index: 201;
+        }
+
+        .swipe-indicator-bar {
+            width: 40px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 2px;
+        }
+
+        /* Details Header - EXACT from SwipeDeck.tsx */
+        .details-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            padding: 8px 20px;
+            padding-top: 60px; /* More space for Dynamic Island */
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-button {
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 22px;
+            transition: background-color 0.2s;
+        }
+
+        .close-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .close-button-text {
+            font-size: 24px;
+            color: #fff;
+        }
+
+        .details-title {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .header-spacer {
+            width: 50px;
+        }
+
+        /* Details Content - EXACT from SwipeDeck.tsx */
+        .details-content {
+            position: absolute;
+            top: 0; /* Start from the very top of the details-container */
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            display: flex; /* Use flex to stack children */
+            flex-direction: column; /* Stack vertically */
+        }
+
+        /* New style for the text content to push it down */
+        .details-text-content {
+            padding: 0 20px; /* Horizontal padding for text content */
+            padding-top: 200px; /* More space for Dynamic Island and header */
+            padding-bottom: 20px; /* Add some bottom padding */
+        }
+
+        .scroll-content-container {
+            padding-bottom: 40px;
+            min-height: 100%;
+        }
+
+        /* Photo Section - EXACT from SwipeDeck.tsx */
+        .photo-section {
+            height: 300px;
+            margin-bottom: 4px; /* Reduced spacing between photos and caption */
+            position: relative;
+            z-index: 1;
+            margin-top: 0; /* Start immediately at top */
+        }
+
+        .photo-carousel-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .photo-carousel {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .photo-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-photo {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+        }
+
+        /* Photo Dots - EXACT from SwipeDeck.tsx */
+        .photo-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .photo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.4);
+            margin: 0 4px;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .photo-dot.active {
+            background: #fff;
+        }
+
+        /* Info Section - EXACT from SwipeDeck.tsx */
+        .info-section {
+            margin-bottom: 4px;
+            padding: 0 20px;
+        }
+
+        .details-hotel-name {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .details-location {
+            color: #999;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .details-price {
+            color: #FFD700;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Booking Section - EXACT from SwipeDeck.tsx */
+        .booking-section {
+            padding: 0 20px 8px 20px;
+        }
+
+        .book-now-button {
+            width: 100%;
+            background: #D4C4A8;
+            color: #000;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .book-now-button:hover {
+            background: #C4B498;
+        }
+
+        .book-now-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Map Section - EXACT from SwipeDeck.tsx */
+        .map-section {
+            padding: 0 20px 8px 20px;
+        }
+
+        .map-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #FFFFFF;
+            margin-bottom: 6px;
+        }
+
+        .map-container {
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 8px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            position: relative;
+        }
+
+        /* Custom Pin Marker - EXACT from HotelMapView.tsx */
+        .custom-pin-marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .pin-head {
+            width: 24px;
+            height: 24px;
+            background-color: #FF3B30;
+            border-radius: 12px;
+            border: 3px solid #FFFFFF;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin: 0 auto;
+        }
+
+        .pin-tail {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #FF3B30;
+            margin: -1px auto 0;
+        }
+
+        .directions-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        .directions-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background-color 0.2s;
+            z-index: 1;
+        }
+
+        .directions-button:hover {
+            background: #0056CC;
+        }
+
+        .directions-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Attribution Container - EXACT from SwipeDeck.tsx */
+        .attribution-container {
+            margin-top: 12px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .attribution-text-details {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .view-on-maps-button {
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .view-on-maps-button:hover {
+            background-color: rgba(255, 190, 130, 0.1);
+        }
+
+        .view-on-maps-text {
+            font-size: 12px;
+            color: #FFBE82;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Swipe indicators - EXACT from SwipeDeck.tsx */
+        .swipe-indicator {
+            position: absolute;
+            padding: 20px;
+            border-radius: 20px;
+            border: 4px solid;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .like-indicator {
+            top: 45%;
+            right: 30%;
+            border-color: rgba(76, 175, 80, 1);
+            background-color: rgba(76, 175, 80, 0.3);
+            transform: rotate(15deg);
+        }
+
+        .dislike-indicator {
+            top: 45%;
+            left: 30%;
+            border-color: rgba(244, 67, 54, 1);
+            background-color: rgba(244, 67, 54, 0.3);
+            transform: rotate(-15deg);
+        }
+
+        .superlike-indicator {
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-color: rgba(33, 150, 243, 1);
+            background-color: rgba(33, 150, 243, 0.3);
+            padding: 20px 24px;
+        }
+
+        .details-indicator {
+            top: 40%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-color: rgba(255, 152, 0, 1);
+            background-color: rgba(255, 152, 0, 0.3);
+            padding: 20px;
+        }
+
+        .indicator-text {
+            color: #fff;
+            font-weight: 800;
+            font-size: 28px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Features section */
+        .features {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 400px;
+        }
+
+        .features h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .feature h3 {
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .feature p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .cta {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .control-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .mockup-section {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .phone-mockup {
+                width: 280px;
+                height: 580px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏨 TinderTravel</h1>
+            <p>Swipe your way to the perfect hotel</p>
+        </div>
+
+        <div class="mockup-section">
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <!-- iPhone 17 Pro Dynamic Island -->
+                    <div class="dynamic-island"></div>
+                    
+                    <div class="app-container" id="appContainer">
+                        <!-- App content will be loaded here -->
+                    </div>
+                    
+                    <!-- Details View - EXACT from SwipeDeck.tsx -->
+                    <div class="details-container" id="detailsContainer">
+                        <!-- Swipe Indicator Bar -->
+                        <div class="swipe-indicator-container">
+                            <div class="swipe-indicator-bar"></div>
+                        </div>
+                        
+                        <!-- Header with iOS blur -->
+                        <div class="details-header">
+                            <div class="header-content">
+                                <div class="close-button" onclick="hideDetails()">
+                                    <div class="close-button-text">✕</div>
+                                </div>
+                                <div class="details-title">Hotel Details</div>
+                                <div class="header-spacer"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="details-content">
+                            <div class="scroll-content-container" id="detailsContent">
+                                <!-- Details content will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features">
+                <h2>Why Choose TinderTravel?</h2>
+                <div class="feature-grid">
+                    <div class="feature">
+                        <div class="feature-icon">💎</div>
+                        <h3>Luxury Hotels</h3>
+                        <p>Discover 5-star resorts and boutique hotels from around the world</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📱</div>
+                        <h3>Swipe Interface</h3>
+                        <p>Easy-to-use Tinder-style interface for finding your perfect match</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🌍</div>
+                        <h3>Global Coverage</h3>
+                        <p>Hotels from Barcelona to Tenerife, with more destinations coming</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📸</div>
+                        <h3>Real Photos</h3>
+                        <p>High-quality photos from Hotelbeds and Google Places API</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-button" onclick="previousHotel()">← Previous</button>
+            <button class="control-button" onclick="nextHotel()">Next →</button>
+            <button class="control-button" onclick="previousPhoto()">← Photo</button>
+            <button class="control-button" onclick="nextPhoto()">Photo →</button>
+            <button class="control-button" onclick="showDetails()">Details</button>
+        </div>
+
+        <div class="cta">
+            <a href="#" class="cta-button">Download App</a>
+        </div>
+    </div>
+
+    <script>
+        // Mock hotel data with real Hotelbeds URLs and coordinates
+        const hotels = [
+            {
+                id: 'luxury-1',
+                name: 'Gran Hotel Bahia del Duque',
+                city: 'Costa Adeje',
+                country: 'Spain',
+                rating: 5,
+                price: { amount: '850', currency: 'USD' },
+                photos: [
+                    'https://photos.hotelbeds.com/giata/xxl/00/000030/000030a_hb_a_001.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000030/000030a_hb_a_002.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000030/000030a_hb_p_001.jpg'
+                ],
+                heroPhoto: 'https://photos.hotelbeds.com/giata/xxl/00/000030/000030a_hb_a_001.jpg',
+                coords: { lat: 28.1000, lng: -16.7167 }
+            },
+            {
+                id: 'luxury-2',
+                name: 'Hotel Arts Barcelona',
+                city: 'Barcelona',
+                country: 'Spain',
+                rating: 5,
+                price: { amount: '750', currency: 'USD' },
+                photos: [
+                    'https://photos.hotelbeds.com/giata/xxl/00/000025/000025a_hb_a_001.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000025/000025a_hb_a_002.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000025/000025a_hb_ro_001.jpg'
+                ],
+                heroPhoto: 'https://photos.hotelbeds.com/giata/xxl/00/000025/000025a_hb_a_001.jpg',
+                coords: { lat: 41.3851, lng: 2.1934 }
+            },
+            {
+                id: 'luxury-3',
+                name: 'Hotel Riu Palace Tenerife',
+                city: 'Adeje',
+                country: 'Spain',
+                rating: 5,
+                price: { amount: '650', currency: 'USD' },
+                photos: [
+                    'https://photos.hotelbeds.com/giata/xxl/00/000010/000010a_hb_a_001.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000010/000010a_hb_a_002.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000010/000010a_hb_p_001.jpg'
+                ],
+                heroPhoto: 'https://photos.hotelbeds.com/giata/xxl/00/000010/000010a_hb_a_001.jpg',
+                coords: { lat: 28.1000, lng: -16.7167 }
+            },
+            {
+                id: 'luxury-4',
+                name: 'Iberostar Selection Playa de Palma',
+                city: 'Palma',
+                country: 'Spain',
+                rating: 4,
+                price: { amount: '550', currency: 'USD' },
+                photos: [
+                    'https://photos.hotelbeds.com/giata/xxl/00/000020/000020a_hb_a_001.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000020/000020a_hb_a_002.jpg',
+                    'https://photos.hotelbeds.com/giata/xxl/00/000020/000020a_hb_p_001.jpg'
+                ],
+                heroPhoto: 'https://photos.hotelbeds.com/giata/xxl/00/000020/000020a_hb_a_001.jpg',
+                coords: { lat: 39.5696, lng: 2.6502 }
+            }
+        ];
+
+        let currentHotelIndex = 0;
+        let currentPhotoIndex = 0;
+        let detailsPhotoIndex = 0;
+        let isActivelyGesturing = false;
+
+        // Function to format price
+        function formatPrice(price) {
+            if (!price) return null;
+            
+            const amount = parseFloat(price.amount);
+            const currency = price.currency === 'EUR' ? '€' : price.currency;
+            
+            return `from ${currency}${Math.round(amount)}/night`;
+        }
+
+        // Function to display the current hotel
+        function displayCurrentHotel() {
+            const hotel = hotels[currentHotelIndex];
+            const photos = hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto];
+            const totalPhotos = photos.length;
+
+            document.getElementById('appContainer').innerHTML = `
+                <div class="image-container">
+                    <div class="hero-image" style="background-image: url('${photos[currentPhotoIndex]}')"></div>
+                </div>
+
+                ${totalPhotos > 1 ? `
+                    <div class="left-tap-area" onclick="previousPhoto()"></div>
+                    <div class="right-tap-area" onclick="nextPhoto()"></div>
+                ` : ''}
+
+                ${totalPhotos > 1 ? `
+                    <div class="photo-indicators">
+                        ${photos.map((_, index) => `
+                            <div class="indicator ${index === currentPhotoIndex ? 'active-indicator' : ''}" onclick="setPhotoIndex(${index})"></div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="gradient-overlay"></div>
+
+                <div class="info-overlay">
+                    <div class="main-info">
+                        <div class="hotel-name">${hotel.name}</div>
+                        <div class="location">${hotel.city}, ${hotel.country}</div>
+                    </div>
+                </div>
+
+                ${totalPhotos > 1 ? `
+                    <div class="photo-counter">
+                        <div class="photo-counter-text">${currentPhotoIndex + 1}/${totalPhotos}</div>
+                    </div>
+                ` : ''}
+
+                <div class="profile-button">
+                    <div class="profile-button-text">👤</div>
+                </div>
+
+                <div class="attribution">
+                    <div class="attribution-text">Photos © Google Maps</div>
+                </div>
+
+                <!-- Swipe indicators -->
+                <div class="swipe-indicator like-indicator" id="likeIndicator">
+                    <div class="indicator-text">LIKE</div>
+                </div>
+                <div class="swipe-indicator dislike-indicator" id="dislikeIndicator">
+                    <div class="indicator-text">PASS</div>
+                </div>
+                <div class="swipe-indicator superlike-indicator" id="superlikeIndicator">
+                    <div class="indicator-text">SUPER LIKE</div>
+                </div>
+                <div class="swipe-indicator details-indicator" id="detailsIndicator">
+                    <div class="indicator-text">DETAILS</div>
+                </div>
+            `;
+
+            // Add swipe simulation
+            addSwipeSimulation();
+        }
+
+        // Function to display details view with photo carousel
+        function displayDetails() {
+            const hotel = hotels[currentHotelIndex];
+            const photos = hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto];
+            const totalPhotos = photos.length;
+
+            // EXACT coordinate validation from HotelMapView.tsx
+            console.log('🗺️ HotelMapView Debug Info:');
+            console.log('Hotel Name:', hotel.name);
+            console.log('Coordinates:', hotel.coords);
+            console.log('City:', hotel.city);
+            console.log('Country:', hotel.country);
+            
+            // Validate coordinates exactly like the app
+            if (hotel.coords && typeof hotel.coords.lat === 'number' && typeof hotel.coords.lng === 'number') {
+                if (hotel.coords.lat < -90 || hotel.coords.lat > 90 || hotel.coords.lng < -180 || hotel.coords.lng > 180) {
+                    console.error('❌ Coordinates out of range:', hotel.coords);
+                } else {
+                    console.log('✅ Coordinates are valid');
+                }
+            } else {
+                console.error('❌ Invalid coordinates:', hotel.coords);
+            }
+
+            document.getElementById('detailsContent').innerHTML = `
+                <div class="photo-section">
+                    <div class="photo-carousel-container">
+                        <div class="photo-carousel" id="detailsCarousel">
+                            ${photos.map((photo, index) => `
+                                <div class="carousel-photo" style="background-image: url('${photo}')"></div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ${totalPhotos > 1 ? `
+                        <div class="photo-dots">
+                            ${photos.map((_, index) => `
+                                <div class="photo-dot ${index === detailsPhotoIndex ? 'active' : ''}" onclick="setDetailsPhotoIndex(${index})"></div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="details-text-content">
+                    <div class="info-section">
+                        <div class="details-hotel-name">${hotel.name}</div>
+                        <div class="details-location">${hotel.city}, ${hotel.country}</div>
+                    </div>
+
+                    <div class="booking-section">
+                        <button class="book-now-button" onclick="handleBookNow()">Book Now</button>
+                    </div>
+
+                    ${hotel.coords ? `
+                        <div class="map-section">
+                            <div class="map-title">Location</div>
+                            <div class="map-container">
+                                <iframe 
+                                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB7zSml4J0qcISSIZUpsSigli1J9Ifx7wU&q=${hotel.coords.lat},${hotel.coords.lng}&zoom=15&maptype=roadmap"
+                                    width="100%" 
+                                    height="100%" 
+                                    style="border:0; border-radius: 12px;" 
+                                    allowfullscreen="" 
+                                    loading="lazy" 
+                                    referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
+                                <button class="directions-button" onclick="getDirections()">Get Directions</button>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="attribution-container">
+                        <div class="attribution-text-details">Photos © Google Maps contributors</div>
+                        <div class="view-on-maps-button" onclick="viewOnGoogleMaps()">
+                            <div class="view-on-maps-text">View on Google Maps →</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Setup photo carousel scrolling
+            setupPhotoCarousel();
+        }
+
+        // Function to setup photo carousel with momentum scrolling
+        function setupPhotoCarousel() {
+            const carousel = document.getElementById('detailsCarousel');
+            if (!carousel) return;
+
+            let isScrolling = false;
+            let scrollTimeout;
+
+            carousel.addEventListener('scroll', () => {
+                if (!isScrolling) {
+                    isScrolling = true;
+                }
+                
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                    // Snap to nearest photo
+                    const scrollLeft = carousel.scrollLeft;
+                    const photoWidth = carousel.clientWidth;
+                    const currentIndex = Math.round(scrollLeft / photoWidth);
+                    setDetailsPhotoIndex(currentIndex);
+                }, 150);
+            });
+
+            // Touch support for mobile
+            let startX = 0;
+            let startScrollLeft = 0;
+
+            carousel.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startScrollLeft = carousel.scrollLeft;
+            });
+
+            carousel.addEventListener('touchmove', (e) => {
+                const currentX = e.touches[0].clientX;
+                const diff = startX - currentX;
+                carousel.scrollLeft = startScrollLeft + diff;
+            });
+
+            // Mouse wheel support
+            carousel.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 1 : -1;
+                const currentIndex = Math.round(carousel.scrollLeft / carousel.clientWidth);
+                const newIndex = Math.max(0, Math.min(currentIndex + delta, carousel.children.length - 1));
+                setDetailsPhotoIndex(newIndex);
+            });
+
+            // Click on photos to advance
+            carousel.addEventListener('click', (e) => {
+                const photoWidth = carousel.clientWidth;
+                const clickX = e.clientX - carousel.getBoundingClientRect().left;
+                const currentIndex = Math.round(carousel.scrollLeft / photoWidth);
+                
+                if (clickX > photoWidth * 0.7) {
+                    // Click on right side - next photo
+                    const nextIndex = Math.min(currentIndex + 1, carousel.children.length - 1);
+                    setDetailsPhotoIndex(nextIndex);
+                } else if (clickX < photoWidth * 0.3) {
+                    // Click on left side - previous photo
+                    const prevIndex = Math.max(currentIndex - 1, 0);
+                    setDetailsPhotoIndex(prevIndex);
+                }
+            });
+        }
+
+        // Function to show details
+        function showDetails() {
+            displayDetails();
+            document.getElementById('detailsContainer').classList.add('show');
+        }
+
+        // Function to hide details
+        function hideDetails() {
+            document.getElementById('detailsContainer').classList.remove('show');
+        }
+
+        // Function to handle book now
+        function handleBookNow() {
+            const hotel = hotels[currentHotelIndex];
+            alert(`Booking ${hotel.name} - In a real app, this would open the booking page.`);
+        }
+
+        // Function to get directions - EXACT from HotelMapView.tsx
+        function getDirections() {
+            const hotel = hotels[currentHotelIndex];
+            console.log('🎯 Get Directions clicked for:', hotel.name);
+            
+            try {
+                if (hotel.coords && hotel.coords.lat && hotel.coords.lng) {
+                    // EXACT same logic as HotelMapView.tsx handleOpenInMaps()
+                    const hotelQuery = encodeURIComponent(hotel.name);
+                    const url = `https://www.google.com/maps/search/?api=1&query=${hotelQuery}&center=${hotel.coords.lat},${hotel.coords.lng}&zoom=15`;
+                    
+                    console.log('🌍 Opening directions URL:', url);
+                    
+                    // Simulate native deep linking behavior
+                    const newWindow = window.open(url, '_blank');
+                    if (!newWindow) {
+                        console.log('❌ Popup blocked, trying alternative method');
+                        window.location.href = url;
+                    }
+                } else {
+                    console.log('❌ No coordinates available for hotel');
+                    alert('Directions not available for this hotel');
+                }
+            } catch (error) {
+                console.error('❌ Error opening directions:', error);
+                alert('Unable to open directions. Please try again.');
+            }
+        }
+
+        // Function to view on Google Maps - EXACT from HotelMapView.tsx
+        function viewOnGoogleMaps() {
+            const hotel = hotels[currentHotelIndex];
+            console.log('🎯 View on Google Maps clicked for:', hotel.name);
+            
+            try {
+                if (hotel.coords && hotel.coords.lat && hotel.coords.lng) {
+                    // EXACT same logic as HotelMapView.tsx handleViewOnMap()
+                    const hotelQuery = encodeURIComponent(hotel.name);
+                    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${hotelQuery}&center=${hotel.coords.lat},${hotel.coords.lng}&zoom=15`;
+                    
+                    console.log('🌍 Opening Google Maps URL:', googleMapsUrl);
+                    
+                    // Simulate native deep linking behavior
+                    const newWindow = window.open(googleMapsUrl, '_blank');
+                    if (!newWindow) {
+                        console.log('❌ Popup blocked, trying alternative method');
+                        window.location.href = googleMapsUrl;
+                    }
+                } else {
+                    console.log('❌ No coordinates available for hotel');
+                    alert('Map not available for this hotel');
+                }
+            } catch (error) {
+                console.error('❌ Error opening Google Maps:', error);
+                alert('Unable to open Google Maps. Please try again.');
+            }
+        }
+
+        // Function to add swipe simulation - EXACT from SwipeDeck.tsx
+        function addSwipeSimulation() {
+            let startX = 0;
+            let startY = 0;
+            let isDragging = false;
+
+            const container = document.getElementById('appContainer');
+            
+            container.addEventListener('mousedown', (e) => {
+                startX = e.clientX;
+                startY = e.clientY;
+                isDragging = true;
+                isActivelyGesturing = true;
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                // Hide all indicators first
+                document.querySelectorAll('.swipe-indicator').forEach(indicator => {
+                    indicator.style.opacity = '0';
+                });
+                
+                // Show appropriate indicator based on drag direction
+                if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                    // Vertical swipe
+                    if (deltaY < -30) {
+                        document.getElementById('superlikeIndicator').style.opacity = '1';
+                    } else if (deltaY > 30) {
+                        document.getElementById('detailsIndicator').style.opacity = '1';
+                    }
+                } else {
+                    // Horizontal swipe
+                    if (Math.abs(deltaX) > 30) {
+                        if (deltaX > 0) {
+                            document.getElementById('likeIndicator').style.opacity = '1';
+                        } else {
+                            document.getElementById('dislikeIndicator').style.opacity = '1';
+                        }
+                    }
+                }
+            });
+
+            container.addEventListener('mouseup', (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                isActivelyGesturing = false;
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                // Hide all indicators
+                document.querySelectorAll('.swipe-indicator').forEach(indicator => {
+                    indicator.style.opacity = '0';
+                });
+                
+                // Handle swipe actions - FIXED LOGIC
+                if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                    // Vertical swipe
+                    if (deltaY < -80) {
+                        // Swipe up - Superlike
+                        simulateSwipe('superlike');
+                    } else if (deltaY > 80) {
+                        // Swipe down - Details
+                        console.log('🎯 Swipe down detected - opening details');
+                        showDetails();
+                    }
+                } else {
+                    // Horizontal swipe
+                    if (Math.abs(deltaX) > 80) {
+                        if (deltaX > 0) {
+                            // Swipe right - Like
+                            simulateSwipe('like');
+                        } else {
+                            // Swipe left - Dismiss
+                            simulateSwipe('dismiss');
+                        }
+                    }
+                }
+            });
+
+            // Touch events for mobile
+            container.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                isDragging = true;
+                isActivelyGesturing = true;
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                
+                const deltaX = e.touches[0].clientX - startX;
+                const deltaY = e.touches[0].clientY - startY;
+                
+                // Hide all indicators first
+                document.querySelectorAll('.swipe-indicator').forEach(indicator => {
+                    indicator.style.opacity = '0';
+                });
+                
+                // Show appropriate indicator based on drag direction
+                if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                    // Vertical swipe
+                    if (deltaY < -30) {
+                        document.getElementById('superlikeIndicator').style.opacity = '1';
+                    } else if (deltaY > 30) {
+                        document.getElementById('detailsIndicator').style.opacity = '1';
+                    }
+                } else {
+                    // Horizontal swipe
+                    if (Math.abs(deltaX) > 30) {
+                        if (deltaX > 0) {
+                            document.getElementById('likeIndicator').style.opacity = '1';
+                        } else {
+                            document.getElementById('dislikeIndicator').style.opacity = '1';
+                        }
+                    }
+                }
+            });
+
+            container.addEventListener('touchend', (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                isActivelyGesturing = false;
+                
+                const deltaX = e.changedTouches[0].clientX - startX;
+                const deltaY = e.changedTouches[0].clientY - startY;
+                
+                // Hide all indicators
+                document.querySelectorAll('.swipe-indicator').forEach(indicator => {
+                    indicator.style.opacity = '0';
+                });
+                
+                // Handle swipe actions - FIXED LOGIC FOR TOUCH
+                if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                    // Vertical swipe
+                    if (deltaY < -80) {
+                        // Swipe up - Superlike
+                        simulateSwipe('superlike');
+                    } else if (deltaY > 80) {
+                        // Swipe down - Details
+                        console.log('🎯 Touch swipe down detected - opening details');
+                        showDetails();
+                    }
+                } else {
+                    // Horizontal swipe
+                    if (Math.abs(deltaX) > 80) {
+                        if (deltaX > 0) {
+                            simulateSwipe('like');
+                        } else {
+                            simulateSwipe('dismiss');
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to simulate swipe action
+        function simulateSwipe(action) {
+            console.log(`🎯 Swipe action: ${action}`);
+
+            // Animate card out
+            const container = document.getElementById('appContainer');
+            container.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            
+            let transform = '';
+            switch (action) {
+                case 'like':
+                    transform = 'translateX(100vw) rotate(15deg)';
+                    break;
+                case 'dismiss':
+                    transform = 'translateX(-100vw) rotate(-15deg)';
+                    break;
+                case 'superlike':
+                    transform = 'translateY(-100vh)';
+                    break;
+            }
+
+            container.style.transform = transform;
+            container.style.opacity = '0';
+
+            setTimeout(() => {
+                // Move to next hotel
+                currentHotelIndex = (currentHotelIndex + 1) % hotels.length;
+                currentPhotoIndex = 0;
+                detailsPhotoIndex = 0;
+                
+                // Reset container
+                container.style.transition = '';
+                container.style.transform = '';
+                container.style.opacity = '';
+                
+                // Display next hotel
+                displayCurrentHotel();
+            }, 300);
+        }
+
+        // Control functions
+        function previousHotel() {
+            currentHotelIndex = (currentHotelIndex - 1 + hotels.length) % hotels.length;
+            currentPhotoIndex = 0;
+            detailsPhotoIndex = 0;
+            displayCurrentHotel();
+        }
+
+        function nextHotel() {
+            currentHotelIndex = (currentHotelIndex + 1) % hotels.length;
+            currentPhotoIndex = 0;
+            detailsPhotoIndex = 0;
+            displayCurrentHotel();
+        }
+
+        function previousPhoto() {
+            const hotel = hotels[currentHotelIndex];
+            const photos = hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto];
+            if (photos.length > 1) {
+                currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
+                displayCurrentHotel();
+            }
+        }
+
+        function nextPhoto() {
+            const hotel = hotels[currentHotelIndex];
+            const photos = hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto];
+            if (photos.length > 1) {
+                currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+                displayCurrentHotel();
+            }
+        }
+
+        function setPhotoIndex(index) {
+            currentPhotoIndex = index;
+            displayCurrentHotel();
+        }
+
+        function setDetailsPhotoIndex(index) {
+            detailsPhotoIndex = index;
+            const carousel = document.getElementById('detailsCarousel');
+            if (carousel) {
+                carousel.scrollTo({
+                    left: index * carousel.clientWidth,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Load initial hotel when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            displayCurrentHotel();
+        });
+    </script>
+</body>
+</html>

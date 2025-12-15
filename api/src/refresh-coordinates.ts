@@ -105,7 +105,7 @@ class CoordinateRefreshService {
    */
   private async getAccurateCoordinates(hotelName: string, city: string, country: string): Promise<{ lat: number; lng: number }> {
     try {
-      // Search for the hotel using Google Places Text Search
+      // Search for the hotel using Google Places Text Search with country context
       const searchQuery = `${hotelName} hotel ${city} ${country}`;
       const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${this.googlePlacesApiKey}`;
       

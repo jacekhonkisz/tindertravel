@@ -263,3 +263,4 @@ class HotelCleanupService {
 // Run the script
 const cleanup = new HotelCleanupService();
 cleanup.run().catch(console.error);
+

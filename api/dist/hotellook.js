@@ -203,3 +203,4 @@ class HotellookClient {
     }
 }
 exports.HotellookClient = HotellookClient;
+//# sourceMappingURL=hotellook.js.map

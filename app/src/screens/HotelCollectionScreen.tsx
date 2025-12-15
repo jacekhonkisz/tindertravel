@@ -34,7 +34,7 @@ const HotelCollectionScreen: React.FC = () => {
   const hotels = type === 'superlike' ? savedHotels.superliked : savedHotels.liked;
 
   const formatPrice = (price?: { amount: string; currency: string }) => {
-    if (!price) return 'Price on request';
+    if (!price) return null; // No price display
     
     const amount = parseFloat(price.amount);
     const currency = price.currency === 'EUR' ? '€' : price.currency;
@@ -89,11 +89,7 @@ const HotelCollectionScreen: React.FC = () => {
         <Text style={styles.hotelLocation} numberOfLines={1}>
           {hotel.city}, {hotel.country}
         </Text>
-        {hotel.price && (
-          <Text style={styles.hotelPrice}>
-            from {formatPrice(hotel.price)}/night
-          </Text>
-        )}
+        {/* Price removed - View rates on hotel website */}
       </View>
 
       {/* Type indicator */}
