@@ -25,7 +25,7 @@ export class OTPService {
   private readonly CODE_LENGTH = 6;
   private readonly CODE_EXPIRY_MINUTES = 10;
   private readonly MAX_ATTEMPTS = 5;
-  private readonly MAX_CODES_PER_EMAIL_PER_HOUR = 3;
+  private readonly MAX_CODES_PER_EMAIL_PER_HOUR = 20; // Increased for development (was 3)
 
   /**
    * Generate a cryptographically secure random 6-digit OTP code

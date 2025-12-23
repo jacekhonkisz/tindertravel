@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HotelCard } from '../types';
@@ -46,6 +46,13 @@ type HotelMapViewNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, country, hotel }) => {
   const navigation = useNavigation<HotelMapViewNavigationProp>();
+  const mapRef = useRef<any>(null);
+  
+  // State for zoom level
+  const [zoomLevel, setZoomLevel] = useState({
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
+  });
   
   // Debug coordinates
   useEffect(() => {
@@ -66,19 +73,31 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
   }, [coords, hotelName, city, country]);
   
   const handleOpenInMaps = () => {
-    // Use coordinates with hotel name for better precision
+    // Enhanced with directions API for better UX
     const hotelQuery = encodeURIComponent(hotelName);
-    const url = `https://www.google.com/maps/search/?api=1&query=${hotelQuery}&center=${coords.lat},${coords.lng}&zoom=15`;
+    // Google Maps with directions mode
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${coords.lat},${coords.lng}&destination_place_id=`;
+    // Apple Maps with directions
+    const appleMapsUrl = `http://maps.apple.com/?daddr=${coords.lat},${coords.lng}&q=${hotelQuery}`;
+    
+    // Platform-specific behavior
+    const url = Platform.OS === 'ios' ? appleMapsUrl : googleMapsUrl;
     
     Linking.canOpenURL(url)
       .then((supported) => {
         if (supported) {
+          console.log('🗺️ Opening directions to:', hotelName);
           Linking.openURL(url);
         } else {
-          Alert.alert('Error', 'Unable to open maps application');
+          // Fallback to Google Maps web
+          Linking.openURL(googleMapsUrl);
         }
       })
-      .catch((err) => console.error('Error opening maps:', err));
+      .catch((err) => {
+        console.error('Error opening maps:', err);
+        // Final fallback
+        Linking.openURL(googleMapsUrl);
+      });
   };
 
   const handleViewOnMap = () => {
@@ -101,6 +120,46 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
       });
   };
 
+  // Zoom In function
+  const handleZoomIn = () => {
+    const newLatDelta = Math.max(zoomLevel.latitudeDelta / 2, 0.0005); // Min zoom
+    const newLngDelta = Math.max(zoomLevel.longitudeDelta / 2, 0.0005);
+    
+    setZoomLevel({
+      latitudeDelta: newLatDelta,
+      longitudeDelta: newLngDelta,
+    });
+    
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude: coords.lat,
+        longitude: coords.lng,
+        latitudeDelta: newLatDelta,
+        longitudeDelta: newLngDelta,
+      }, 300);
+    }
+  };
+
+  // Zoom Out function
+  const handleZoomOut = () => {
+    const newLatDelta = Math.min(zoomLevel.latitudeDelta * 2, 0.5); // Max zoom out
+    const newLngDelta = Math.min(zoomLevel.longitudeDelta * 2, 0.5);
+    
+    setZoomLevel({
+      latitudeDelta: newLatDelta,
+      longitudeDelta: newLngDelta,
+    });
+    
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude: coords.lat,
+        longitude: coords.lng,
+        latitudeDelta: newLatDelta,
+        longitudeDelta: newLngDelta,
+      }, 300);
+    }
+  };
+
   // Validate coordinates before rendering
   if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') {
     return (
@@ -115,8 +174,8 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
   }
 
   // Tighter zoom level for more precise pin positioning
-  const latitudeDelta = 0.002;
-  const longitudeDelta = 0.002;
+  const latitudeDelta = zoomLevel.latitudeDelta;
+  const longitudeDelta = zoomLevel.longitudeDelta;
   
   const mapRegion = {
     latitude: coords.lat,
@@ -151,6 +210,7 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
         {/* On iOS: Uses Apple Maps (default, no additional setup needed) */}
         {/* On Android: Uses Google Maps via PROVIDER_GOOGLE */}
         <MapView
+          ref={mapRef}
           provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
           style={styles.map}
           initialRegion={mapRegion}
@@ -173,9 +233,6 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
           onMapReady={() => {
             console.log('🗺️ Map is ready, coordinates:', coords);
           }}
-          onRegionChange={(region) => {
-            console.log('🗺️ Map region changed:', region);
-          }}
         >
           <Marker
             coordinate={{
@@ -188,6 +245,25 @@ const HotelMapView: React.FC<HotelMapViewProps> = ({ coords, hotelName, city, co
             <CustomPinMarker />
           </Marker>
         </MapView>
+        
+        {/* Zoom Controls */}
+        <View style={styles.zoomControls}>
+          <TouchableOpacity 
+            style={styles.zoomButton} 
+            onPress={handleZoomIn}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.zoomButtonText}>+</Text>
+          </TouchableOpacity>
+          <View style={styles.zoomDivider} />
+          <TouchableOpacity 
+            style={styles.zoomButton} 
+            onPress={handleZoomOut}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.zoomButtonText}>−</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       
       <TouchableOpacity onPress={handleOpenInMaps}>
@@ -222,6 +298,41 @@ const styles = StyleSheet.create({
   map: {
     width: '100%',
     height: '100%',
+  },
+  // Zoom Controls Styles
+  zoomControls: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    overflow: 'hidden',
+  },
+  zoomButton: {
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  zoomButtonText: {
+    fontSize: 24,
+    fontWeight: '400',
+    color: '#333',
+    lineHeight: 28,
+  },
+  zoomDivider: {
+    height: 1,
+    backgroundColor: '#E0E0E0',
+    marginHorizontal: 6,
   },
   // Custom Pin Marker Styles
   customPin: {

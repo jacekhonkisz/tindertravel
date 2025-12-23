@@ -10,6 +10,7 @@
     "seed": "npm run build && node -e \"console.log('🏨 Seeding hotels via API endpoint. Use POST /api/seed')\"",
     "refresh-coordinates": "npm run build && node dist/refresh-coordinates.js",
     "test": "echo \"Tests will be added in future versions\"",
+    "test:giata": "ts-node test-giata-connection.ts",
     "clean": "rm -rf dist *.log"
   },
   "keywords": [

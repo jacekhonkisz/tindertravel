@@ -19,7 +19,6 @@ import { useAppStore } from '../store';
 import { apiClient } from '../api/client';
 import AuthBackground from '../components/AuthBackground';
 import GlassCard from '../components/GlassCard';
-import MonogramGlow from '../components/MonogramGlow';
 import { preloadBackground, BgRotationResult } from '../utils/backgroundRotation';
 import {
   DUR_FAST,

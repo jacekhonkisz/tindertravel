@@ -4,7 +4,7 @@ import { getApiConfig, logApiConfig, printApiInstructions } from '../config/api'
 
 // Get API configuration based on environment (async)
 let apiConfig: any = null;
-let API_BASE_URL = 'http://192.168.1.102:3001'; // Default to current network IP
+let API_BASE_URL = 'http://192.168.1.108:3001'; // Default to current network IP
 let API_TIMEOUT = 30000; // Default timeout
 let configInitialized = false;
 let configInitPromise: Promise<void> | null = null;
@@ -75,14 +75,10 @@ class ApiClient {
   ): Promise<T> {
     // Ensure config is initialized before making requests
     if (!configInitialized) {
-      console.log('⏳ Waiting for API config to initialize...');
       await initializeConfig();
     }
     
     const url = `${this.baseUrl}${endpoint}`;
-    
-    console.log(`🌐 API Request: ${url}`);
-    console.log(`🌐 Base URL: ${this.baseUrl}`);
     
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -103,40 +99,27 @@ class ApiClient {
       // Create AbortController for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
-        console.log(`🌐 Request timeout after ${this.timeout}ms: ${url}`);
         controller.abort();
       }, this.timeout);
-
-      console.log(`🌐 Making request to: ${url}`);
-      console.log(`🌐 AbortController signal aborted before fetch:`, controller.signal.aborted);
 
       const response = await fetch(url, {
         ...config,
         signal: controller.signal,
       });
 
-      console.log(`🌐 AbortController signal aborted after fetch:`, controller.signal.aborted);
-
       clearTimeout(timeoutId);
-      console.log(`🌐 Response status: ${response.status}`);
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error(`🌐 API Error Response:`, errorData);
         throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      console.log(`🌐 API Success: ${endpoint}`);
-      return data;
+      return await response.json();
     } catch (error) {
-      console.error(`🌐 API request failed: ${endpoint}`, error);
-      console.error(`🌐 Base URL: ${this.baseUrl}`);
-      console.error(`🌐 Full URL: ${url}`);
-      
       // Show configuration instructions on first error
       if (!hasShownInstructions) {
         hasShownInstructions = true;
+        console.error(`🌐 API request failed: ${endpoint}`, error);
         printApiInstructions();
       }
       
@@ -200,20 +183,10 @@ class ApiClient {
 
   // Request OTP code via email
   async requestOTP(data: OTPRequest): Promise<AuthResponse> {
-    console.log('🌐 API Client: Requesting OTP for', data.email);
-    console.log('🌐 API Client: Base URL', this.baseUrl);
-    
-    try {
-      const response = await this.request<AuthResponse>('/api/auth/request-otp', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      console.log('🌐 API Client: OTP Response', response);
-      return response;
-    } catch (error) {
-      console.log('🌐 API Client: OTP Error', error);
-      throw error;
-    }
+    return this.request<AuthResponse>('/api/auth/request-otp', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 
   // Verify OTP code and authenticate
@@ -230,15 +203,39 @@ class ApiClient {
       const originalToken = this.authToken;
       this.setAuthToken(token);
       
-      const response = await this.request<{ valid: boolean }>('/api/auth/verify-token');
-      
+      // Make request without logging the expected 401 error
+      const url = `${this.baseUrl}/api/auth/verify-token`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
       // Restore original token
       this.setAuthToken(originalToken);
-      
-      return response.valid;
+
+      if (response.status === 401) {
+        // Expected - token is invalid/expired (don't log as error)
+        return false;
+      }
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = await response.json();
+      return data.valid;
     } catch (error) {
       // Restore original token on error
       this.setAuthToken(this.authToken);
+      // Don't log - token verification failure is expected when not logged in
       return false;
     }
   }
@@ -273,10 +270,7 @@ class ApiClient {
       });
 
       // Use local backend endpoint which has R2 photo mapping
-      console.log('🏨 Fetching hotels from backend Partners endpoint (with R2 photos)...');
       const response = await this.request(`/api/hotels/partners?${queryParams.toString()}`);
-      
-      console.log(`✅ Loaded ${response.hotels?.length || 0} hotels with photos`);
       
       // Response is already in HotelsResponse format from our backend
       return {
@@ -311,6 +305,32 @@ class ApiClient {
   // Get specific hotel details
   async getHotelDetails(hotelId: string): Promise<HotelCard> {
     return this.request(`/api/hotels/${hotelId}`);
+  }
+
+  // Get GIATA hotel location (coordinates)
+  async getGiataLocation(giataId: number): Promise<{
+    success: boolean;
+    location?: {
+      giata_id: number;
+      hotel_name: string;
+      latitude?: number;
+      longitude?: number;
+      address?: string;
+      city?: string;
+      country?: string;
+      postal_code?: string;
+    };
+    error?: string;
+  }> {
+    try {
+      return await this.request(`/api/giata/${giataId}/location`);
+    } catch (error) {
+      console.error(`Failed to fetch GIATA location for ID ${giataId}:`, error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
   }
 
   // Update personalization based on user actions

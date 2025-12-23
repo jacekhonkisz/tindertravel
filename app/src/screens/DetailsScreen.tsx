@@ -25,6 +25,7 @@ import { useTheme } from '../theme';
 import { Button, Card, Chip } from '../ui';
 import { getImageSource } from '../utils/imageUtils';
 import { dimensionCache } from '../utils/dimensionCache';
+import apiClient from '../api/client';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -60,6 +61,10 @@ const DetailsScreen: React.FC = () => {
   const [dimensionsReady, setDimensionsReady] = useState(false);
   const photoScrollViewRef = React.useRef<ScrollView>(null);
   const { saveHotel, savedHotels } = useAppStore();
+  
+  // State for GIATA location fetching
+  const [fetchedCoords, setFetchedCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   
   const photos = hotel.photos || [];
   const totalPhotos = photos.length > 0 ? photos.length : (hotel.heroPhoto ? 1 : 0);
@@ -180,6 +185,46 @@ const DetailsScreen: React.FC = () => {
     }
   }, [currentPhotoIndex, hotel.photos, hotel.heroPhoto]);
 
+  // Fetch GIATA location if hotel ID starts with 'giata-' and no coords exist
+  useEffect(() => {
+    const fetchGiataLocation = async () => {
+      // Only fetch if hotel has no coords and ID suggests it's from GIATA
+      if (hotel.coords || !hotel.id.startsWith('giata-')) {
+        return;
+      }
+
+      // Extract GIATA ID from hotel ID (format: "giata-12345")
+      const giataIdMatch = hotel.id.match(/giata-(\d+)/);
+      if (!giataIdMatch) {
+        return;
+      }
+
+      const giataId = parseInt(giataIdMatch[1]);
+      console.log(`📍 Fetching GIATA location for hotel ID: ${hotel.id}, GIATA ID: ${giataId}`);
+      
+      setIsLoadingLocation(true);
+      try {
+        const response = await apiClient.getGiataLocation(giataId);
+        if (response.success && response.location?.latitude && response.location?.longitude) {
+          const coords = {
+            lat: response.location.latitude,
+            lng: response.location.longitude
+          };
+          setFetchedCoords(coords);
+          console.log(`✅ Fetched GIATA location:`, coords);
+        } else {
+          console.log(`❌ No location data available for GIATA ID ${giataId}`);
+        }
+      } catch (error) {
+        console.error(`Failed to fetch GIATA location:`, error);
+      } finally {
+        setIsLoadingLocation(false);
+      }
+    };
+
+    fetchGiataLocation();
+  }, [hotel.id, hotel.coords]);
+
   const isLiked = savedHotels.liked.some(h => h.id === hotel.id);
   const isSuperliked = savedHotels.superliked.some(h => h.id === hotel.id);
 
@@ -290,24 +335,11 @@ const DetailsScreen: React.FC = () => {
 
     // Simple two-category system: horizontal (wide) vs vertical/square
     const getPhotoDisplaySize = (dims: { width: number; height: number } | null) => {
-      if (!dims) return { height: dimensions.photoHeight, isHorizontal: false, shouldCenter: false };
-      
-      const aspectRatio = dims.width / dims.height;
-      
-      // Horizontal (landscape) photos: wider than 1.15:1 ratio
-      if (aspectRatio > 1.15) {
-        return { 
-          height: SCREEN_HEIGHT * 0.6, 
-          isHorizontal: true,
-          shouldCenter: true  // Center horizontally-oriented photos
-        };
-      }
-      
-      // Vertical/Square photos: 1.15:1 ratio or less
+      // Always use container height - no dynamic sizing
       return { 
         height: dimensions.photoHeight, 
-        isHorizontal: false,
-        shouldCenter: false  // Fill screen for vertical photos
+        isHorizontal: false, 
+        shouldCenter: false 
       };
     };
     
@@ -315,7 +347,7 @@ const DetailsScreen: React.FC = () => {
     const photoHeight = displaySize.height;
     const isHorizontal = displaySize.isHorizontal;
     const shouldCenter = displaySize.shouldCenter;
-    const contentFit = 'cover'; // Use 'cover' for both to fill screen completely (no black bars)
+    const contentFit = 'contain'; // Use 'contain' to show full image without cropping
 
     // Use placeholder height that matches final image height to prevent layout shift
     const placeholderHeight = photoHeight;
@@ -330,8 +362,8 @@ const DetailsScreen: React.FC = () => {
           styles.singlePhoto, 
           { 
             height: dimensions.photoHeight,
-            justifyContent: 'center',
-            backgroundColor: isHorizontal ? '#1a1a1a' : 'transparent' // Single background layer
+            justifyContent: 'flex-start', // Align to top instead of center
+            backgroundColor: '#E5DED5' // Sand beige from brandbook
           }
         ]}>
           {dimensionsReady ? (
@@ -343,7 +375,7 @@ const DetailsScreen: React.FC = () => {
                   height: photoHeight,
                   width: '100%',
                   alignSelf: 'center',
-                  marginTop: photoMarginTop  // Center horizontal photos
+                  marginTop: 0  // Remove centering margin
                 }
               ]}
               contentFit={contentFit}
@@ -364,8 +396,8 @@ const DetailsScreen: React.FC = () => {
               {
                 height: placeholderHeight,
                 width: '100%',
-                marginTop: photoMarginTop,  // Match image centering
-                backgroundColor: '#2a2a2a', // Softer gray instead of pure black
+                marginTop: 0,  // Remove centering margin
+                backgroundColor: '#EFEAE3', // Slightly lighter beige for loading
                 justifyContent: 'center',
                 alignItems: 'center'
               }
@@ -377,7 +409,7 @@ const DetailsScreen: React.FC = () => {
       );
     }
 
-    // Multiple photos - carousel with 50/50 tap areas
+    // Multiple photos - carousel with 50/50 tap areas and swipe support
     return (
       <View style={[styles.photoCarousel, { height: dimensions.photoHeight, position: 'relative' }]}>
         <ScrollView
@@ -391,9 +423,16 @@ const DetailsScreen: React.FC = () => {
           directionalLockEnabled={true}
           alwaysBounceHorizontal={false}
           contentInsetAdjustmentBehavior="never"
+          scrollEnabled={true} // Ensure scrolling is enabled for swipe gestures
           onMomentumScrollEnd={(event) => {
             const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
             setCurrentPhotoIndex(index);
+            
+            // Preload dimensions for next/previous photos for smooth transitions
+            const nextPhoto = photos[index + 1];
+            const prevPhoto = photos[index - 1];
+            if (nextPhoto) dimensionCache.get(nextPhoto);
+            if (prevPhoto) dimensionCache.get(prevPhoto);
           }}
           style={{ flex: 1 }}
           contentContainerStyle={{ flexGrow: 1 }}
@@ -403,34 +442,47 @@ const DetailsScreen: React.FC = () => {
             // Get dimensions for THIS specific photo from cache (not current photo's dimensions!)
             const photoDims = dimensionCache.get(photo);
             
-            // Use same simple two-category logic for carousel photos
-            const photoDisplaySize = photoDims ? (() => {
-              const aspectRatio = photoDims.width / photoDims.height;
-              if (aspectRatio > 1.15) {
-                return { height: SCREEN_HEIGHT * 0.6, isHorizontal: true, shouldCenter: true };
-              }
-              return { height: dimensions.photoHeight, isHorizontal: false, shouldCenter: false };
-            })() : { height: dimensions.photoHeight, isHorizontal: false, shouldCenter: false };
+            // Use same logic - always use container height
+            const photoDisplaySize = { 
+              height: dimensions.photoHeight, 
+              isHorizontal: false, 
+              shouldCenter: false 
+            };
             
             const photoHeight = photoDisplaySize.height;
             const isPhotoHorizontal = photoDisplaySize.isHorizontal;
             const photoShouldCenter = photoDisplaySize.shouldCenter;
-            const photoContentFit = 'cover'; // Use 'cover' for both to fill screen completely (no black bars)
+            const photoContentFit = 'contain'; // Use 'contain' to show full image without cropping
             const photoPlaceholderHeight = photoHeight;
-            const photoMarginTop = photoShouldCenter ? (SCREEN_HEIGHT - photoHeight) / 2 : 0;
+            const photoMarginTop = 0; // Remove centering - align to top
+            
+            // Handler for tap detection on individual photos
+            const handlePhotoPress = (event: any) => {
+              const touchX = event.nativeEvent.locationX;
+              const isLeftHalf = touchX < SCREEN_WIDTH / 2;
+              
+              if (isLeftHalf) {
+                handleLeftTap();
+              } else {
+                handleRightTap();
+              }
+            };
             
             return (
-              <View 
+              <TouchableOpacity
                 key={index}
                 style={[
                   styles.carouselPhoto, 
                   { 
                     height: dimensions.photoHeight,
                     width: SCREEN_WIDTH,
-                    justifyContent: 'center',
-                    backgroundColor: isPhotoHorizontal ? '#1a1a1a' : 'transparent' // Single background layer
+                    justifyContent: 'flex-start', // Align to top
+                    backgroundColor: '#E5DED5' // Sand beige from brandbook
                   }
                 ]}
+                activeOpacity={1}
+                onPress={handlePhotoPress}
+                delayPressIn={150} // Add delay to distinguish between tap and swipe
               >
                 {dimensionsReady && photoDims ? (
                   <Image
@@ -439,7 +491,7 @@ const DetailsScreen: React.FC = () => {
                       height: photoHeight,
                       width: SCREEN_WIDTH,
                       alignSelf: 'center',
-                      marginTop: photoMarginTop  // Center horizontal photos in carousel
+                      marginTop: 0  // Align to top, no centering
                     }]}
                     contentFit={photoContentFit}
                     cachePolicy="memory-disk"
@@ -459,8 +511,8 @@ const DetailsScreen: React.FC = () => {
                     {
                       height: photoPlaceholderHeight,
                       width: SCREEN_WIDTH,
-                      marginTop: photoMarginTop,  // Match image centering in carousel
-                      backgroundColor: '#2a2a2a', // Softer gray instead of pure black
+                      marginTop: 0,  // Align to top
+                      backgroundColor: '#EFEAE3', // Slightly lighter beige for loading
                       justifyContent: 'center',
                       alignItems: 'center'
                     }
@@ -468,28 +520,10 @@ const DetailsScreen: React.FC = () => {
                     {/* Clean loading state without text */}
                   </View>
                 )}
-              </View>
+              </TouchableOpacity>
             );
           })}
         </ScrollView>
-        
-        {/* Left tap area for previous photo (50% of screen) */}
-        {totalPhotos > 1 && (
-          <TouchableOpacity
-            style={styles.leftTapArea}
-            onPress={handleLeftTap}
-            activeOpacity={1}
-          />
-        )}
-        
-        {/* Right tap area for next photo (50% of screen) */}
-        {totalPhotos > 1 && (
-          <TouchableOpacity
-            style={styles.rightTapArea}
-            onPress={handleRightTap}
-            activeOpacity={1}
-          />
-        )}
       </View>
     );
   };
@@ -681,6 +715,13 @@ const DetailsScreen: React.FC = () => {
       marginTop: theme.spacing.l, // Add top margin to separate from hotel info
       minHeight: 200, // Ensure map has minimum height
     },
+    loadingLocationText: {
+      textAlign: 'center',
+      color: theme.textSecondary,
+      fontSize: 14,
+      fontStyle: 'italic',
+      marginBottom: theme.spacing.m,
+    },
     bookingSection: {
       position: 'absolute',
       left: 0,
@@ -773,16 +814,21 @@ const DetailsScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Map View (if coordinates available) */}
-        {hotel.coords && (
+        {/* Map View (if coordinates available from hotel or GIATA) */}
+        {(hotel.coords || fetchedCoords) && (
           <View style={styles.mapSection}>
-            <HotelMapView
-              coords={hotel.coords}
-              hotelName={hotel.name}
-              city={hotel.city}
-              country={hotel.country}
-              hotel={hotel}
-            />
+            {isLoadingLocation && !hotel.coords && (
+              <Text style={styles.loadingLocationText}>📍 Loading map location...</Text>
+            )}
+            {(hotel.coords || fetchedCoords) && (
+              <HotelMapView
+                coords={hotel.coords || fetchedCoords!}
+                hotelName={hotel.name}
+                city={hotel.city}
+                country={hotel.country}
+                hotel={hotel}
+              />
+            )}
           </View>
         )}
       </ScrollView>

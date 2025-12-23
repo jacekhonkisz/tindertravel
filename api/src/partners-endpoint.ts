@@ -6,8 +6,10 @@
 import { partnersApi } from './services/partnersApi';
 import type { HotelCard } from './types';
 
-const API_BASE = "https://web-production-b200.up.railway.app";
-const API_KEY = "javq6PUgEBDpmKXtasxQkaKpmeKrPqGueqlwOgjXXe8";
+// API credentials from environment variables
+// Set PARTNERS_API_URL and PARTNERS_API_KEY in your .env file
+const API_BASE = process.env.PARTNERS_API_URL || "https://web-production-b200.up.railway.app";
+const API_KEY = process.env.PARTNERS_API_KEY || "";
 
 /**
  * Convert Partner to HotelCard format

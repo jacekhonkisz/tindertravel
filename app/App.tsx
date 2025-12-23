@@ -6,8 +6,7 @@ import { StyleSheet, StatusBar, Platform, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import GlintzLogo from './src/components/GlintzLogo';
 
-// IMMEDIATE LOG TO VERIFY CODE IS LOADING
-console.log('🚨🚨🚨 APP.TSX FILE IS LOADING - NEW CODE VERSION 4.0 🚨🚨🚨');
+// App loaded
 
 // Screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -130,14 +129,9 @@ const LoadingScreen = () => (
 );
 
 export default function App() {
-  const { isAuthenticated, isLoading, checkAuthStatus, loadPersistedData } = useAppStore();
-  
-  console.log('🏠 App render - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
-  console.log('🏠 APP LOADED WITH NEW CODE - VERSION 3.0 (SIMPLIFIED)');
-  
-  // Log which stack we're showing
-  console.log('🏠 Showing stack:', isAuthenticated ? 'MainStack' : 'AuthStack');
+  const { isAuthenticated, isLoading, loading: hotelsLoading, checkAuthStatus, loadPersistedData, loadHotels } = useAppStore();
 
+  // Initialize app ONCE on mount - no dependencies to prevent infinite loops
   useEffect(() => {
     const initializeApp = async () => {
       // Load persisted data (preferences, saved hotels, etc.)
@@ -145,13 +139,19 @@ export default function App() {
       
       // Check if user is already authenticated
       await checkAuthStatus();
+      
+      // Preload hotels if authenticated to prevent second loading screen
+      const state = useAppStore.getState();
+      if (state.isAuthenticated && state.hotels.length === 0) {
+        await loadHotels();
+      }
     };
 
     initializeApp();
-  }, [checkAuthStatus, loadPersistedData]);
+  }, []); // Empty deps - run only once on mount
 
-  // Show loading screen while checking authentication
-  if (isLoading) {
+  // Show loading screen while checking authentication OR loading initial hotels
+  if (isLoading || (isAuthenticated && hotelsLoading && useAppStore.getState().hotels.length === 0)) {
     return (
       <SafeAreaProvider>
         <GestureHandlerRootView style={styles.container}>

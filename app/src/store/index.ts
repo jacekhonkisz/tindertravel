@@ -10,7 +10,7 @@ interface AppStore extends AppState, AuthState {
   
   // Hotel Actions
   loadHotels: (refresh?: boolean) => Promise<void>;
-  swipeHotel: (hotelId: string, action: SwipeAction) => Promise<void>;
+  swipeHotel: (hotelId: string, action: SwipeAction) => void;
   saveHotel: (hotel: HotelCard, type: 'like' | 'superlike') => void;
   removeSavedHotel: (hotelId: string, type: 'like' | 'superlike') => void;
   updatePersonalization: (country: string, amenityTags: string[], action: SwipeAction) => void;
@@ -36,6 +36,21 @@ const STORAGE_KEYS = {
   SEEN_HOTELS: '@glintz_seen_hotels',
   AUTH_TOKEN: '@glintz_auth_token',
   USER_DATA: '@glintz_user_data',
+};
+
+// Debounced persist - only sync to server every 3 seconds max
+let persistTimeout: NodeJS.Timeout | null = null;
+let storeRef: (() => ReturnType<typeof useAppStore.getState>) | null = null;
+
+const debouncedPersist = () => {
+  if (persistTimeout) {
+    clearTimeout(persistTimeout);
+  }
+  persistTimeout = setTimeout(() => {
+    if (storeRef) {
+      storeRef().persistData();
+    }
+  }, 3000); // Persist after 3 seconds of inactivity
 };
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -73,7 +88,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
     try {
       // Validate connection on first load
       if (state.hotels.length === 0 && !refresh) {
-        console.log('🔍 First load - validating API connection...');
         const validation = await apiClient.validateConnection();
 
         if (!validation.connected) {
@@ -89,7 +103,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       // Always use Partners API as main source (Railway production API)
       // The recommendations endpoint is not available on Railway
-      console.log('🔄 Loading hotels from Partners API...');
       const response = await apiClient.getHotels({
         limit: 20,
         offset,
@@ -118,10 +131,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         loading: false,
       });
 
-      // Log recommendation metrics if available
-      if (response.metrics) {
-        console.log(`📊 Recommendation metrics: avg=${response.metrics.averageScore.toFixed(2)}, top=${response.metrics.topScore.toFixed(2)}, algorithm=${response.algorithm}`);
-      }
+      // Note: response.metrics available for debugging if needed
     } catch (error) {
       console.error('Failed to load hotels:', error);
       set({
@@ -132,7 +142,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   // Handle swipe actions
-  swipeHotel: async (hotelId: string, action: SwipeAction) => {
+  swipeHotel: (hotelId: string, action: SwipeAction) => {
     const state = get();
     const hotel = state.hotels.find(h => h.id === hotelId);
     
@@ -143,33 +153,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
     // Update seen hotels
     const newSeenHotels = [...state.personalization.seenHotels, hotelId];
     
-    // Update personalization based on action
+    // Update personalization based on action (local state only)
     if (action !== 'details') {
       get().updatePersonalization(hotel.country, hotel.amenityTags, action);
       
-      // Track interaction in database
+      // Track interaction in database (fire-and-forget, non-blocking)
       if (userId) {
-        try {
-          await apiClient.saveUserInteraction({
-            userId,
-            hotelId,
-            actionType: action as 'like' | 'dismiss' | 'superlike',
-          });
-        } catch (error) {
-          console.warn('Failed to track interaction:', error);
-        }
-      }
-      
-      // Send to API for server-side tracking (legacy)
-      try {
-        await apiClient.updatePersonalization({
+        apiClient.saveUserInteraction({
+          userId,
           hotelId,
-          action: action as 'like' | 'dismiss' | 'superlike',
-          country: hotel.country,
-          amenityTags: hotel.amenityTags,
-        });
-      } catch (error) {
-        console.warn('Failed to update server personalization:', error);
+          actionType: action as 'like' | 'dismiss' | 'superlike',
+        }).catch(() => {}); // Silent fail
       }
     }
 
@@ -197,8 +191,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
       get().loadHotels();
     }
 
-    // Persist data
-    get().persistData();
+    // Debounced persist - use setTimeout to avoid blocking swipe
+    debouncedPersist();
   },
 
   // Save hotel to favorites
@@ -385,39 +379,43 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   // Request OTP code via email
   requestOTP: async (email: string) => {
-    console.log('🏪 Store: Starting OTP request for', email);
     set({ isLoading: true, error: null });
     
     try {
-      console.log('🏪 Store: Calling API client...');
       const response = await apiClient.requestOTP({ email });
-      console.log('🏪 Store: API client response:', response);
+      
+      // Log OTP code for development (it's in the response)
+      if (response.success && (response as any).debugCode) {
+        console.log('');
+        console.log('🔐 ============================================');
+        console.log('🔐          OTP CODE FOR TESTING');
+        console.log('🔐 ============================================');
+        console.log('🔐 Email:', email);
+        console.log('🔐 Code: ', (response as any).debugCode);
+        console.log('🔐 ============================================');
+        console.log('🔐 Enter this code in the app!');
+        console.log('🔐 ============================================');
+        console.log('');
+      }
       
       set({ isLoading: false });
       
-      const result = {
+      return {
         success: response.success || false,
         message: response.message,
         error: response.error,
       };
-      
-      console.log('🏪 Store: Returning result:', result);
-      return result;
     } catch (error) {
-      console.log('🏪 Store: API client threw error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to send OTP';
       set({ 
         isLoading: false,
         error: errorMessage,
       });
       
-      const result = {
+      return {
         success: false,
         error: errorMessage,
       };
-      
-      console.log('🏪 Store: Returning error result:', result);
-      return result;
     }
   },
 
@@ -582,4 +580,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   // Set OTP email
   setOTPEmail: (email: string | null) => set({ otpEmail: email }),
-})); 
+}));
+
+// Set store reference for debounced persist
+storeRef = () => useAppStore.getState();

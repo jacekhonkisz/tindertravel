@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import Svg, { G, Path, Defs, Style } from 'react-native-svg';
+import Svg, { G, Path, Defs } from 'react-native-svg';
 
 interface GlintzLogoProps {
   width?: number;
@@ -30,9 +30,6 @@ const GlintzLogo: React.FC<GlintzLogoProps> = ({
         viewBox="0 0 438.52 252.72"
         preserveAspectRatio="xMidYMid meet"
       >
-        <Defs>
-          <Style>{`.cls-1{fill:#10233b;}`}</Style>
-        </Defs>
         <G id="Warstwa_1-2">
           <Path
             className="cls-1"

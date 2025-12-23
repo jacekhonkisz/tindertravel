@@ -51,6 +51,7 @@ const photo_curation_1 = require("./photo-curation");
 const network_utils_1 = require("./network-utils");
 // // import { LandingPageAPI } from './landing-page-api';
 const partnersApi_1 = require("./services/partnersApi");
+const giataPartnersApi_1 = require("./services/giataPartnersApi");
 // Load environment variables
 dotenv.config();
 const app = (0, express_1.default)();
@@ -113,6 +114,20 @@ catch (error) {
 }
 // Initialize Photo Quality Auditor
 const photoAuditor = new photo_quality_auditor_1.PhotoQualityAuditor();
+// Initialize Giata Partners API (Second database)
+let giataInitialized = false;
+(async () => {
+    console.log('🔄 Initializing Giata Partners API (second database)...');
+    const giataInitStatus = await giataPartnersApi_1.giataPartnersApi.testConnection();
+    if (giataInitStatus.success) {
+        console.log('✅ Giata Partners API initialized successfully');
+        console.log('   Using same CRM endpoint: https://web-production-b200.up.railway.app');
+        giataInitialized = true;
+    }
+    else {
+        console.warn('⚠️  Giata Partners API not available:', giataInitStatus.message);
+    }
+})();
 // CORS configuration - Allow all origins for development
 app.use((0, cors_1.default)({
     origin: true, // Allow all origins for development
@@ -296,12 +311,18 @@ app.post('/api/auth/request-otp', otpLimiter, async (req, res) => {
             });
         }
         console.log('✅ OTP request completed successfully');
+        console.log('');
         console.log('🔐 ============================================');
-        console.log('🔐 OTP CODE FOR TESTING:');
+        console.log('🔐 ============================================');
+        console.log('🔐          OTP CODE FOR TESTING');
+        console.log('🔐 ============================================');
         console.log('🔐 Email:', email);
-        console.log('🔐 Code:', otpResult.code);
-        console.log('🔐 Use this code in the app!');
+        console.log('🔐 Code: ', otpResult.code);
         console.log('🔐 ============================================');
+        console.log('🔐 Use this code in the mobile app!');
+        console.log('🔐 ============================================');
+        console.log('🔐 ============================================');
+        console.log('');
         res.json({
             success: true,
             message: 'Verification code sent to your email',
@@ -1611,6 +1632,51 @@ app.get('/api/hotels/partners', async (req, res) => {
             };
         });
         const hotelCards = await Promise.all(hotelPromises);
+        // ADD GIATA PARTNERS (Second Database)
+        try {
+            console.log('🔄 Adding Giata partners to the mix...');
+            const giataResponse = await giataPartnersApi_1.giataPartnersApi.listPartners({
+                page: pageNum,
+                per_page: Math.max(5, Math.floor(perPageNum / 3)), // Get some Giata hotels
+                partner_status: 'candidate' // Include candidates since no approved yet
+            });
+            console.log(`✅ Found ${giataResponse.partners.length} Giata partners`);
+            // Convert Giata partners to HotelCard format
+            for (const partner of giataResponse.partners) {
+                let photos = [];
+                let heroPhoto = '';
+                if (includePhotos && partner.has_selected_photos && partner.giata_id) {
+                    try {
+                        const photosData = await giataPartnersApi_1.giataPartnersApi.getSelectedPhotos(partner.giata_id);
+                        photos = photosData.photos.map(p => p.cloudflare_public_url);
+                        const heroPhotoData = photosData.photos.find(p => p.is_hero);
+                        heroPhoto = heroPhotoData?.cloudflare_public_url || photos[0] || '';
+                    }
+                    catch (error) {
+                        console.log(`No photos for Giata hotel ${partner.giata_id}`);
+                    }
+                }
+                hotelCards.push({
+                    id: `giata-${partner.giata_id}`,
+                    name: partner.hotel_name,
+                    city: partner.city_name || 'Unknown',
+                    country: partner.country_name || 'Unknown',
+                    coords: undefined,
+                    price: undefined,
+                    description: partner.notes_internal || `${partner.hotel_name} in ${partner.city_name || partner.country_name}`,
+                    amenityTags: [],
+                    photos: photos,
+                    heroPhoto: heroPhoto || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920',
+                    bookingUrl: partner.website || '',
+                    rating: partner.rating_internal || undefined
+                });
+            }
+            console.log(`✅ Total hotels (Partners + Giata): ${hotelCards.length}`);
+        }
+        catch (error) {
+            console.error('⚠️  Failed to fetch Giata partners:', error);
+            // Continue without Giata hotels - graceful degradation
+        }
         res.json({
             hotels: hotelCards,
             total: partnersResponse.total,
@@ -1772,6 +1838,219 @@ app.get('/api/photos/hotel/:hotelName', async (req, res) => {
         });
     }
 });
+// ============================================================================
+// GIATA PARTNERS API ENDPOINTS (Second Database)
+// ============================================================================
+// Get all Giata partners
+app.get('/api/giata-partners', async (req, res) => {
+    try {
+        const { page = 1, per_page = 50, partner_status, search } = req.query;
+        console.log(`🏨 Fetching Giata partners: page=${page}, per_page=${per_page}, status=${partner_status || 'all'}`);
+        const response = await giataPartnersApi_1.giataPartnersApi.listPartners({
+            page: parseInt(page),
+            per_page: parseInt(per_page),
+            partner_status: partner_status,
+            search: search
+        });
+        console.log(`✅ Found ${response.partners.length} Giata partners`);
+        res.json(response);
+    }
+    catch (error) {
+        console.error('Failed to fetch Giata partners:', error);
+        res.status(500).json({
+            error: 'Failed to fetch Giata partners',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Get single Giata partner by ID
+app.get('/api/giata-partners/:partnerId', async (req, res) => {
+    try {
+        const { partnerId } = req.params;
+        console.log(`🔍 Fetching Giata partner: ${partnerId}`);
+        const response = await giataPartnersApi_1.giataPartnersApi.getPartner(partnerId);
+        res.json(response);
+    }
+    catch (error) {
+        console.error(`Failed to fetch Giata partner ${req.params.partnerId}:`, error);
+        res.status(404).json({
+            error: 'Partner not found',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Get selected photos from Cloudflare for a Giata hotel
+app.get('/api/giata/:giataId/photos/selected', async (req, res) => {
+    try {
+        const { giataId } = req.params;
+        const { refresh = 'false' } = req.query;
+        console.log(`📸 Fetching selected photos for Giata ID: ${giataId}`);
+        const useCache = refresh !== 'true';
+        const response = await giataPartnersApi_1.giataPartnersApi.getSelectedPhotos(parseInt(giataId), useCache);
+        res.json(response);
+    }
+    catch (error) {
+        console.error(`Failed to fetch photos for Giata ID ${req.params.giataId}:`, error);
+        res.status(404).json({
+            error: 'Photos not found',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Get location data (coordinates) for a Giata hotel
+app.get('/api/giata/:giataId/location', async (req, res) => {
+    try {
+        const { giataId } = req.params;
+        console.log(`📍 Fetching location for Giata ID: ${giataId}`);
+        const location = await giataPartnersApi_1.giataPartnersApi.getHotelLocation(parseInt(giataId));
+        if (!location) {
+            res.status(404).json({
+                error: 'Location not found',
+                message: `No location data available for Giata ID ${giataId}`
+            });
+            return;
+        }
+        res.json({
+            success: true,
+            location
+        });
+    }
+    catch (error) {
+        console.error(`Failed to fetch location for Giata ID ${req.params.giataId}:`, error);
+        res.status(500).json({
+            error: 'Failed to fetch location',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Get Giata partner statistics
+app.get('/api/giata-partners/stats', async (req, res) => {
+    try {
+        console.log('📊 Fetching Giata partner statistics...');
+        const response = await giataPartnersApi_1.giataPartnersApi.getStats();
+        res.json(response);
+    }
+    catch (error) {
+        console.error('Failed to fetch Giata partner stats:', error);
+        res.status(500).json({
+            error: 'Failed to fetch statistics',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Get unified hotel data (combining both databases)
+app.get('/api/hotels/unified', async (req, res) => {
+    try {
+        const { limit = 20, offset = 0, source = 'all', // 'supabase', 'giata', or 'all'
+         } = req.query;
+        const limitNum = parseInt(limit);
+        const offsetNum = parseInt(offset);
+        console.log(`🔄 Fetching unified hotels: limit=${limitNum}, offset=${offsetNum}, source=${source}`);
+        const hotels = [];
+        // Fetch from Supabase (first database)
+        if (source === 'all' || source === 'supabase') {
+            if (supabaseService) {
+                const supabaseHotels = await supabaseService.getHotels(limitNum, offsetNum);
+                const convertedHotels = supabaseHotels.map((hotel) => ({
+                    id: hotel.id,
+                    name: hotel.name,
+                    city: hotel.city,
+                    country: hotel.country,
+                    coords: hotel.coords ? { lat: hotel.coords.lat, lng: hotel.coords.lng } : undefined,
+                    price: hotel.price ? { amount: String(hotel.price.amount), currency: hotel.price.currency } : undefined,
+                    description: hotel.description,
+                    amenityTags: hotel.amenity_tags || [],
+                    photos: hotel.photos || [],
+                    heroPhoto: hotel.hero_photo || '',
+                    bookingUrl: hotel.booking_url || '',
+                    rating: hotel.rating || 0
+                }));
+                hotels.push(...convertedHotels);
+            }
+        }
+        // Fetch from Giata Partners (second database)
+        if (source === 'all' || source === 'giata') {
+            try {
+                const giataPartners = await giataPartnersApi_1.giataPartnersApi.listPartners({
+                    page: Math.floor(offsetNum / limitNum) + 1,
+                    per_page: limitNum,
+                    partner_status: 'approved'
+                });
+                // Convert Giata partners to HotelCard format
+                const giataHotels = await Promise.all(giataPartners.partners.map(async (partner) => {
+                    // Fetch photos for this hotel
+                    let photos = [];
+                    let heroPhoto = '';
+                    if (partner.has_selected_photos && partner.giata_id) {
+                        try {
+                            const photosData = await giataPartnersApi_1.giataPartnersApi.getSelectedPhotos(partner.giata_id);
+                            photos = photosData.photos.map(p => p.cloudflare_public_url);
+                            const heroPhotoData = photosData.photos.find(p => p.is_hero);
+                            heroPhoto = heroPhotoData?.cloudflare_public_url || photos[0] || '';
+                        }
+                        catch (error) {
+                            console.error(`Failed to fetch photos for Giata hotel ${partner.giata_id}`);
+                        }
+                    }
+                    return {
+                        id: `giata-${partner.giata_id}`,
+                        name: partner.hotel_name,
+                        city: partner.city_name || '',
+                        country: partner.country_name || '',
+                        coords: undefined, // Not available in Giata data
+                        price: undefined, // Not available in Giata data
+                        description: partner.notes_internal || '',
+                        amenityTags: [],
+                        photos: photos,
+                        heroPhoto: heroPhoto,
+                        bookingUrl: partner.website || '',
+                        rating: partner.rating_internal || 0
+                    };
+                }));
+                hotels.push(...giataHotels);
+            }
+            catch (error) {
+                console.error('Failed to fetch Giata hotels:', error);
+            }
+        }
+        console.log(`✅ Returning ${hotels.length} unified hotels`);
+        // Count hotels by checking if ID starts with 'giata-'
+        const supabaseCount = hotels.filter(h => !h.id.startsWith('giata-')).length;
+        const giataCount = hotels.filter(h => h.id.startsWith('giata-')).length;
+        res.json({
+            hotels: hotels.slice(0, limitNum),
+            total: hotels.length,
+            hasMore: hotels.length === limitNum,
+            sources: {
+                supabase: supabaseCount,
+                giata: giataCount
+            }
+        });
+    }
+    catch (error) {
+        console.error('Failed to fetch unified hotels:', error);
+        res.status(500).json({
+            error: 'Failed to fetch unified hotels',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Test Giata API connection
+app.get('/api/giata-partners/test', async (req, res) => {
+    try {
+        console.log('🧪 Testing Giata Partners API connection...');
+        const result = await giataPartnersApi_1.giataPartnersApi.testConnection();
+        res.json(result);
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Connection test failed',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// ============================================================================
 // Update personalization data (for tracking likes/dislikes)
 app.post('/api/personalization', (req, res) => {
     try {
