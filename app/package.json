@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "npx expo start --dev-client --clear --ios",
+    "start": "npx expo start --dev-client",
+    "start:fresh": "npx expo start --dev-client --clear",
+    "start:ios": "npx expo start --dev-client --ios",
+    "start:ios:fresh": "npx expo start --dev-client --clear --ios",
     "start:tunnel": "npx expo start --dev-client --tunnel --ios",
     "ios": "npx expo run:ios",
     "ios:release": "npx expo run:ios --configuration Release",

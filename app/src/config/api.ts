@@ -58,7 +58,8 @@ const configs: Record<Environment, Partial<ApiConfig>> = {
   development: {
     // Local backend for app services (auth, user data, etc.)
     // Partners API (Railway) is called directly in client.ts for hotel data
-    baseUrl: 'http://192.168.1.108:3001',
+    // Default to localhost for simulator, will auto-detect best URL
+    baseUrl: 'http://localhost:3001',
     timeout: 30000,
     retryAttempts: 3,
     retryDelay: 1000,
@@ -176,11 +177,13 @@ export function getFallbackUrls(): string[] {
   const env = getEnvironment();
   
   if (env === 'development') {
-    // Try common development URLs in order of preference
+    // For iOS Simulator, localhost works best
+    // For physical devices, network IP is needed
+    // Try localhost first (simulator), then network IP (physical device)
     return [
-      'http://192.168.1.108:3001',   // Primary: current network IP
-      'http://localhost:3001',        // Secondary: localhost (works in simulator)
-      'http://127.0.0.1:3001',       // Tertiary: loopback
+      'http://localhost:3001',        // Primary: localhost (works in simulator)
+      'http://127.0.0.1:3001',       // Secondary: loopback
+      'http://192.168.1.108:3001',   // Tertiary: network IP (for physical devices)
       // Add other common local IPs if needed
     ];
   }
