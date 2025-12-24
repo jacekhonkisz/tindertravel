@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { HotelCard } from '../types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';

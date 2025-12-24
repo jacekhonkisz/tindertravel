@@ -12,7 +12,7 @@ import {
   PanResponder,
   Animated,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../ui/Icon';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -146,7 +146,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color="#333" />
+              <Icon name="close" size={24} variant="navy" />
             </TouchableOpacity>
             <View style={styles.headerCenter}>
               <Text style={styles.headerTitle}>Photo Manager</Text>
@@ -155,7 +155,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({
             <View style={styles.headerRight}>
               {hasChanges && (
                 <TouchableOpacity onPress={resetChanges} style={styles.resetButton}>
-                  <Ionicons name="refresh" size={20} color="#ff6b6b" />
+                  <Icon name="refresh" size={20} variant="accent" />
                 </TouchableOpacity>
               )}
             </View>
@@ -191,12 +191,12 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({
                     style={styles.removeButton}
                     onPress={() => removePhoto(photo.id)}
                   >
-                    <Ionicons name="close-circle" size={24} color="#ff4444" />
+                    <Icon name="close-circle" size={24} variant="accent" />
                   </TouchableOpacity>
 
                   {/* Drag handle */}
                   <View style={styles.dragHandle}>
-                    <Ionicons name="menu" size={20} color="#666" />
+                    <Icon name="menu" size={20} variant="navy" />
                   </View>
                 </TouchableOpacity>
 
@@ -207,14 +207,14 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({
                     disabled={index === 0}
                     style={[styles.reorderButton, index === 0 && styles.disabledButton]}
                   >
-                    <Ionicons name="chevron-up" size={16} color={index === 0 ? "#ccc" : "#666"} />
+                    <Icon name="chevron-up" size={16} color={index === 0 ? "#ccc" : undefined} variant={index === 0 ? "default" : "navy"} />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => movePhoto(index, Math.min(photos.length - 1, index + 1))}
                     disabled={index === photos.length - 1}
                     style={[styles.reorderButton, index === photos.length - 1 && styles.disabledButton]}
                   >
-                    <Ionicons name="chevron-down" size={16} color={index === photos.length - 1 ? "#ccc" : "#666"} />
+                    <Icon name="chevron-down" size={16} color={index === photos.length - 1 ? "#ccc" : undefined} variant={index === photos.length - 1 ? "default" : "navy"} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -234,7 +234,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({
             
             {hasChanges && (
               <TouchableOpacity onPress={saveChanges} style={styles.saveButton}>
-                <Ionicons name="checkmark" size={20} color="white" />
+                <Icon name="checkmark" size={20} variant="white" />
                 <Text style={styles.saveButtonText}>Save Changes</Text>
               </TouchableOpacity>
             )}
@@ -261,7 +261,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({
                     style={styles.zoomCloseButton}
                     onPress={() => setZoomVisible(false)}
                   >
-                    <Ionicons name="close" size={30} color="white" />
+                    <Icon name="close" size={30} variant="white" />
                   </TouchableOpacity>
                 </>
               )}

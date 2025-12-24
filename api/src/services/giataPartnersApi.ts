@@ -344,49 +344,85 @@ class GiataPartnersApi {
   }
 
   /**
-   * Get hotel location data (coordinates and address) from GIATA
-   * This extracts location from the partner data already available in the CRM
+   * Get hotel location data (coordinates and address) from GIATA table in CRM
+   * This directly queries the Giata table from the CRM API by giata_id
    */
   async getHotelLocation(giataId: number): Promise<GiataLocation | null> {
     try {
-      console.log(`📍 Fetching partner data for Giata ID ${giataId} to extract location`);
+      console.log(`📍 Fetching location from Giata table for Giata ID ${giataId}`);
       
-      // Fetch the partner data which should include location info
-      const response = await this.listPartners({
-        page: 1,
-        per_page: 1,
-        partner_status: undefined // Search all statuses
+      // Try direct Giata table endpoint first (the CRM should have this endpoint)
+      let url = `${this.baseUrl}/api/giata/${giataId}`;
+      let response = await fetch(url, {
+        headers: this.getHeaders(),
       });
 
-      // Find the partner with matching GIATA ID
-      const partner = response.partners.find(p => p.giata_id === giataId);
-      
-      if (!partner) {
-        console.log(`❌ No partner found for Giata ID ${giataId}`);
-        return null;
+      // If direct endpoint doesn't exist, use the partner endpoint and search for the giata_id
+      if (!response.ok) {
+        console.log(`📍 Direct Giata endpoint returned ${response.status}, fetching from partners endpoint`);
+        
+        // Fetch all partners (they should be cached) and find the one with matching giata_id
+        const partnersResponse = await this.listPartners({
+          page: 1,
+          per_page: 100, // Get more partners to increase chance of finding it
+          partner_status: undefined // Search all statuses
+        });
+
+        const partner = partnersResponse.partners.find((p: any) => p.giata_id === giataId);
+        
+        if (!partner) {
+          console.log(`❌ No partner found with Giata ID ${giataId} in partners list`);
+          return null;
+        }
+
+        console.log(`✅ Found partner for Giata ID ${giataId}: ${partner.hotel_name}`);
+        
+        // Extract location from partner data (which should include Giata table geolocation)
+        const location: GiataLocation = {
+          giata_id: giataId,
+          hotel_name: partner.hotel_name,
+          latitude: (partner as any).latitude || (partner as any).lat,
+          longitude: (partner as any).longitude || (partner as any).lng || (partner as any).lon,
+          address: (partner as any).address,
+          city: partner.city_name,
+          country: partner.country_name,
+          postal_code: (partner as any).postal_code || (partner as any).postcode,
+        };
+
+        if (!location.latitude || !location.longitude) {
+          console.log(`⚠️  Partner found but no coordinates in Giata table for Giata ID ${giataId}`);
+          console.log(`📊 Partner data keys:`, Object.keys(partner));
+          return null;
+        }
+
+        console.log(`✅ Found location from Giata table for ${location.hotel_name}: ${location.latitude}, ${location.longitude}`);
+        return location;
       }
 
-      // For now, we'll need to add lat/lng to the partner data structure
-      // The CRM should provide these, but if not available, return null
+      // Handle direct Giata endpoint response
+      const giataData = await response.json();
+
       const location: GiataLocation = {
         giata_id: giataId,
-        hotel_name: partner.hotel_name,
-        city: partner.city_name,
-        country: partner.country_name,
-        // Note: lat/lng need to be added to GiataPartner interface if available from CRM
-        latitude: (partner as any).latitude || (partner as any).lat,
-        longitude: (partner as any).longitude || (partner as any).lng,
+        hotel_name: giataData.hotel_name || giataData.name || '',
+        latitude: giataData.latitude || giataData.lat,
+        longitude: giataData.longitude || giataData.lng || giataData.lon,
+        address: giataData.address,
+        city: giataData.city || giataData.city_name,
+        country: giataData.country || giataData.country_name,
+        postal_code: giataData.postal_code || giataData.postcode,
       };
 
       if (!location.latitude || !location.longitude) {
-        console.log(`⚠️  Partner found but no coordinates available for ${partner.hotel_name}`);
+        console.log(`⚠️  Giata record found but no coordinates available in Giata table for Giata ID ${giataId}`);
+        console.log(`📊 Available data fields:`, Object.keys(giataData));
         return null;
       }
 
-      console.log(`✅ Extracted location for ${location.hotel_name}: ${location.latitude}, ${location.longitude}`);
+      console.log(`✅ Found location from Giata table for ${location.hotel_name}: ${location.latitude}, ${location.longitude}`);
       return location;
     } catch (error) {
-      console.error(`Error fetching location for Giata ID ${giataId}:`, error);
+      console.error(`Error fetching location from Giata table for Giata ID ${giataId}:`, error);
       return null;
     }
   }

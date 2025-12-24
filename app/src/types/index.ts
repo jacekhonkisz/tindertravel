@@ -116,4 +116,14 @@ export interface SwipeGestureEvent {
     velocityX: number;
     velocityY: number;
   };
-} 
+}
+
+// Photo View System types (re-export for convenience)
+export type {
+  ViewMode,
+  PhotoTag,
+  FocalPoint,
+  PhotoMetadata,
+  ViewportMetadata,
+  ComputedPhotoStyles,
+} from './photoView'; 

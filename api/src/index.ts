@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import * as path from 'path';
 import * as dotenv from 'dotenv';
 import { AmadeusClient } from './amadeus';
 import DatabaseService from './database';
@@ -18,6 +19,11 @@ import { partnersApi } from './services/partnersApi';
 import { giataPartnersApi } from './services/giataPartnersApi';
 // Load environment variables
 dotenv.config();
+
+// Check environment mode
+const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+console.log('🌍 Environment:', isDevelopment ? 'DEVELOPMENT (rate limiting disabled)' : 'PRODUCTION (rate limiting enabled)');
+console.log('   NODE_ENV:', process.env.NODE_ENV || '(not set, defaulting to development)');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -102,17 +108,25 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate limiting: 100 requests per 15 minutes per IP
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
-  message: {
-    error: 'Too many requests from this IP, please try again later.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use(limiter);
+// Rate limiting: 100 requests per 15 minutes per IP (disabled in development)
+
+if (isDevelopment) {
+  console.log('🔓 Development mode: Global rate limiting DISABLED');
+  // No rate limiting in development - use a pass-through middleware
+  app.use((req, res, next) => next());
+} else {
+  console.log('🔒 Production mode: Global rate limiting ENABLED (100 req/15min)');
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100,
+    message: {
+      error: 'Too many requests from this IP, please try again later.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.use(limiter);
+}
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
@@ -131,6 +145,11 @@ const seedLimiter = rateLimit({
 
 // Body parsing middleware
 app.use(express.json());
+
+// Serve partner photos locally (downloaded from Dropbox)
+const partnersPhotosPath = path.join(__dirname, '..', 'partners-photos');
+app.use('/photos/partners', express.static(partnersPhotosPath));
+console.log(`📸 Serving partner photos from: ${partnersPhotosPath}`);
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
@@ -276,9 +295,18 @@ app.post('/api/auth/request-otp', otpLimiter, async (req, res) => {
 
     if (!otpResult.success) {
       console.error('❌ Failed to create OTP:', otpResult.error);
-      // Rate limiting should return 400, not 500
-      const isRateLimit = otpResult.error?.includes('Too many OTP requests');
-      return res.status(isRateLimit ? 400 : 500).json({
+      
+      // Return 429 for rate limiting with proper wait time
+      if (otpResult.error?.includes('wait') || otpResult.error?.includes('Too many')) {
+        return res.status(429).json({
+          success: false,
+          error: otpResult.error,
+          waitSeconds: otpResult.waitSeconds,
+        });
+      }
+      
+      // Other errors return 500
+      return res.status(500).json({
         success: false,
         error: otpResult.error || 'Failed to create OTP',
       });
@@ -1794,169 +1822,188 @@ app.get('/api/hotels', async (req, res) => {
   }
 });
 
-// Partners cache for super-fast responses
-let partnersCache: any = null;
-let partnersCacheTime = 0;
-const PARTNERS_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+// ============================================================================
+// UNIFIED HOTELS CACHE - Scalable, instant access for all users
+// ============================================================================
 
-// Get hotels from Partners API (with R2 photos) - OPTIMIZED
+interface CachedHotel extends HotelCard {
+  source: 'partners' | 'giata';
+}
+
+let unifiedHotelsCache: CachedHotel[] | null = null;
+let unifiedCacheTime = 0;
+const UNIFIED_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
+/**
+ * Load and cache ALL hotels from both sources (Partners + Giata)
+ * Only includes hotels with complete data (photos required)
+ */
+async function loadUnifiedHotelsCache(): Promise<CachedHotel[]> {
+  const now = Date.now();
+  
+  // Return cached data if still valid
+  if (unifiedHotelsCache && (now - unifiedCacheTime) < UNIFIED_CACHE_DURATION) {
+    return unifiedHotelsCache;
+  }
+
+  console.log('🔄 Building unified hotels cache from both tables...');
+  const allHotels: CachedHotel[] = [];
+
+  // ========================================
+  // TABLE 1: Partners (with R2 photos - fetched from bucket or sync file)
+  // ========================================
+  try {
+    const { getPartnerR2Photos } = require('./services/r2PhotoMapping');
+    const partnersResponse = await partnersApi.listPartners({
+      page: 1,
+      per_page: 100,
+      status: 'active'
+    });
+
+    console.log(`📦 Partners Table: Found ${partnersResponse.partners.length} partners`);
+
+    for (const partner of partnersResponse.partners) {
+      // Fetch R2 photos (from sync file or directly from bucket)
+      const r2Photos = await getPartnerR2Photos(partner.id);
+      
+      // SKIP partners without R2 photos
+      if (r2Photos.length === 0) {
+        continue;
+      }
+
+      const location = partner.location_label || 
+        (partner.city && partner.country_code 
+          ? `${partner.city}, ${partner.country_code}` 
+          : partner.country_code || 'Unknown');
+      const locationParts = location.split(',').map((s: string) => s.trim());
+
+      allHotels.push({
+        id: partner.id,
+        source: 'partners',
+        name: partner.hotel_name,
+        city: partner.city || locationParts[0] || '',
+        country: partner.country_code || locationParts[1] || '',
+        address: location,
+        coords: partner.lat && partner.lng ? { lat: partner.lat, lng: partner.lng } : undefined,
+        description: partner.notes || `${partner.hotel_name} - ${location}`,
+        amenityTags: partner.tags || [],
+        photos: r2Photos,
+        heroPhoto: r2Photos[0],
+        bookingUrl: partner.website || `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(partner.hotel_name)}`,
+        rating: undefined
+      });
+    }
+    
+    const partnersCount = allHotels.filter(h => h.source === 'partners').length;
+    if (partnersCount === 0) {
+      console.log(`⚠️  Partners Table: No R2 photos available`);
+    } else {
+      console.log(`✅ Partners Table: ${partnersCount} hotels with R2 photos`);
+    }
+  } catch (error) {
+    console.error('❌ Failed to load Partners table:', error);
+  }
+
+  // ========================================
+  // TABLE 2: Giata Partners (with Cloudflare photos)
+  // ========================================
+  try {
+    const giataResponse = await giataPartnersApi.listPartners({
+      page: 1,
+      per_page: 100,
+      partner_status: 'candidate' // Using candidate status as they have photos
+    });
+
+    console.log(`📦 Giata Table: Found ${giataResponse.partners.length} partners`);
+    
+    let giataWithPhotos = 0;
+    for (const partner of giataResponse.partners) {
+      // SKIP giata partners without selected photos
+      if (!partner.has_selected_photos || !partner.giata_id) {
+        continue;
+      }
+
+      try {
+        const photosData = await giataPartnersApi.getSelectedPhotos(partner.giata_id);
+        
+        // SKIP if no photos returned
+        if (photosData.photos.length === 0) {
+          continue;
+        }
+
+        const photos = photosData.photos.map(p => p.cloudflare_public_url);
+        const heroPhotoData = photosData.photos.find(p => p.is_hero);
+        const heroPhoto = heroPhotoData?.cloudflare_public_url || photos[0];
+
+        allHotels.push({
+          id: `giata-${partner.giata_id}`,
+          source: 'giata',
+          name: partner.hotel_name,
+          city: partner.city_name || 'Unknown',
+          country: partner.country_name || 'Unknown',
+          coords: undefined, // Will be fetched on-demand from Giata table
+          description: partner.notes_internal || `${partner.hotel_name} in ${partner.city_name || partner.country_name}`,
+          amenityTags: [],
+          photos: photos,
+          heroPhoto: heroPhoto,
+          bookingUrl: partner.website || '',
+          rating: partner.rating_internal || undefined
+        });
+        giataWithPhotos++;
+      } catch (error) {
+        // Skip hotels that fail to load photos
+        console.log(`⚠️  Skipping Giata hotel ${partner.giata_id} - photo fetch failed`);
+      }
+    }
+    console.log(`✅ Giata Table: ${giataWithPhotos} hotels with photos`);
+  } catch (error) {
+    console.error('❌ Failed to load Giata table:', error);
+  }
+
+  // Cache the results
+  unifiedHotelsCache = allHotels;
+  unifiedCacheTime = now;
+  
+  console.log(`🎉 Unified Cache Ready: ${allHotels.length} total hotels`);
+  console.log(`   📊 Partners: ${allHotels.filter(h => h.source === 'partners').length}`);
+  console.log(`   📊 Giata: ${allHotels.filter(h => h.source === 'giata').length}`);
+  
+  return allHotels;
+}
+
+// Get hotels from BOTH tables - OPTIMIZED with unified cache
 app.get('/api/hotels/partners', async (req, res) => {
   try {
     const {
       page = 1,
       per_page = 20,
-      status = 'active',
-      country_code,
-      include_photos = 'true'
     } = req.query;
 
     const pageNum = parseInt(page as string);
     const perPageNum = parseInt(per_page as string);
-    const includePhotos = include_photos === 'true';
 
-    const now = Date.now();
+    // Get cached hotels (instant if already cached)
+    const allHotels = await loadUnifiedHotelsCache();
     
-    // Use cached partners if fresh (massive speed improvement)
-    let partnersResponse;
-    if (partnersCache && (now - partnersCacheTime) < PARTNERS_CACHE_DURATION) {
-      console.log('⚡ Using cached partners data');
-      partnersResponse = partnersCache;
-    } else {
-      console.log('🔄 Fetching fresh partners data...');
-      partnersResponse = await partnersApi.listPartners({
-        page: 1,
-        per_page: 100, // Get all partners at once for caching
-        status: 'active'
-      });
-      partnersCache = partnersResponse;
-      partnersCacheTime = now;
-      console.log(`✅ Cached ${partnersResponse.partners.length} partners`);
-    }
-    
-    // Apply pagination from cache
+    // Apply pagination
     const startIdx = (pageNum - 1) * perPageNum;
-    const paginatedPartners = {
-      ...partnersResponse,
-      partners: partnersResponse.partners.slice(startIdx, startIdx + perPageNum)
-    };
+    const paginatedHotels = allHotels.slice(startIdx, startIdx + perPageNum);
 
-    // Convert partners to hotel cards and fetch photos
-    const hotels: HotelCard[] = [];
+    console.log(`⚡ Serving ${paginatedHotels.length} hotels (page ${pageNum})`);
 
-    // Import R2 photo mapping service (cached in memory)
-    const { getPartnerR2Photos } = require('./services/r2PhotoMapping');
-    
-    // PERFORMANCE: Process partners synchronously (R2 mapping is cached, no async needed)
-    // Images are now compressed (~150KB each), so we can show ALL photos!
-    // No limit needed - even 50 photos = 7.5MB (totally reasonable)
-    
-    const hotelPromises = paginatedPartners.partners.map((partner: any) => {
-      let photos: string[] = [];
-      
-      if (includePhotos) {
-        // R2 photos only (no Dropbox fallback - too slow)
-        const r2Photos = getPartnerR2Photos(partner.id);
-        if (r2Photos.length > 0) {
-          // Show ALL photos - no limit! Images are optimized (~150KB each)
-          photos = r2Photos;
-        }
-      }
-
-      // Use location_label or construct from city/country
-      const location = partner.location_label || 
-        (partner.city && partner.country_code 
-          ? `${partner.city}, ${partner.country_code}` 
-          : partner.country_code || 'Unknown');
-
-      // Split location into city and country
-      const locationParts = location.split(',').map((s: string) => s.trim());
-      const city = partner.city || locationParts[0] || '';
-      const country = partner.country_code || locationParts[1] || location || '';
-
-      // Use website as booking URL
-      const bookingUrl = partner.website || 
-        `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(partner.hotel_name)}`;
-
-      // Use tags as amenity tags
-      const amenityTags = partner.tags || [];
-
-      // Set hero photo (first photo or empty)
-      const heroPhoto = photos.length > 0 ? photos[0] : '';
-
-      return {
-        id: partner.id,
-        name: partner.hotel_name,
-        city,
-        country,
-        address: location,
-        coords: partner.lat && partner.lng ? {
-          lat: partner.lat,
-          lng: partner.lng
-        } : undefined,
-        description: partner.notes || `${partner.hotel_name} - ${location}`,
-        amenityTags,
-        photos,
-        heroPhoto,
-        bookingUrl,
-        rating: undefined
-      };
-    });
-
-    const hotelCards = await Promise.all(hotelPromises);
-
-    // ADD GIATA PARTNERS (Second Database)
-    try {
-      console.log('🔄 Adding Giata partners to the mix...');
-      const giataResponse = await giataPartnersApi.listPartners({
-        page: pageNum,
-        per_page: Math.max(5, Math.floor(perPageNum / 3)), // Get some Giata hotels
-        partner_status: 'candidate' // Include candidates since no approved yet
-      });
-
-      console.log(`✅ Found ${giataResponse.partners.length} Giata partners`);
-
-      // Convert Giata partners to HotelCard format
-      for (const partner of giataResponse.partners) {
-        let photos: string[] = [];
-        let heroPhoto = '';
-
-        if (includePhotos && partner.has_selected_photos && partner.giata_id) {
-          try {
-            const photosData = await giataPartnersApi.getSelectedPhotos(partner.giata_id);
-            photos = photosData.photos.map(p => p.cloudflare_public_url);
-            const heroPhotoData = photosData.photos.find(p => p.is_hero);
-            heroPhoto = heroPhotoData?.cloudflare_public_url || photos[0] || '';
-          } catch (error) {
-            console.log(`No photos for Giata hotel ${partner.giata_id}`);
-          }
-        }
-
-        hotelCards.push({
-          id: `giata-${partner.giata_id}`,
-          name: partner.hotel_name,
-          city: partner.city_name || 'Unknown',
-          country: partner.country_name || 'Unknown',
-          coords: undefined,
-          price: undefined,
-          description: partner.notes_internal || `${partner.hotel_name} in ${partner.city_name || partner.country_name}`,
-          amenityTags: [],
-          photos: photos,
-          heroPhoto: heroPhoto || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920',
-          bookingUrl: partner.website || '',
-          rating: partner.rating_internal || undefined
-        });
-      }
-
-      console.log(`✅ Total hotels (Partners + Giata): ${hotelCards.length}`);
-    } catch (error) {
-      console.error('⚠️  Failed to fetch Giata partners:', error);
-      // Continue without Giata hotels - graceful degradation
-    }
+    // Remove 'source' field from response (internal use only)
+    const hotelCards: HotelCard[] = paginatedHotels.map(({ source, ...hotel }) => hotel);
 
     res.json({
       hotels: hotelCards,
-      total: partnersResponse.total,
-      hasMore: partnersResponse.page < partnersResponse.total_pages
+      total: allHotels.length,
+      page: pageNum,
+      per_page: perPageNum,
+      hasMore: startIdx + perPageNum < allHotels.length,
+      sources: {
+        partners: allHotels.filter(h => h.source === 'partners').length,
+        giata: allHotels.filter(h => h.source === 'giata').length
+      }
     });
   } catch (error) {
     console.error('Failed to fetch partners hotels:', error);
@@ -3270,6 +3317,17 @@ app.listen(port, () => {
     console.log('⚠️  DATABASE STATUS: Could not check status');
     console.log('');
   });
+
+  // Pre-warm the unified hotels cache for instant access
+  setTimeout(async () => {
+    try {
+      console.log('🔄 Pre-warming hotels cache for instant access...');
+      await loadUnifiedHotelsCache();
+      console.log('✅ Hotels cache ready - all requests will be instant!');
+    } catch (error) {
+      console.error('⚠️  Failed to pre-warm cache:', error);
+    }
+  }, 2000); // Wait 2 seconds for services to initialize
 });
 
 export default app;

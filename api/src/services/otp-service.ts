@@ -25,7 +25,8 @@ export class OTPService {
   private readonly CODE_LENGTH = 6;
   private readonly CODE_EXPIRY_MINUTES = 10;
   private readonly MAX_ATTEMPTS = 5;
-  private readonly MAX_CODES_PER_EMAIL_PER_HOUR = 20; // Increased for development (was 3)
+  private readonly MAX_CODES_PER_EMAIL_PER_HOUR = 5; // Production-ready rate limit
+  private readonly MIN_SECONDS_BETWEEN_REQUESTS = 60; // Minimum 60 seconds between OTP requests
 
   /**
    * Generate a cryptographically secure random 6-digit OTP code
@@ -39,31 +40,78 @@ export class OTPService {
 
   /**
    * Create and store a new OTP code for an email address
-   * Includes rate limiting to prevent abuse
+   * Includes rate limiting to prevent abuse (disabled in development)
    */
-  async createOTP(email: string): Promise<{ success: boolean; message?: string; error?: string; code?: string }> {
+  async createOTP(email: string): Promise<{ success: boolean; message?: string; error?: string; code?: string; waitSeconds?: number }> {
     try {
       console.log('📧 Creating OTP for email:', email);
 
-      // Check rate limiting: max 3 codes per hour per email
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-      const { data: recentCodes, error: countError } = await supabase
-        .from('otp_codes')
-        .select('id')
-        .eq('email', email)
-        .gte('created_at', oneHourAgo);
-
-      if (countError) {
-        console.error('❌ Error checking rate limit:', countError);
-        throw countError;
+      // Skip rate limiting in development mode
+      const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+      
+      console.log('🔍 OTP Service - Environment check:');
+      console.log('   NODE_ENV:', process.env.NODE_ENV || '(not set)');
+      console.log('   isDevelopment:', isDevelopment);
+      
+      if (isDevelopment) {
+        console.log('🔓 Development mode: OTP rate limiting DISABLED - skipping all checks');
+      } else {
+        console.log('🔒 Production mode: OTP rate limiting ENABLED');
       }
+      
+      if (!isDevelopment) {
+        // PRODUCTION: Check minimum time between requests (last request within 60 seconds)
+        const minSecondsAgo = new Date(Date.now() - this.MIN_SECONDS_BETWEEN_REQUESTS * 1000).toISOString();
+        const { data: veryRecentCodes, error: recentError } = await supabase
+          .from('otp_codes')
+          .select('created_at')
+          .eq('email', email.toLowerCase())
+          .gte('created_at', minSecondsAgo)
+          .order('created_at', { ascending: false })
+          .limit(1);
 
-      if (recentCodes && recentCodes.length >= this.MAX_CODES_PER_EMAIL_PER_HOUR) {
-        console.warn('⚠️  Rate limit exceeded for email:', email);
-        return {
-          success: false,
-          error: 'Too many OTP requests. Please try again in an hour.'
-        };
+        if (recentError) {
+          console.error('❌ Error checking recent requests:', recentError);
+          throw recentError;
+        }
+
+        if (veryRecentCodes && veryRecentCodes.length > 0) {
+          const lastRequest = new Date(veryRecentCodes[0].created_at);
+          const timeSinceLastRequest = Math.floor((Date.now() - lastRequest.getTime()) / 1000);
+          const waitSeconds = this.MIN_SECONDS_BETWEEN_REQUESTS - timeSinceLastRequest;
+          
+          console.warn('⚠️  Too soon to request another code for email:', email);
+          console.warn('⚠️  Wait', waitSeconds, 'more seconds');
+          
+          return {
+            success: false,
+            error: `Please wait ${waitSeconds} seconds before requesting another code.`,
+            waitSeconds
+          };
+        }
+
+        // PRODUCTION: Check hourly rate limiting
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const { data: recentCodes, error: countError } = await supabase
+          .from('otp_codes')
+          .select('id')
+          .eq('email', email.toLowerCase())
+          .gte('created_at', oneHourAgo);
+
+        if (countError) {
+          console.error('❌ Error checking rate limit:', countError);
+          throw countError;
+        }
+
+        if (recentCodes && recentCodes.length >= this.MAX_CODES_PER_EMAIL_PER_HOUR) {
+          console.warn('⚠️  Hourly rate limit exceeded for email:', email);
+          return {
+            success: false,
+            error: 'Too many OTP requests. Please try again in an hour.'
+          };
+        }
+      } else {
+        console.log('🔓 Development mode: Rate limiting disabled');
       }
 
       // Invalidate any existing active codes for this email

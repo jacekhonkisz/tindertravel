@@ -41,6 +41,8 @@ const AuthScreen: React.FC = () => {
   const [bgData, setBgData] = useState<BgRotationResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [isResending, setIsResending] = useState(false);
+  const [rateLimitCooldown, setRateLimitCooldown] = useState<number>(0);
+  const lastRequestTime = useRef<number>(0);
 
   // Animations
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -77,8 +79,30 @@ const AuthScreen: React.FC = () => {
       }
     };
     
+    // Check for persisted cooldown on mount
+    const checkPersistedCooldown = async () => {
+      try {
+        const cooldownData = await AsyncStorage.getItem('@glintz_otp_cooldown');
+        if (cooldownData) {
+          const { expiresAt } = JSON.parse(cooldownData);
+          const remainingSeconds = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
+          if (remainingSeconds > 0) {
+            console.log('⏱️  Restoring cooldown:', remainingSeconds, 'seconds');
+            setRateLimitCooldown(remainingSeconds);
+            startCooldownTimer(remainingSeconds);
+          } else {
+            // Cooldown expired, remove it
+            await AsyncStorage.removeItem('@glintz_otp_cooldown');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load persisted cooldown:', error);
+      }
+    };
+    
     // Start loading immediately but don't wait
     loadBackground();
+    checkPersistedCooldown();
   }, []);
 
   // Animate step transitions
@@ -121,6 +145,30 @@ const AuthScreen: React.FC = () => {
 
   // Handle continue from email
   const handleContinue = async () => {
+    // Client-side rate limiting: prevent rapid-fire requests (disabled in dev)
+    const isDevelopment = __DEV__;
+    
+    if (!isDevelopment) {
+      const now = Date.now();
+      const timeSinceLastRequest = (now - lastRequestTime.current) / 1000;
+      if (timeSinceLastRequest < 3) {
+        console.log('⚠️  Client-side rate limit: Too soon since last request');
+        return;
+      }
+      lastRequestTime.current = now;
+    } else {
+      console.log('🔓 Development mode: Client-side rate limiting disabled');
+    }
+    
+    // Check if still in cooldown (still enforced even in dev if backend returns it)
+    if (rateLimitCooldown > 0) {
+      Alert.alert(
+        'Please Wait',
+        `Please wait ${rateLimitCooldown} seconds before requesting another code.`
+      );
+      return;
+    }
+
     if (!email || email.trim() === '') {
       Alert.alert('Error', 'Please enter your email');
       return;
@@ -134,6 +182,9 @@ const AuthScreen: React.FC = () => {
     }
 
     try {
+      if (!isDevelopment) {
+        lastRequestTime.current = Date.now();
+      }
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
       // Request OTP from backend
@@ -142,12 +193,54 @@ const AuthScreen: React.FC = () => {
       if (response.success) {
         animateTransition(() => setStep('otp'));
       } else {
-        Alert.alert('Error', response.error || 'Failed to send OTP code');
+        // Check for rate limit error with waitSeconds
+        if (response.error?.toLowerCase().includes('wait') || response.error?.toLowerCase().includes('too many')) {
+          const cooldownSeconds = response.waitSeconds || 60;
+          setRateLimitCooldown(cooldownSeconds);
+          startCooldownTimer(cooldownSeconds);
+          Alert.alert(
+            'Too Many Requests',
+            response.error || `Please wait ${cooldownSeconds} seconds before requesting another code.`
+          );
+        } else {
+          Alert.alert('Error', response.error || 'Failed to send OTP code');
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to request OTP:', error);
-      Alert.alert('Error', 'Failed to send OTP code. Please try again.');
+      
+      // Check if it's a rate limit error (HTTP 429)
+      if (error?.response?.status === 429 || error?.message?.includes('429') || error?.status === 429) {
+        const cooldownSeconds = error?.waitSeconds || 60;
+        setRateLimitCooldown(cooldownSeconds);
+        startCooldownTimer(cooldownSeconds);
+        Alert.alert(
+          'Too Many Requests',
+          `Please wait ${cooldownSeconds} seconds before trying again.`
+        );
+      } else {
+        Alert.alert('Error', 'Failed to send OTP code. Please try again.');
+      }
     }
+  };
+
+  // Cooldown timer for rate limiting
+  const startCooldownTimer = (seconds: number) => {
+    // Persist cooldown to AsyncStorage
+    const expiresAt = Date.now() + (seconds * 1000);
+    AsyncStorage.setItem('@glintz_otp_cooldown', JSON.stringify({ expiresAt })).catch(console.error);
+    
+    const interval = setInterval(() => {
+      setRateLimitCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          // Remove persisted cooldown when it expires
+          AsyncStorage.removeItem('@glintz_otp_cooldown').catch(console.error);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   // Handle OTP entry
@@ -236,8 +329,35 @@ const AuthScreen: React.FC = () => {
   // Handle resend OTP
   const handleResendOTP = async () => {
     if (isResending) return;
+    
+    // Client-side rate limiting: prevent rapid-fire requests (disabled in dev)
+    const isDevelopment = __DEV__;
+    
+    if (!isDevelopment) {
+      const now = Date.now();
+      const timeSinceLastRequest = (now - lastRequestTime.current) / 1000;
+      if (timeSinceLastRequest < 3) {
+        console.log('⚠️  Client-side rate limit: Too soon since last request');
+        return;
+      }
+      lastRequestTime.current = now;
+    } else {
+      console.log('🔓 Development mode: Client-side rate limiting disabled');
+    }
+    
+    // Check if still in cooldown (still enforced even in dev if backend returns it)
+    if (rateLimitCooldown > 0) {
+      Alert.alert(
+        'Please Wait',
+        `Please wait ${rateLimitCooldown} seconds before requesting another code.`
+      );
+      return;
+    }
 
     try {
+      if (!isDevelopment) {
+        lastRequestTime.current = Date.now();
+      }
       setIsResending(true);
       console.log('📧 Resending OTP to:', email);
 
@@ -246,8 +366,19 @@ const AuthScreen: React.FC = () => {
       if (response.success) {
         Alert.alert('Code Sent', 'A new verification code has been sent to your email.');
         setOtp(''); // Clear current OTP
+        // Start cooldown to prevent rapid resends
+        setRateLimitCooldown(60);
+        startCooldownTimer(60);
       } else {
-        Alert.alert('Error', response.error || 'Failed to resend code');
+        // Handle rate limiting
+        if (response.error?.toLowerCase().includes('wait') || response.error?.toLowerCase().includes('too many')) {
+          const cooldownSeconds = response.waitSeconds || 60;
+          setRateLimitCooldown(cooldownSeconds);
+          startCooldownTimer(cooldownSeconds);
+          Alert.alert('Too Many Requests', response.error);
+        } else {
+          Alert.alert('Error', response.error || 'Failed to resend code');
+        }
       }
     } catch (error) {
       console.error('Failed to resend OTP:', error);
@@ -447,13 +578,19 @@ const AuthScreen: React.FC = () => {
 
                     <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
                       <TouchableOpacity
-                        style={dynamicStyles.primaryButton}
+                        style={[
+                          dynamicStyles.primaryButton,
+                          rateLimitCooldown > 0 && { opacity: 0.5 }
+                        ]}
                         onPress={handleContinue}
                         onPressIn={handleButtonPressIn}
                         onPressOut={handleButtonPressOut}
                         activeOpacity={0.9}
+                        disabled={rateLimitCooldown > 0}
                       >
-                        <Text style={dynamicStyles.buttonText}>Continue</Text>
+                        <Text style={dynamicStyles.buttonText}>
+                          {rateLimitCooldown > 0 ? `Wait ${rateLimitCooldown}s` : 'Continue'}
+                        </Text>
                       </TouchableOpacity>
                     </Animated.View>
                   </View>
@@ -489,10 +626,17 @@ const AuthScreen: React.FC = () => {
                       style={styles.resendLink}
                       onPress={handleResendOTP}
                       activeOpacity={0.7}
-                      disabled={isResending}
+                      disabled={isResending || rateLimitCooldown > 0}
                     >
-                      <Text style={[dynamicStyles.resendLinkText, isResending && dynamicStyles.resendLinkDisabled]}>
-                        {isResending ? 'Sending...' : "Didn't get the code? Resend"}
+                      <Text style={[
+                        dynamicStyles.resendLinkText, 
+                        (isResending || rateLimitCooldown > 0) && dynamicStyles.resendLinkDisabled
+                      ]}>
+                        {rateLimitCooldown > 0 
+                          ? `Wait ${rateLimitCooldown}s to resend` 
+                          : isResending 
+                            ? 'Sending...' 
+                            : "Didn't get the code? Resend"}
                       </Text>
                     </TouchableOpacity>
 

@@ -18,6 +18,16 @@ import IOSHaptics from '../utils/IOSHaptics';
 import { useTheme } from '../theme';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Helper function to convert hex color to rgba with opacity
+const hexToRgba = (hex: string, opacity: number): string => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return hex;
+  const r = parseInt(result[1], 16);
+  const g = parseInt(result[2], 16);
+  const b = parseInt(result[3], 16);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+};
 const SWIPE_THRESHOLD = 60; // Further reduced for easier swipe detection
 const SWIPE_OUT_DURATION = 220; // Faster, smoother swipe (was 250ms)
 const DETAILS_ANIMATION_DURATION = 280; // Snappier details animation (was 300ms)
@@ -353,6 +363,39 @@ const panResponder = PanResponder.create({
     });
   };
 
+  // Get overlay opacity for each swipe direction
+  const getLikeOverlayOpacity = () => {
+    return position.x.interpolate({
+      inputRange: [0, SWIPE_THRESHOLD],
+      outputRange: [0, 0.3], // Increased from 0.15 to 0.3
+      extrapolate: 'clamp',
+    });
+  };
+
+  const getDislikeOverlayOpacity = () => {
+    return position.x.interpolate({
+      inputRange: [-SWIPE_THRESHOLD, 0],
+      outputRange: [0.3, 0], // Increased from 0.15 to 0.3
+      extrapolate: 'clamp',
+    });
+  };
+
+  const getSuperlikeOverlayOpacity = () => {
+    return position.y.interpolate({
+      inputRange: [0, SWIPE_THRESHOLD],
+      outputRange: [0, 0.3], // Increased from 0.15 to 0.3
+      extrapolate: 'clamp',
+    });
+  };
+
+  const getDetailsOverlayOpacity = () => {
+    return position.y.interpolate({
+      inputRange: [-SWIPE_THRESHOLD, -20, 0],
+      outputRange: [0.25, 0.1, 0], // Increased from 0.12 to 0.25
+      extrapolate: 'clamp',
+    });
+  };
+
   const renderCard = (hotel: HotelCard, index: number) => {
     const isCurrentCard = index === currentIndex;
     const isNextCard = index === currentIndex + 1;
@@ -420,51 +463,128 @@ const panResponder = PanResponder.create({
           onPress={undefined} // Explicitly no tap handler - swipe up is the only way to open details
         />
         
+        {/* Color overlays - show subtle color tint during swiping */}
+        {isCurrentCard && isActivelyGesturing && (
+          <>
+            {/* Like overlay (swipe right) - Terracotta */}
+            <Animated.View
+              style={[
+                styles.swipeOverlay,
+                {
+                  backgroundColor: '#9D5049', // Terracotta
+                  opacity: getLikeOverlayOpacity(),
+                },
+              ]}
+              pointerEvents="none"
+            />
+            
+            {/* Pass overlay (swipe left) - Navy Blue */}
+            <Animated.View
+              style={[
+                styles.swipeOverlay,
+                {
+                  backgroundColor: '#10233B', // Navy Blue
+                  opacity: getDislikeOverlayOpacity(),
+                },
+              ]}
+              pointerEvents="none"
+            />
+            
+            {/* Superlike overlay (swipe down) - Coastal Blue */}
+            <Animated.View
+              style={[
+                styles.swipeOverlay,
+                {
+                  backgroundColor: '#A1BAC7', // Coastal Blue
+                  opacity: getSuperlikeOverlayOpacity(),
+                },
+              ]}
+              pointerEvents="none"
+            />
+            
+            {/* Details overlay (swipe up) - Beige */}
+            <Animated.View
+              style={[
+                styles.swipeOverlay,
+                {
+                  backgroundColor: '#E5DED5', // Beige
+                  opacity: getDetailsOverlayOpacity(),
+                },
+              ]}
+              pointerEvents="none"
+            />
+          </>
+        )}
+        
         {/* Swipe indicators - only show on current card during active gesture */}
         {isCurrentCard && isActivelyGesturing && (
           <>
-            {/* Like indicator */}
+            {/* Like indicator (swipe right) - Terracotta */}
             <Animated.View
               style={[
                 styles.swipeIndicator,
-                styles.likeIndicator,
-                { opacity: getLikeOpacity() },
+                {
+                  top: '45%',
+                  right: '30%',
+                  borderColor: '#9D5049', // Terracotta
+                  backgroundColor: hexToRgba('#9D5049', 0.3),
+                  transform: [{ rotate: '15deg' }],
+                  opacity: getLikeOpacity(),
+                },
               ]}
             >
               <Text style={styles.indicatorText}>LIKE</Text>
             </Animated.View>
 
-            {/* Dislike indicator */}
+            {/* Pass indicator (swipe left) - Navy Blue */}
             <Animated.View
               style={[
                 styles.swipeIndicator,
-                styles.dislikeIndicator,
-                { opacity: getDislikeOpacity() },
+                {
+                  top: '45%',
+                  left: '30%',
+                  borderColor: '#10233B', // Navy Blue
+                  backgroundColor: hexToRgba('#10233B', 0.3),
+                  transform: [{ rotate: '-15deg' }],
+                  opacity: getDislikeOpacity(),
+                },
               ]}
             >
               <Text style={styles.indicatorText}>PASS</Text>
             </Animated.View>
 
-            {/* Superlike indicator */}
+            {/* Superlike indicator (swipe down) - Coastal Blue */}
             <Animated.View
               style={[
                 styles.swipeIndicator,
-                styles.superlikeIndicator,
-                { opacity: getSuperlikeOpacity() },
+                {
+                  top: '50%',
+                  alignSelf: 'center',
+                  borderColor: '#A1BAC7', // Coastal Blue
+                  backgroundColor: hexToRgba('#A1BAC7', 0.3),
+                  paddingHorizontal: 24,
+                  opacity: getSuperlikeOpacity(),
+                },
               ]}
             >
               <Text style={styles.indicatorText}>SUPER LIKE</Text>
             </Animated.View>
 
-            {/* Details indicator */}
+            {/* Details indicator (swipe up) - Beige */}
             <Animated.View
               style={[
                 styles.swipeIndicator,
-                styles.detailsIndicator,
-                { opacity: getDetailsOpacity() },
+                {
+                  top: '40%',
+                  alignSelf: 'center',
+                  borderColor: '#E5DED5', // Beige
+                  backgroundColor: hexToRgba('#E5DED5', 0.4), // Slightly more opacity for visibility
+                  paddingHorizontal: 20,
+                  opacity: getDetailsOpacity(),
+                },
               ]}
             >
-              <Text style={styles.indicatorText}>DETAILS</Text>
+              <Text style={[styles.indicatorText, { color: '#10233B' }]}>DETAILS</Text>
             </Animated.View>
           </>
         )}
@@ -549,6 +669,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+  swipeOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 0,
+  },
   swipeIndicator: {
     position: 'absolute',
     padding: 20,
@@ -563,42 +691,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 10,
   },
-  likeIndicator: {
-    top: '45%', // Centered vertically
-    right: '30%', // More toward center
-    borderColor: 'rgba(76, 175, 80, 1)',
-    backgroundColor: 'rgba(76, 175, 80, 0.3)',
-    transform: [{ rotate: '15deg' }],
-  },
-  dislikeIndicator: {
-    top: '45%', // Centered vertically
-    left: '30%', // More toward center
-    borderColor: 'rgba(244, 67, 54, 1)',
-    backgroundColor: 'rgba(244, 67, 54, 0.3)',
-    transform: [{ rotate: '-15deg' }],
-  },
-  superlikeIndicator: {
-    top: '50%', // Centered vertically
-    alignSelf: 'center',
-    borderColor: 'rgba(33, 150, 243, 1)',
-    backgroundColor: 'rgba(33, 150, 243, 0.3)',
-    paddingHorizontal: 24,
-  },
-  detailsIndicator: {
-    top: '40%', // Centered vertically
-    alignSelf: 'center',
-    borderColor: 'rgba(255, 152, 0, 1)',
-    backgroundColor: 'rgba(255, 152, 0, 0.3)',
-    paddingHorizontal: 20,
-  },
   indicatorText: {
-    color: '#fff',
+    color: '#FFFFFF', // White text for contrast on colored backgrounds (except beige)
     fontWeight: '800',
-    fontSize: 28,
-    letterSpacing: 2,
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 5,
+    fontSize: 38, // Increased from 28 to 38
+    letterSpacing: 2.5, // Slightly increased letter spacing for larger text
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 4,
   },
 
 });

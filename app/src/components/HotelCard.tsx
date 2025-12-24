@@ -5,18 +5,78 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Image as RNImage,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { HotelCard as HotelCardType, RootStackParamList } from '../types';
 import IOSHaptics from '../utils/IOSHaptics';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../ui/Icon';
 import { useTheme } from '../theme';
 import { GradientOverlay } from '../ui';
 import { getImageSource } from '../utils/imageUtils';
 import { useAppStore } from '../store';
+import { usePhotoViewMode } from '../hooks/usePhotoViewMode';
+import { cycleViewMode, getModeDisplayName } from '../utils/photoStyleComputer';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// BALANCED mode parameters (from photo view system spec)
+const BALANCED_PARAMS = {
+  DEFAULT_M_TARGET: 1.45,
+  DEFAULT_M_MIN: 1.35,
+  MAX_CROP: 0.35,
+  get DEFAULT_M_MAX() {
+    return 1 / (1 - this.MAX_CROP); // ≈ 1.538
+  },
+  EXTREME_PANORAMA_RATIO: 1.9,
+  PANORAMA_M_TARGET: 1.35,
+  PANORAMA_M_MAX: 1.40,
+};
+
+/**
+ * Compute balanced scale using bounded fill algorithm
+ * This is the sweet spot between cover and contain
+ */
+const computeBalancedScale = (
+  imageWidth: number,
+  imageHeight: number,
+  viewportWidth: number,
+  viewportHeight: number
+): number => {
+  if (!imageWidth || !imageHeight || !viewportWidth || !viewportHeight) {
+    return 1; // Fallback to no scaling
+  }
+
+  const aspectRatio = imageWidth / imageHeight;
+  
+  // Base scales
+  const scaleContain = Math.min(viewportWidth / imageWidth, viewportHeight / imageHeight);
+  const scaleCover = Math.max(viewportWidth / imageWidth, viewportHeight / imageHeight);
+
+  // Determine multiplier based on aspect ratio
+  let mTarget: number;
+  let mMax: number;
+
+  if (aspectRatio >= BALANCED_PARAMS.EXTREME_PANORAMA_RATIO) {
+    // Extreme panoramas: more conservative
+    mTarget = BALANCED_PARAMS.PANORAMA_M_TARGET;
+    mMax = BALANCED_PARAMS.PANORAMA_M_MAX;
+  } else {
+    // Standard images
+    mTarget = BALANCED_PARAMS.DEFAULT_M_TARGET;
+    mMax = BALANCED_PARAMS.DEFAULT_M_MAX;
+  }
+
+  // Clamp m to [mMin, mMax]
+  const m = Math.min(Math.max(mTarget, BALANCED_PARAMS.DEFAULT_M_MIN), mMax);
+
+  // Compute balanced scale
+  const scaleBalanced = Math.min(scaleCover, scaleContain * m);
+
+  return scaleBalanced;
+};
 
 interface HotelCardProps {
   hotel: HotelCardType;
@@ -25,11 +85,21 @@ interface HotelCardProps {
 
 const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, navigation }) => {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
+  
   // Use selectors to prevent unnecessary re-renders - only re-render when THIS hotel's saved status changes
   const saveHotel = useAppStore((state) => state.saveHotel);
   const isSaved = useAppStore((state) => state.savedHotels.liked.some(h => h.id === hotel.id));
   const isSuperliked = useAppStore((state) => state.savedHotels.superliked.some(h => h.id === hotel.id));
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [imageDimensions, setImageDimensions] = useState<{width: number; height: number} | null>(null);
+  
+  // Photo view mode
+  const { viewMode, setViewMode } = usePhotoViewMode();
+
+  // Compute photo viewport (68% of screen height minus safe area top)
+  const photoViewportHeight = SCREEN_HEIGHT * 0.68 - insets.top;
+  const photoViewportWidth = SCREEN_WIDTH;
 
   const photos = useMemo(() => 
     hotel.photos && hotel.photos.length > 0 ? hotel.photos : [hotel.heroPhoto], 
@@ -38,7 +108,7 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, navigation }) => {
   
   const totalPhotos = useMemo(() => photos.length, [photos.length]);
 
-  // Preload ALL photos in background - no dimension fetching needed (always full screen)
+  // Preload ALL photos in background and fetch dimensions for BALANCED mode
   useEffect(() => {
     if (!photos || photos.length === 0) return;
     
@@ -48,7 +118,23 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, navigation }) => {
         Image.prefetch(photo).catch(() => {});
       }
     });
-  }, [photos]);
+
+    // Fetch current image dimensions for BALANCED mode calculation
+    const currentPhoto = photos[currentPhotoIndex];
+    if (currentPhoto && currentPhoto.length > 0) {
+      RNImage.getSize(
+        currentPhoto,
+        (width, height) => {
+          setImageDimensions({ width, height });
+        },
+        (error) => {
+          console.log('Could not get image size:', error);
+          // Fallback to common hotel photo dimensions
+          setImageDimensions({ width: 1920, height: 1080 });
+        }
+      );
+    }
+  }, [photos, currentPhotoIndex]);
 
 
   const formatPrice = (price?: { amount: string; currency: string }) => {
@@ -91,13 +177,71 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, navigation }) => {
     saveHotel(hotel, 'like');
   }, [hotel, saveHotel]);
 
+  const handleModeToggle = useCallback(() => {
+    IOSHaptics.buttonPress();
+    const nextMode = cycleViewMode(viewMode);
+    setViewMode(nextMode);
+  }, [viewMode, setViewMode]);
+
   // Get image source with fallback
   const currentPhoto = photos[currentPhotoIndex];
   const imageSource = currentPhoto ? getImageSource(currentPhoto) : null;
   const hasValidImage = imageSource && imageSource.uri && imageSource.uri.length > 0;
 
-  // SIMPLIFIED: Always use full screen - no dimension calculations = no flickering
-  // All photos fill the entire screen with 'cover' mode for maximum smoothness
+  // Compute proper rendering based on view mode
+  const renderingConfig = useMemo(() => {
+    if (viewMode === 'FULL_VERTICAL_SCREEN') {
+      // FULL: cover mode, fills entire viewport
+      return {
+        contentFit: 'cover' as const,
+        style: {},
+      };
+    }
+
+    if (viewMode === 'ORIGINAL_FULL') {
+      // FIT: contain mode, shows complete image
+      return {
+        contentFit: 'contain' as const,
+        style: {},
+      };
+    }
+
+    // BALANCED: Use bounded fill algorithm
+    if (imageDimensions) {
+      const { width: imgW, height: imgH } = imageDimensions;
+      
+      // Calculate base scales
+      const scaleContain = Math.min(photoViewportWidth / imgW, photoViewportHeight / imgH);
+      const scaleCover = Math.max(photoViewportWidth / imgW, photoViewportHeight / imgH);
+      
+      // Get balanced scale from algorithm (this is the scale we want the image to be)
+      const balancedScale = computeBalancedScale(
+        imgW,
+        imgH,
+        photoViewportWidth,
+        photoViewportHeight
+      );
+
+      // For BALANCED mode: use contain as base, then scale UP to show more than contain
+      // balancedScale is between scaleContain and scaleCover
+      // finalScale = balancedScale / scaleContain (will be > 1.0, showing less letterboxing)
+      // This scales up from contain mode, which naturally shows the full image
+      const finalScale = balancedScale / scaleContain;
+
+      return {
+        contentFit: 'contain' as const,
+        style: {
+          transform: [{ scale: finalScale }],
+        },
+      };
+    }
+
+    // Fallback if dimensions not loaded yet
+    return {
+      contentFit: 'contain' as const,
+      style: { transform: [{ scale: 1.15 }] }, // Temporary fallback - slight zoom from contain
+    };
+  }, [viewMode, imageDimensions, photoViewportWidth, photoViewportHeight]);
 
   // Memoize dynamic styles to prevent recreation on every render
   const dynamicStyles = useMemo(() => StyleSheet.create({
@@ -130,12 +274,18 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Photo Carousel - OPTIMIZED: No transitions, no dimension checks = zero flicker */}
-      <View style={styles.imageContainer}>
+      {/* Photo Carousel - Uses proper bounded fill algorithm for BALANCED mode */}
+      <View style={[
+        styles.imageContainer,
+        (viewMode === 'ORIGINAL_FULL' || viewMode === 'BALANCED') && { backgroundColor: '#0A1929' } // Navy blue background
+      ]}>
         <Image
           source={hasValidImage ? imageSource : { uri: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920' }}
-          style={styles.heroImage}
-          contentFit="cover"
+          style={[
+            styles.heroImage,
+            renderingConfig.style
+          ]}
+          contentFit={renderingConfig.contentFit}
           transition={0}
           cachePolicy="memory-disk"
           priority="high"
@@ -207,11 +357,31 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, navigation }) => {
         accessibilityLabel={isSaved ? "Hotel already saved" : "Save hotel"}
         accessibilityRole="button"
       >
-        <Ionicons 
+        <Icon 
           name={isSaved ? "bookmark" : "bookmark-outline"} 
           size={20} 
-          color={isSaved ? theme.accent : "#fff"} 
+          variant={isSaved ? "accent" : "white"}
         />
+      </TouchableOpacity>
+
+      {/* Photo view mode toggle button - Top right, below save button */}
+      <TouchableOpacity
+        style={styles.viewModeButton}
+        onPress={handleModeToggle}
+        accessible={true}
+        accessibilityLabel={`Change photo view mode. Current: ${getModeDisplayName(viewMode)}`}
+        accessibilityRole="button"
+      >
+        <Icon 
+          name={
+            viewMode === 'FULL_VERTICAL_SCREEN' ? 'expand' : 
+            viewMode === 'ORIGINAL_FULL' ? 'contract' : 
+            'balance'
+          }
+          size={16}
+          variant="white"
+        />
+        <Text style={styles.viewModeLabel}>{getModeDisplayName(viewMode)}</Text>
       </TouchableOpacity>
 
       {/* Profile button */}
@@ -225,7 +395,7 @@ const HotelCard: React.FC<HotelCardProps> = memo(({ hotel, navigation }) => {
         accessibilityLabel="View profile and saved hotels"
         accessibilityRole="button"
       >
-        <Text style={styles.profileButtonText}>👤</Text>
+        <Icon name="person" size={20} variant="white" />
       </TouchableOpacity>
 
       {/* Photo counter - Bottom right */}
@@ -334,6 +504,33 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
   },
+  viewModeButton: {
+    position: 'absolute',
+    top: 78, // Below save button
+    right: 20,
+    backgroundColor: 'rgba(10, 25, 41, 0.7)', // Navy blue translucent
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.9)',
+    zIndex: 101,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 36,
+    height: 36,
+  },
+  viewModeLabel: {
+    fontSize: 7,
+    color: '#fff',
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
   photoCounterText: {
     color: '#fff',
     fontSize: 11,
@@ -392,10 +589,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
-  },
-  profileButtonText: {
-    color: '#fff',
-    fontSize: 16,
   },
 });
 

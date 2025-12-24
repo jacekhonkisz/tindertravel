@@ -111,7 +111,14 @@ class ApiClient {
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+        const errorMessage = errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+        
+        // Create error object with status code
+        const error: any = new Error(errorMessage);
+        error.status = response.status;
+        error.response = { status: response.status, data: errorData };
+        
+        throw error;
       }
 
       return await response.json();
@@ -182,11 +189,26 @@ class ApiClient {
   // AUTHENTICATION METHODS
 
   // Request OTP code via email
-  async requestOTP(data: OTPRequest): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/api/auth/request-otp', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+  async requestOTP(data: OTPRequest): Promise<AuthResponse & { waitSeconds?: number }> {
+    try {
+      return await this.request<AuthResponse & { waitSeconds?: number }>('/api/auth/request-otp', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch (error: any) {
+      // Better error handling for rate limiting
+      if (error.status === 429 || error.response?.status === 429) {
+        return {
+          success: false,
+          error: error.message || 'Too many requests. Please wait before trying again.',
+          waitSeconds: error.waitSeconds || 60,
+        };
+      }
+      return {
+        success: false,
+        error: error.message || 'Failed to request OTP',
+      };
+    }
   }
 
   // Verify OTP code and authenticate

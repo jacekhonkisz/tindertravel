@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import Icon from '../ui/Icon';
 
 interface PhotoSourceTagProps {
   source: string;
@@ -26,23 +27,23 @@ const PhotoSourceTag: React.FC<PhotoSourceTagProps> = ({
     }
   };
   
-  const getSourceIcon = (source: string) => {
+  const getSourceIconName = (source: string): 'camera' | 'image' | 'search' | 'help-circle' => {
     switch (source.toLowerCase()) {
       case 'google places':
       case 'unsplash_curated':
-        return '📸';
+        return 'camera';
       case 'unsplash':
-        return '🎨';
+        return 'image';
       case 'serpapi':
-        return '🔍';
+        return 'search';
       default:
-        return '❓';
+        return 'help-circle';
     }
   };
   
   return (
     <View style={[styles.container, { backgroundColor: getSourceColor(source) }]}>
-      <Text style={styles.icon}>{getSourceIcon(source)}</Text>
+      <Icon name={getSourceIconName(source)} size={12} variant="white" style={styles.icon} />
       <Text style={styles.text}>{source}</Text>
     </View>
   );
@@ -69,7 +70,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   icon: {
-    fontSize: 12,
     marginRight: 4,
   },
   text: {
